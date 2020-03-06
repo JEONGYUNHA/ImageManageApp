@@ -53,7 +53,6 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when(item?.itemId){
             R.id.action_search -> {
-                //검색 버튼 눌렀을 때
                 return super.onOptionsItemSelected(item)
             }
             else -> return super.onOptionsItemSelected(item)
