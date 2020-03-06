@@ -1,4 +1,4 @@
-package com.example.imagemanageapp.ui.send
+package com.example.imagemanageapp.ui.recommend
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,20 +10,20 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.example.imagemanageapp.R
 
-class SendFragment : Fragment() {
+class RecommendFrament : Fragment() {
 
-    private lateinit var sendViewModel: SendViewModel
+    private lateinit var recommendViewModel: RecommendViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        sendViewModel =
-            ViewModelProviders.of(this).get(SendViewModel::class.java)
-        val root = inflater.inflate(R.layout.fragment_send, container, false)
-        val textView: TextView = root.findViewById(R.id.text_send)
-        sendViewModel.text.observe(this, Observer {
+        recommendViewModel =
+            ViewModelProviders.of(this).get(RecommendViewModel::class.java)
+        val root = inflater.inflate(R.layout.fragment_recommend, container, false)
+        val textView: TextView = root.findViewById(R.id.text_recommend)
+        recommendViewModel.text.observe(this, Observer {
             textView.text = it
         })
         return root

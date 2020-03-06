@@ -1,16 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-xmlns:app="http://schemas.android.com/apk/res-auto">
-<item
-    android:id="@+id/action_settings"
-    android:orderInCategory="100"
-    android:title="@string/action_settings"
-    app:showAsAction="never" />
-<item
-    android:id="@+id/action_search"
-    android:title="search"
-    android:icon="@drawable/search"
-    app:showAsAction="always"
-    app:actionViewClass="android.widget.SearchView"/>
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:title="자동삭제"
+       app:showAsAction="always" />
+    <item
+        android:id="@+id/app_bar_switch"
+        android:title="AutoDelete"
+        app:actionLayout="@layout/switch_item"
+        app:showAsAction="always" />
 
+    <item
+        android:id="@+id/action_search"
+        android:icon="@drawable/search"
+        android:title="search"
+        app:actionViewClass="android.widget.SearchView"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="100"
+        android:title="@string/action_settings"
+        app:showAsAction="never" />
 </menu>
