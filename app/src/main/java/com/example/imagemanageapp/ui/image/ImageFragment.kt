@@ -1,4 +1,4 @@
-package com.example.imagemanageapp.ui.tools
+package com.example.imagemanageapp.ui.image
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,22 +10,22 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.example.imagemanageapp.R
 
-class ToolsFragment : Fragment() {
-
-    private lateinit var toolsViewModel: ToolsViewModel
+class ImageFragment  : Fragment(){
+    private lateinit var imageViewModel: ImageViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        toolsViewModel =
-            ViewModelProviders.of(this).get(ToolsViewModel::class.java)
-        val root = inflater.inflate(R.layout.fragment_tools, container, false)
-        val textView: TextView = root.findViewById(R.id.text_tools)
-        toolsViewModel.text.observe(this, Observer {
+        imageViewModel =
+            ViewModelProviders.of(this).get(ImageViewModel::class.java)
+        val root = inflater.inflate(R.layout.fragment_image, container, false)
+        val textView: TextView = root.findViewById(R.id.text_image)
+        imageViewModel.text.observe(this, Observer {
             textView.text = it
         })
         return root
     }
 }
+
