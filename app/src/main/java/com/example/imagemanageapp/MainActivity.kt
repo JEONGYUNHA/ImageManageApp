@@ -25,17 +25,17 @@ class MainActivity : AppCompatActivity() {
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
-        val fab: FloatingActionButton = findViewById(R.id.fab) // 아래 분홍색 메시지 버튼
+        /*val fab: FloatingActionButton = findViewById(R.id.fab) // 아래 분홍색 메시지 버튼
         fab.setOnClickListener { view ->
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show()
-        }
+        }*/
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         val navView: NavigationView = findViewById(R.id.nav_view)
         val navController = findNavController(R.id.nav_host_fragment)
         appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.nav_home, R.id.nav_image, R.id.nav_recommend,
+                R.id.nav_home, R.id.nav_image, R.id.nav_album, R.id.nav_recommend,
                 R.id.nav_mypage, R.id.nav_trash
             ), drawerLayout
         )
@@ -43,12 +43,16 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
     }
 
+    // 카테고리 생성될 때 inflate
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main, menu)
         return true
     }
+
+    // 카테고리 선택됐을 때
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when(item?.itemId){
+            // 검색
             R.id.action_search -> {
                 return super.onOptionsItemSelected(item)
             }

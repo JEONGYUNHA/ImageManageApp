@@ -16,7 +16,11 @@
         android:name="com.example.imagemanageapp.ui.image.ImageFragment"
         android:label="@string/menu_image"
         tools:layout="@layout/fragment_image" />
-
+    <fragment
+        android:id="@+id/nav_album"
+        android:name="com.example.imagemanageapp.ui.album.AlbumFragment"
+        android:label="@string/menu_album"
+        tools:layout="@layout/fragment_album" />
     <fragment
         android:id="@+id/nav_recommend"
         android:name="com.example.imagemanageapp.ui.recommend.RecommendFrament"
