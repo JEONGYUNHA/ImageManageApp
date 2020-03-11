@@ -18,4 +18,8 @@
     <string name="menu_recommend">삭제 추천</string>
     <string name="menu_mypage">마이페이지</string>
     <string name="menu_trash">휴지통</string>
+
+    <string name="tab_text_1">날짜</string>
+    <string name="tab_text_2">장소</string>
+    <string name="tab_text_3">추천 태그</string>
 </resources>
