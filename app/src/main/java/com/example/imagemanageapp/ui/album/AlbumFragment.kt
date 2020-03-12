@@ -1,4 +1,4 @@
-package com.example.imagemanageapp.ui.image
+package com.example.imagemanageapp.ui.album
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,19 +10,19 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.example.imagemanageapp.R
 
-class ImageFragment : Fragment() {
-    private lateinit var imageViewModel: ImageViewModel
+class AlbumFragment : Fragment() {
+    private lateinit var albumViewModel: AlbumViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        imageViewModel =
-            ViewModelProviders.of(this).get(ImageViewModel::class.java)
-        val root = inflater.inflate(R.layout.fragment_image, container, false)
-        val textView: TextView = root.findViewById(R.id.text_image)
-        imageViewModel.text.observe(this, Observer {
+        albumViewModel =
+            ViewModelProviders.of(this).get(AlbumViewModel::class.java)
+        val root = inflater.inflate(R.layout.fragment_album, container, false)
+        val textView: TextView = root.findViewById(R.id.text_album)
+        albumViewModel.text.observe(this, Observer {
             textView.text = it
         })
 

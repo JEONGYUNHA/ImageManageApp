@@ -4,31 +4,30 @@
     tools:showIn="navigation_view">
 
     <group android:checkableBehavior="single">
-        <item
+  <!--      <item
             android:id="@+id/nav_home"
             android:icon="@drawable/ic_menu_camera"
-            android:title="@string/menu_home" />
+            android:title="@string/menu_home" />-->
         <item
             android:id="@+id/nav_image"
             android:icon="@drawable/ic_menu_gallery"
             android:title="@string/menu_image" />
         <item
+            android:id="@+id/nav_album"
+            android:icon="@drawable/ic_menu_gallery"
+            android:title="@string/menu_album" />
+        <item
             android:id="@+id/nav_recommend"
-            android:icon="@drawable/ic_menu_slideshow"
+            android:icon="@drawable/ic_menu_gallery"
             android:title="@string/menu_recommend" />
+
         <item
             android:id="@+id/nav_mypage"
             android:icon="@drawable/ic_menu_manage"
             android:title="@string/menu_mypage" />
+        <item
+            android:id="@+id/nav_trash"
+            android:icon="@drawable/ic_menu_share"
+            android:title="@string/menu_trash" />
     </group>
-
-    <item android:title="Communicate">
-        <menu>
-            <item
-                android:id="@+id/nav_trash"
-                android:icon="@drawable/ic_menu_share"
-                android:title="@string/menu_trash" />
-        </menu>
-    </item>
-
 </menu>
