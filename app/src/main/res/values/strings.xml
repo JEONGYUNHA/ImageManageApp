@@ -17,4 +17,17 @@
     <string name="tab_text_1">날짜</string>
     <string name="tab_text_2">장소</string>
     <string name="tab_text_3">추천 태그</string>
+
+    <string-array name="search_array">
+        <item>서울특별시</item>
+        <item>경기도 안양시</item>
+        <item>경기도 군포시</item>
+        <item>서울특별시 성북구</item>
+        <item>인천광역시</item>
+        <item>경기도 파주시</item>
+        <item>apple</item>
+        <item>bananananana</item>
+        <item>bear</item>
+        <item>banana</item>
+    </string-array>
 </resources>

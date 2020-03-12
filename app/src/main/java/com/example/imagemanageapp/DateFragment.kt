@@ -4,11 +4,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProviders
-import com.example.imagemanageapp.ui.PageViewModel
-import androidx.lifecycle.Observer
 
 class DateFragment : Fragment() {
     override fun onCreateView(
@@ -17,6 +15,16 @@ class DateFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater!!.inflate(R.layout.fragment_date, container, false)
+        // Get a reference to the AutoCompleteTextView in the layout
+        val v = inflater!!.inflate(R.layout.fragment_date, container, false)
+        val textView = v.findViewById<AutoCompleteTextView>(R.id.autoCompleteTextView)
+        val countries: Array<out String> = resources.getStringArray(R.array.search_array)
+        // Create the adapter and set it to the AutoCompleteTextView
+        ArrayAdapter<String>(this.requireContext(), android.R.layout.simple_list_item_1, countries).also { adapter ->
+            textView.setAdapter(adapter)
+        }
+        return v
     }
+
+
 }
