@@ -10,6 +10,17 @@
         android:orientation="vertical"
         tools:layout_editor_absoluteY="8dp"
         tools:layout_editor_absoluteX="8dp">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:orientation="horizontal">
+
+        <ImageView
+            android:layout_margin="5dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/search"
+            ></ImageView>
 
         <AutoCompleteTextView
             android:id="@+id/autoCompleteTextView"
@@ -20,6 +31,7 @@
             android:completionHint="장소 또는 테마로 사진을 검색해보세요"
             android:completionThreshold="1"
             android:labelFor="@id/autoCompleteTextView"/>
+        </LinearLayout>
     </LinearLayout>
 
 </LinearLayout>

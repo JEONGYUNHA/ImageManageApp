@@ -25,6 +25,4 @@ class DateFragment : Fragment() {
         }
         return v
     }
-
-
 }
