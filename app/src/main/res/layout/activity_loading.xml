@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="SDK DRIVE"
+            android:textColor="#FFFFFF"
+            android:textSize="55dp"
+            android:textStyle="bold"
+            android:layout_marginTop="30dp"/>
+
+        <Button
+            android:id="@+id/btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="START"
+            android:padding="15dp"
+            android:textSize="17dp"
+            android:textColor="#000000"
+            android:layout_margin="40dp"
+            android:background="@drawable/roundedbutton"
+            />
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
