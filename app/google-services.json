@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "668173320524",
+    "firebase_url": "https://sdkcloud-9de4f.firebaseio.com",
+    "project_id": "sdkcloud-9de4f",
+    "storage_bucket": "sdkcloud-9de4f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:668173320524:android:d2edceab20103041594fe9",
+        "android_client_info": {
+          "package_name": "com.example.imagemanageapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "668173320524-fkpo50ebn5adrks5mdkihvi3kpkm5jh6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBy7S0IUL4ff2Ie7lXScbVK_7JoZOXrb8U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "668173320524-fkpo50ebn5adrks5mdkihvi3kpkm5jh6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
