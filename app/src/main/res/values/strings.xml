@@ -18,16 +18,65 @@
     <string name="tab_text_2">장소</string>
     <string name="tab_text_3">추천 태그</string>
 
-    <string-array name="search_array">
+    <string-array name="place_array">
         <item>서울특별시</item>
         <item>경기도 안양시</item>
         <item>경기도 군포시</item>
         <item>서울특별시 성북구</item>
         <item>인천광역시</item>
         <item>경기도 파주시</item>
-        <item>apple</item>
-        <item>bananananana</item>
-        <item>bear</item>
-        <item>banana</item>
+        <item>경기도</item>
+        <item>강원도</item>
+        <item>경상도</item>
+        <item>경상북도</item>
+        <item>경상남도</item>
+        <item>충청도</item>
+        <item>전라도</item>
+        <item>충청북도</item>
+        <item>충청남도</item>
+        <item>전라남도</item>
+        <item>전라북도</item>
+        <item>제주도</item>
+        <item>한성대학교</item>
+        <item>성북구</item>
+        <item>종로구</item>
+        <item>동대문구</item>
+    </string-array>
+    <string-array name="date_array">
+        <item>2020</item>
+        <item>2019</item>
+        <item>2018</item>
+        <item>1월</item>
+        <item>2월</item>
+        <item>3월</item>
+        <item>4월</item>
+        <item>5월</item>
+        <item>6월</item>
+        <item>7월</item>
+        <item>8월</item>
+        <item>9월</item>
+        <item>10월</item>
+        <item>11월</item>
+        <item>12월</item>
+        <item>어제</item>
+        <item>오늘</item>
+        <item>엊그제</item>
+        <item>이번주</item>
+        <item>저번주</item>
+        <item>이번달</item>
+        <item>저번달</item>
+    </string-array>
+    <string-array name="tag_array">
+        <item>흔들린 사진</item>
+        <item>어두운 사진</item>
+        <item>유사한 사진</item>
+        <item>스크린샷</item>
+        <item>사람</item>
+        <item>동물</item>
+        <item>자동차</item>
+        <item>가구</item>
+        <item>책</item>
+        <item>식물</item>
+        <item>음식</item>
     </string-array>
 </resources>

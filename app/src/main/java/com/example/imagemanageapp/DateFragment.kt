@@ -18,7 +18,7 @@ class DateFragment : Fragment() {
         // Get a reference to the AutoCompleteTextView in the layout
         val v = inflater!!.inflate(R.layout.fragment_date, container, false)
         val textView = v.findViewById<AutoCompleteTextView>(R.id.autoCompleteTextView)
-        val countries: Array<out String> = resources.getStringArray(R.array.search_array)
+        val countries: Array<out String> = resources.getStringArray(R.array.date_array)
         // Create the adapter and set it to the AutoCompleteTextView
         ArrayAdapter<String>(this.requireContext(), android.R.layout.simple_list_item_1, countries).also { adapter ->
             textView.setAdapter(adapter)
