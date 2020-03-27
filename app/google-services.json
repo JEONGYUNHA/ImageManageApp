@@ -1,34 +1,66 @@
 {
   "project_info": {
-    "project_number": "668173320524",
-    "firebase_url": "https://sdkcloud-9de4f.firebaseio.com",
-    "project_id": "sdkcloud-9de4f",
-    "storage_bucket": "sdkcloud-9de4f.appspot.com"
+    "project_number": "254529947622",
+    "firebase_url": "https://sdkproject-a65d9.firebaseio.com",
+    "project_id": "sdkproject-a65d9",
+    "storage_bucket": "sdkproject-a65d9.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:668173320524:android:d2edceab20103041594fe9",
+        "mobilesdk_app_id": "1:254529947622:android:b9e515d761c50c40357827",
         "android_client_info": {
           "package_name": "com.example.imagemanageapp"
         }
       },
       "oauth_client": [
         {
-          "client_id": "668173320524-fkpo50ebn5adrks5mdkihvi3kpkm5jh6.apps.googleusercontent.com",
+          "client_id": "254529947622-sfoefpsd50kts0cddgglqn3n537mh2n4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.imagemanageapp",
+            "certificate_hash": "602f917aebeb6b60d64ad87a12d62e91927f7404"
+          }
+        },
+        {
+          "client_id": "254529947622-sld7majkhhnckslmm40beqms7meehbkp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.imagemanageapp",
+            "certificate_hash": "fd2fe88f8caf8a4136507c0725b08bb1d0f427ac"
+          }
+        },
+        {
+          "client_id": "254529947622-koh5qnlgi0ucm1qp6cvnchsjv4vppgmv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.imagemanageapp",
+            "certificate_hash": "ae9bd9ba46be0503c63d8530682879fc573c4eb6"
+          }
+        },
+        {
+          "client_id": "254529947622-j4n60t37crtljvbjio92dlejfv9ao7k7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.imagemanageapp",
+            "certificate_hash": "ff3023a57062efa175167197d1f1eb9f81a06370"
+          }
+        },
+        {
+          "client_id": "254529947622-vsrkl6mpopofqhtbj1hn4pe6dhtgq8t2.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBy7S0IUL4ff2Ie7lXScbVK_7JoZOXrb8U"
+          "current_key": "AIzaSyCRjOdfi3Pm-Cck7WeVRHXUpECgfhwcCH4"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "668173320524-fkpo50ebn5adrks5mdkihvi3kpkm5jh6.apps.googleusercontent.com",
+              "client_id": "254529947622-vsrkl6mpopofqhtbj1hn4pe6dhtgq8t2.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
