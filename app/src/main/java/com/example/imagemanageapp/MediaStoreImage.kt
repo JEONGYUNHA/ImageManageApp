@@ -4,13 +4,13 @@ import android.net.Uri
 import androidx.recyclerview.widget.DiffUtil
 import java.util.Date
 
-/**
- * Simple data class to hold information about an image included in the device's MediaStore.
- */
 data class MediaStoreImage(
-    val id: Long,
-    val displayName: String,
-    val contentUri: Uri
+    val id: Int,
+    val title: String,
+    val path: String,
+    val date: Long,
+    val latitude: Double,
+    val longitude: Double
 ) {
     companion object {
         val DiffCallback = object : DiffUtil.ItemCallback<MediaStoreImage>() {

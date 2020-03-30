@@ -1,25 +1,15 @@
 package com.example.imagemanageapp
 
-import PathFileObserver
 import android.Manifest
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.database.Cursor
-import android.graphics.Bitmap
-import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
-import android.os.FileObserver
 import android.provider.MediaStore
 import android.provider.Settings
 import android.util.Log
 import android.view.*
-import android.widget.ImageView
-import android.widget.Toast
-import androidx.annotation.IntegerRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
@@ -31,28 +21,14 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
-import com.firebase.ui.auth.AuthUI
-import com.google.android.gms.tasks.OnFailureListener
-import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.material.navigation.NavigationView
-import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.storage.FirebaseStorage
-import kotlinx.android.synthetic.main.nav_header_main.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.ByteArrayOutputStream
 import java.io.File
-import java.io.FileInputStream
-import java.io.InputStream
-import java.text.SimpleDateFormat
-import java.util.*
 
 
 class MainActivity : AppCompatActivity() {
@@ -209,11 +185,15 @@ class MainActivity : AppCompatActivity() {
         withContext(Dispatchers.IO) {
             val projection = arrayOf(
                 MediaStore.Images.Media._ID,
-                MediaStore.Images.Media.DISPLAY_NAME
+                MediaStore.Images.Media.DISPLAY_NAME,
+                MediaStore.Images.Media.DATA,
+                MediaStore.Images.Media.DATE_TAKEN,
+                MediaStore.Images.Media.LATITUDE,
+                MediaStore.Images.Media.LONGITUDE
             )
 
             // ID로 정렬
-            val sortOrder = "${MediaStore.Images.Media._ID} DESC"
+            val sortOrder = "${MediaStore.Images.Media.DATE_TAKEN} ASC"
             contentResolver.query(
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                 projection,
@@ -222,21 +202,30 @@ class MainActivity : AppCompatActivity() {
                 sortOrder
             )?.use { cursor ->
                 val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
-                val displayNameColumn =
+                val titleColumn =
                     cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME)
+                val pathColumn =
+                    cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
+                val dateColumn =
+                    cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_TAKEN)
+                val latitudeColumn =
+                    cursor.getColumnIndexOrThrow(MediaStore.Images.Media.LATITUDE)
+                val longitudeColumn =
+                    cursor.getColumnIndexOrThrow(MediaStore.Images.Media.LONGITUDE)
                 // 저장소의 존재하는 모든 파일에 대해
                 while (cursor.moveToNext()) {
-                    val id = cursor.getLong(idColumn)
-                    val displayName = cursor.getString(displayNameColumn)
-                    // uri/id
-                    val contentUri = Uri.withAppendedPath(
-                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                        id.toString()
-                    )
+                    val id = cursor.getInt(idColumn)
+                    val title = cursor.getString(titleColumn)
+                    val path = cursor.getString(pathColumn)
+                    val date = cursor.getLong(dateColumn)
+                    val latitude = cursor.getDouble(latitudeColumn)
+                    val longitude = cursor.getDouble(longitudeColumn)
 
                     // 이미지 배열에 이미지 저장
-                    val image = MediaStoreImage(id, displayName, contentUri)
+                    val image = MediaStoreImage(id, title, path, date, latitude, longitude)
                     images += image
+
+                    Log.d("meta", image.toString())
 
                     // ******** Storage에 업로드 ********
                     // Cloud storage 인스턴스 생성
@@ -247,23 +236,14 @@ class MainActivity : AppCompatActivity() {
                     // ??
                     val mountainsRef = storageRef.child("images")
                     // Storage에 올릴 위치/파일이름
-                    val mountainImagesRef = storageRef.child("images/" + displayName)
+                    val mountainImagesRef = storageRef.child("images/" + title)
 
                     // ??
                     mountainsRef.name == mountainImagesRef.name // true
                     mountainsRef.path == mountainImagesRef.path // false
 
-                    // MediaStore로 받아온 URI에 파일명 붙인 문자열 생성
-                    val str = String.format(
-                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI.toString(), "/", displayName
-                    )
-                    // 생성한 문자열을 URI로 변환
-                    val externalUri = Uri.parse(str)
-                    // 생성한 URI를 유효한 Path로 변환
-                    val path = getPathFromUri(externalUri)
                     // 최종 Path로 파일 불러옴
                     val file = Uri.fromFile(File(path))
-
                     // file 업로드
                     val uploadTask = mountainImagesRef.putFile(file)
                     uploadTask.addOnFailureListener {
@@ -271,7 +251,7 @@ class MainActivity : AppCompatActivity() {
                         Log.d("upload result", "failed")
                     }.addOnSuccessListener {
                         // 업로드 성공 시
-                        Log.d("upload result", displayName)
+                        Log.d("upload result", path)
                     }
                 }
             }
@@ -279,15 +259,6 @@ class MainActivity : AppCompatActivity() {
 
         Log.d(TAG, "Found ${images.size} images")
         return images
-    }
-
-    // URI를 File Path로 바꿔주는 함수
-    fun getPathFromUri(uri: Uri): String? {
-        val cursor = contentResolver.query(uri, null, null, null, null);
-        cursor?.moveToNext();
-        val path = cursor?.getString(cursor.getColumnIndex("_data"));
-
-        return path;
     }
 
     override fun onDestroy() {
