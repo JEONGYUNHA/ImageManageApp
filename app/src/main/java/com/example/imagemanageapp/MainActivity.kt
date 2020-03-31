@@ -29,6 +29,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.util.*
 
 
 class MainActivity : AppCompatActivity() {
@@ -36,6 +37,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
     val context: Context = this
     private lateinit var auth: FirebaseAuth
+    private lateinit var preTimeString: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,6 +49,9 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
+
+        // 시간 저장
+        saveTime()
 
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         val navView: NavigationView = findViewById(R.id.nav_view)
@@ -212,8 +217,10 @@ class MainActivity : AppCompatActivity() {
                     cursor.getColumnIndexOrThrow(MediaStore.Images.Media.LATITUDE)
                 val longitudeColumn =
                     cursor.getColumnIndexOrThrow(MediaStore.Images.Media.LONGITUDE)
+                Log.d("pre", preTimeString)
                 // 저장소의 존재하는 모든 파일에 대해
                 while (cursor.moveToNext()) {
+                    // 여기서부터!!!
                     val id = cursor.getInt(idColumn)
                     val title = cursor.getString(titleColumn)
                     val path = cursor.getString(pathColumn)
@@ -253,12 +260,31 @@ class MainActivity : AppCompatActivity() {
                         // 업로드 성공 시
                         Log.d("upload result", path)
                     }
+
                 }
             }
         }
 
         Log.d(TAG, "Found ${images.size} images")
         return images
+    }
+
+    fun saveTime(){
+        // 현재 시간
+        val nowTime = Calendar.getInstance().time.time
+        val nowTimeString = nowTime.toString()
+        Log.d("nowTime", nowTimeString)
+
+        val pref = this.getSharedPreferences("currentTime", Context.MODE_PRIVATE)
+        val editor = pref.edit()
+
+        // 현재 시간을 pre에 저장, 처음에는 0 저장
+        preTimeString = pref.getString("currentTime",Date(-1).time.toString())!!
+        Log.d("preTime", preTimeString)
+
+        editor.putString("currentTime",nowTimeString)
+        editor.apply()
+        Log.d("changeTime",pref.getString("currentTime",""))
     }
 
     override fun onDestroy() {
