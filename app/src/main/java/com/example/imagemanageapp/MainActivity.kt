@@ -111,8 +111,6 @@ class MainActivity : AppCompatActivity() {
         const val TAG = "MainActivity"
     }
 
-    // 이미지 담을 List
-    private val images = MutableLiveData<List<MediaStoreImage>>()
 
     // Permission 검사?
     override fun onRequestPermissionsResult(
@@ -140,11 +138,22 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // 이미지 담을 List
+    private val images = MutableLiveData<List<MediaStoreImage>>()
+
     // query문 돌려서 이미지 불러와 이미지 List에 저장
     private fun showImages() {
         GlobalScope.launch {
             val imageList = queryImages()
             images.postValue(imageList)
+            var size = imageList.size
+            var i = 0
+            Log.d("size", size.toString())
+            if(size != null) {
+                for (i in 0..size-1) {
+                    uploadToStorage(imageList[i].title, imageList[i].path)
+                }
+            }
         }
     }
 
@@ -220,55 +229,56 @@ class MainActivity : AppCompatActivity() {
                 Log.d("pre", preTimeString)
                 // 저장소의 존재하는 모든 파일에 대해
                 while (cursor.moveToNext()) {
-                    // 여기서부터!!!
-                    val id = cursor.getInt(idColumn)
-                    val title = cursor.getString(titleColumn)
-                    val path = cursor.getString(pathColumn)
-                    val date = cursor.getLong(dateColumn)
-                    val latitude = cursor.getDouble(latitudeColumn)
-                    val longitude = cursor.getDouble(longitudeColumn)
+                    if(preTimeString.toLong() < cursor.getLong(dateColumn)){
+                        val id = cursor.getInt(idColumn)
+                        val title = cursor.getString(titleColumn)
+                        val path = cursor.getString(pathColumn)
+                        val date = cursor.getLong(dateColumn)
+                        val latitude = cursor.getDouble(latitudeColumn)
+                        val longitude = cursor.getDouble(longitudeColumn)
 
-                    // 이미지 배열에 이미지 저장
-                    val image = MediaStoreImage(id, title, path, date, latitude, longitude)
-                    images += image
-
-                    Log.d("meta", image.toString())
-
-                    // ******** Storage에 업로드 ********
-                    // Cloud storage 인스턴스 생성
-                    val storage = FirebaseStorage.getInstance()
-                    // 인스턴스의 reference 생성
-                    val storageRef = storage.reference
-
-                    // ??
-                    val mountainsRef = storageRef.child("images")
-                    // Storage에 올릴 위치/파일이름
-                    val mountainImagesRef = storageRef.child("images/" + title)
-
-                    // ??
-                    mountainsRef.name == mountainImagesRef.name // true
-                    mountainsRef.path == mountainImagesRef.path // false
-
-                    // 최종 Path로 파일 불러옴
-                    val file = Uri.fromFile(File(path))
-                    // file 업로드
-                    val uploadTask = mountainImagesRef.putFile(file)
-                    uploadTask.addOnFailureListener {
-                        // 업로드 실패 시
-                        Log.d("upload result", "failed")
-                    }.addOnSuccessListener {
-                        // 업로드 성공 시
-                        Log.d("upload result", path)
+                        // 이미지 배열에 이미지 저장
+                        val image = MediaStoreImage(id, title, path, date, latitude, longitude)
+                        images += image
+                        Log.d("pre", preTimeString)
+                        Log.d("date", date.toString())
+                        Log.d("date-pre", (date-preTimeString.toLong()).toString())
+                        Log.d("meta", image.toString())
                     }
-
                 }
             }
         }
-
-        Log.d(TAG, "Found ${images.size} images")
         return images
     }
 
+    fun uploadToStorage(title: String, path : String){
+        // ******** Storage에 업로드 ********
+        // Cloud storage 인스턴스 생성
+        val storage = FirebaseStorage.getInstance()
+        // 인스턴스의 reference 생성
+        val storageRef = storage.reference
+
+        // ??
+        val mountainsRef = storageRef.child("images")
+        // Storage에 올릴 위치/파일이름
+        val mountainImagesRef = storageRef.child("images/" + title)
+
+        // ??
+        mountainsRef.name == mountainImagesRef.name // true
+        mountainsRef.path == mountainImagesRef.path // false
+
+        // 최종 Path로 파일 불러옴
+        val file = Uri.fromFile(File(path))
+        // file 업로드
+        val uploadTask = mountainImagesRef.putFile(file)
+        uploadTask.addOnFailureListener {
+            // 업로드 실패 시
+            Log.d("upload result", "failed")
+        }.addOnSuccessListener {
+            // 업로드 성공 시
+            Log.d("upload result", path)
+        }
+    }
     fun saveTime(){
         // 현재 시간
         val nowTime = Calendar.getInstance().time.time
