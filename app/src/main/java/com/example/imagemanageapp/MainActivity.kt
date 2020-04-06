@@ -249,12 +249,9 @@ class MainActivity : AppCompatActivity() {
                         val title = cursor.getString(titleColumn)
                         val path = cursor.getString(pathColumn)
                         val date = cursor.getLong(dateColumn)
-                        // long형 Date형으로 바꾸기
-                        val dateFormat : SimpleDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-                        val dateStr = dateFormat.format(date)
                         val latitude = cursor.getDouble(latitudeColumn)
                         val longitude = cursor.getDouble(longitudeColumn)
-                        val token = ("gs://sdkproject-a65d9.appspot.com/images/"+title)
+                        val token = ""
 
                         // 이미지 배열에 이미지 저장
                         val image = Meta(id, title, path, date, latitude, longitude,token)
@@ -262,7 +259,6 @@ class MainActivity : AppCompatActivity() {
                         Log.d("pre", preTimeString)
                         Log.d("date", date.toString())
                         Log.d("meta", image.toString())
-                        Log.d("token",token)
                     }
                 }
             }
@@ -296,7 +292,13 @@ class MainActivity : AppCompatActivity() {
         }.addOnSuccessListener {
             // 업로드 성공 시
             Log.d("Storage upload result", img.path)
-            uploadToDB(img)
+            mountainImagesRef.downloadUrl.addOnCompleteListener {
+                if(it.isComplete) {
+                    Log.d("token", it.toString())
+                    img.token = it.result.toString()
+                    uploadToDB(img)
+                }
+            }
         }
     }
 

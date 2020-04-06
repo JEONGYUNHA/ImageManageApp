@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.GridView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -38,10 +39,6 @@ class ImageFragment : Fragment() {
         imageViewModel =
             ViewModelProviders.of(this).get(ImageViewModel::class.java)
         val root = inflater.inflate(R.layout.fragment_image, container, false)
-        /*val textView: TextView = root.findViewById(R.id.text_image)
-        imageViewModel.text.observe(this, Observer {
-            textView.text = it
-        })*/
         readImages()
 
         return root
@@ -59,10 +56,13 @@ class ImageFragment : Fragment() {
                     // Date타입
                     val date = Date(dateLong)
                     // String타입
-                    val dateStr = date.toString()
+                    val dateStr = DateToString(date)
 
-                    val year = date.year
-                    val month = date.month
+
+                    var cal = Calendar.getInstance()
+                    cal.time = date
+                    val year = cal.get(Calendar.YEAR)
+                    val month = cal.get(Calendar.MONTH) + 1
                     val image =
                         Image(document.get("token").toString(), dateStr, dateLong, year, month)
                     images.add(image)
@@ -81,15 +81,15 @@ class ImageFragment : Fragment() {
         mGrid.adapter = mAdapter
         // 각 메뉴별 클릭 시 이벤트 달기
         mGrid.setOnItemClickListener { parent, view, position, id ->
-
+            Toast.makeText(this.context, images[position].toString(), Toast.LENGTH_SHORT).show()
         }
     }
 
-    private fun StringToDate(str: String): Date {
+    private fun DateToString(date: Date): String {
         val dateFormat: SimpleDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-        val date = dateFormat.parse(str)
+        val str = dateFormat.format(date)
 
-        return date
+        return str
     }
 
 
