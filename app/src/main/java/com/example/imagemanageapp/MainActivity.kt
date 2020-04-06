@@ -202,8 +202,12 @@ class MainActivity : AppCompatActivity() {
 
         // 구글 로그인한 id 받아오기
         val pref = this.getSharedPreferences("id", Context.MODE_PRIVATE)
-        val email = pref.getString("id", "")!!
+        val editor = pref.edit()
+        val email = pref.getString("email", "")!!
         val id = email.substring(0, email.lastIndexOf("@"))
+        editor.putString("id",id)
+        editor.apply()
+
 
         withContext(Dispatchers.IO) {
             val projection = arrayOf(
@@ -245,16 +249,20 @@ class MainActivity : AppCompatActivity() {
                         val title = cursor.getString(titleColumn)
                         val path = cursor.getString(pathColumn)
                         val date = cursor.getLong(dateColumn)
+                        // long형 Date형으로 바꾸기
+                        val dateFormat : SimpleDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+                        val dateStr = dateFormat.format(date)
                         val latitude = cursor.getDouble(latitudeColumn)
                         val longitude = cursor.getDouble(longitudeColumn)
-                        val token = ""
+                        val token = ("gs://sdkproject-a65d9.appspot.com/images/"+title)
 
                         // 이미지 배열에 이미지 저장
-                        val image = Meta(id, title, path, date, latitude, longitude, token)
+                        val image = Meta(id, title, path, date, latitude, longitude,token)
                         images += image
                         Log.d("pre", preTimeString)
                         Log.d("date", date.toString())
                         Log.d("meta", image.toString())
+                        Log.d("token",token)
                     }
                 }
             }
@@ -288,18 +296,11 @@ class MainActivity : AppCompatActivity() {
         }.addOnSuccessListener {
             // 업로드 성공 시
             Log.d("Storage upload result", img.path)
-            mountainImagesRef.downloadUrl.addOnCompleteListener {
-                if(it.isComplete) {
-                    Log.d("token", it.toString())
-                    img.token = it.result.toString()
-                    uploadToDB(img)
-                }
-            }
+            uploadToDB(img)
         }
-
     }
 
-    fun uploadToDB(img: Meta) {
+    fun uploadToDB(img : Meta) {
         val db: FirebaseFirestore = FirebaseFirestore.getInstance()
         val docTitle = String.format("%s-%s", img.id, img.title)
         //db.collection("meta").document(docTitle).set(meta)

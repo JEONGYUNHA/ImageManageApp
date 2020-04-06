@@ -20,17 +20,20 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-        <RadioGroup
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <RadioButton
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="날짜순으로 보기"/>
-            <RadioButton
+                android:text="날짜순으로 보기"
+                android:id="@+id/setDate"/>
+            <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="카테고리별로 보기"/>
-        </RadioGroup>
+                android:text="카테고리별로 보기"
+                android:id="@+id/setCategory"/>
+        </LinearLayout>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

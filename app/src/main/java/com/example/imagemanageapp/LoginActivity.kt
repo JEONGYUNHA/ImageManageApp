@@ -53,7 +53,7 @@ class LoginActivity : AppCompatActivity() {
                 // Successfully signed in
                 val user = FirebaseAuth.getInstance().currentUser!!
                 val email = user.email
-                editor.putString("id",email)
+                editor.putString("email",email)
                 editor.apply()
                 startLoading()
                 //  Log.d("email",email)
