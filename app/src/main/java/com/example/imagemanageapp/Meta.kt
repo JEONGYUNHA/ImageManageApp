@@ -3,11 +3,11 @@ package com.example.imagemanageapp
 import android.net.Uri
 
 data class Meta(
-    val id: String? = null,
-    val title: String? = null,
-    val path: String? = null,
-    val date: String? = null,
-    val latitude: Double? = null,
-    val longitude: Double? = null,
-    val token: String? = null
+    var id: String? = null,
+    var title: String? = null,
+    var path: String? = null,
+    var date: Long? = null,
+    var latitude: Double? = null,
+    var longitude: Double? = null,
+    var token: String? = null
 )

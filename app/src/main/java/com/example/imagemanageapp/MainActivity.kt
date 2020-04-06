@@ -143,7 +143,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     // 이미지 담을 List
-    private val images = MutableLiveData<List<MediaStoreImage>>()
+    private val images = MutableLiveData<List<Meta>>()
 
     // query문 돌려서 이미지 불러와 이미지 List에 저장
     private fun showImages() {
@@ -197,8 +197,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     // query문 만들어서 돌리기, 저장소의 이미지 모두 불러옴
-    private suspend fun queryImages(): List<MediaStoreImage> {
-        val images = mutableListOf<MediaStoreImage>()
+    private suspend fun queryImages(): List<Meta> {
+        val images = mutableListOf<Meta>()
+
+        // 구글 로그인한 id 받아오기
+        val pref = this.getSharedPreferences("id", Context.MODE_PRIVATE)
+        val email = pref.getString("id", "")!!
+        val id = email.substring(0, email.lastIndexOf("@"))
 
         withContext(Dispatchers.IO) {
             val projection = arrayOf(
@@ -231,22 +236,24 @@ class MainActivity : AppCompatActivity() {
                 val longitudeColumn =
                     cursor.getColumnIndexOrThrow(MediaStore.Images.Media.LONGITUDE)
                 Log.d("pre", preTimeString)
+
+
                 // 저장소의 존재하는 모든 파일에 대해
                 while (cursor.moveToNext()) {
                     if (preTimeString.toLong() < cursor.getLong(dateColumn)) {
-                        val id = cursor.getInt(idColumn)
+
                         val title = cursor.getString(titleColumn)
                         val path = cursor.getString(pathColumn)
                         val date = cursor.getLong(dateColumn)
                         val latitude = cursor.getDouble(latitudeColumn)
                         val longitude = cursor.getDouble(longitudeColumn)
+                        val token = ""
 
                         // 이미지 배열에 이미지 저장
-                        val image = MediaStoreImage(id, title, path, date, latitude, longitude)
+                        val image = Meta(id, title, path, date, latitude, longitude, token)
                         images += image
                         Log.d("pre", preTimeString)
                         Log.d("date", date.toString())
-                        Log.d("date-pre", (date - preTimeString.toLong()).toString())
                         Log.d("meta", image.toString())
                     }
                 }
@@ -256,7 +263,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     // Storage에 사진 업로드
-    fun uploadToStorage(img: MediaStoreImage) {
+    fun uploadToStorage(img: Meta) {
         // Cloud storage 인스턴스 생성
         val storage = FirebaseStorage.getInstance()
         // 인스턴스의 reference 생성
@@ -281,40 +288,24 @@ class MainActivity : AppCompatActivity() {
         }.addOnSuccessListener {
             // 업로드 성공 시
             Log.d("Storage upload result", img.path)
-        }
-    }
-
-    fun uploadToDB(img : MediaStoreImage, token : String) {
-        val db: FirebaseFirestore = FirebaseFirestore.getInstance()
-
-        // 구글 로그인한 id 받아오기
-        val pref = this.getSharedPreferences("id", Context.MODE_PRIVATE)
-        val email = pref.getString("id", "")!!
-        var id : String? = null
-        Log.d("email", email)
-
-        db.collection("meta")
-            .whereEqualTo("email", email)
-            .get()
-            .addOnSuccessListener { documents ->
-                for(document in documents){
-                    id = document.id.toString()
+            mountainImagesRef.downloadUrl.addOnCompleteListener {
+                if(it.isComplete) {
+                    Log.d("token", it.toString())
+                    img.token = it.result.toString()
+                    uploadToDB(img)
                 }
             }
-            .addOnFailureListener { exception ->
-                Log.w(TAG, "Error getting documents: ", exception)
-            }
-        // long형 Date형으로 바꾸기
-        val date = Date(img.date)
-        val dateFormat : SimpleDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        val dateStr = dateFormat.format(date);
+        }
 
-        val meta = Meta(id, img.title, img.path, dateStr, img.latitude, img.longitude, token)
-        val docTitle = String.format("%s-%s", id, img.title)
+    }
+
+    fun uploadToDB(img: Meta) {
+        val db: FirebaseFirestore = FirebaseFirestore.getInstance()
+        val docTitle = String.format("%s-%s", img.id, img.title)
         //db.collection("meta").document(docTitle).set(meta)
         db.collection("meta")
             .document(docTitle)
-            .set(meta)
+            .set(img)
             .addOnSuccessListener { documentReference ->
                 Log.d("DB upload result", "DocumentSnapshot written with ID: ${docTitle}")
             }
@@ -355,4 +346,3 @@ class MainActivity : AppCompatActivity() {
 
     }
 }
-
