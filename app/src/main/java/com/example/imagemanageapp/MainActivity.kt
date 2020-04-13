@@ -42,6 +42,7 @@ class MainActivity : AppCompatActivity() {
     val context: Context = this
     private lateinit var auth: FirebaseAuth
     private lateinit var preTimeString: String
+    var categoryList = ArrayList<String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,6 +57,7 @@ class MainActivity : AppCompatActivity() {
 
         // 시간 저장
         saveTime()
+        addList()
 
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         val navView: NavigationView = findViewById(R.id.nav_view)
@@ -140,6 +142,14 @@ class MainActivity : AppCompatActivity() {
                 return
             }
         }
+    }
+
+    private fun addList(){
+        categoryList.add("유사사진")
+        categoryList.add("흔들린사진")
+        categoryList.add("어두운사진")
+        categoryList.add("불균형사진")
+        categoryList.add("스크린샷")
     }
 
     // 이미지 담을 List
