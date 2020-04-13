@@ -54,6 +54,8 @@ class LoginActivity : AppCompatActivity() {
                 val user = FirebaseAuth.getInstance().currentUser!!
                 val email = user.email
                 editor.putString("email",email)
+                val id = email!!.substring(0, email!!.lastIndexOf("@"))
+                editor.putString("id",id)
                 editor.apply()
                 startLoading()
                 //  Log.d("email",email)

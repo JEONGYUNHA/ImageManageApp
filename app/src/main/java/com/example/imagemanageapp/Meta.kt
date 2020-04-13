@@ -1,6 +1,5 @@
 package com.example.imagemanageapp
 
-import android.net.Uri
 
 data class Meta(
     var id: String? = null,

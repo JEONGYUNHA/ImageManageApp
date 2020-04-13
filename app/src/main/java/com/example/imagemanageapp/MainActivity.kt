@@ -27,6 +27,9 @@ import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.nav_header_main.*
+import kotlinx.android.synthetic.main.nav_header_main.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -69,21 +72,14 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
-        // FileObserver 부분, 혹시 몰라서 놥둠
-        /*val fileObserver = PathFileObserver("/sdcard/DCIM/Screenshots/")
-         fileObserver.startWatching()
-        Toast.makeText(this, Environment.getExternalStoragePublicDirectory(DIRECTORY_PICTURES).toString(), Toast.LENGTH_SHORT).show()
-        val fs = File.separator
-        val path: String = (Environment.getExternalStorageDirectory().absolutePath + fs).toString()
-        Log.d("test", "path is $path")
-        val fileObserver: FileObserver = object : FileObserver(path, ALL_EVENTS) {
-            override fun onEvent(event: Int, path: String?) {
-                Log.d("test", "event dectect $event $path")
-            }
-        }
-        fileObserver.startWatching()*/
-
         openMediaStore()
+
+        // HeaderView 접근하여 프로필 변경
+        val headerView = navView.getHeaderView(0)
+        val pref = this.getSharedPreferences("id", Context.MODE_PRIVATE)
+        headerView.idField.text = pref.getString("id", "User")
+        headerView.emailField.text = pref.getString("email", "Email")
+
     }
 
     // 상단 메뉴 생성
@@ -202,11 +198,7 @@ class MainActivity : AppCompatActivity() {
 
         // 구글 로그인한 id 받아오기
         val pref = this.getSharedPreferences("id", Context.MODE_PRIVATE)
-        val editor = pref.edit()
-        val email = pref.getString("email", "")!!
-        val id = email.substring(0, email.lastIndexOf("@"))
-        editor.putString("id",id)
-        editor.apply()
+        val id = pref.getString("id", "")!!
 
 
         withContext(Dispatchers.IO) {
