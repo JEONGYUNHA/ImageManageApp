@@ -3,6 +3,7 @@ package com.example.imagemanageapp.ui.recommend
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,6 +21,7 @@ class RecommendFrament : Fragment() {
 
     private lateinit var recommendViewModel: RecommendViewModel
     private val db = FirebaseFirestore.getInstance()
+    var categoryList = ArrayList<String>()
 
 
 
@@ -35,21 +37,26 @@ class RecommendFrament : Fragment() {
         val textView: TextView = root.findViewById(R.id.text_recommend)
         //카테고리순 버튼 누르면 카테고리순 엑티비티로 이동
         val setCategoty: Button = root.findViewById((R.id.setCategory))
-        root.setCategory.setOnClickListener {   activity?.let{
-            val intent = Intent(context, SetCategoryActivity::class.java)
-            startActivity(intent)
-        } }
+        val transaction = parentFragmentManager.beginTransaction()
+
+        root.setCategory.setOnClickListener {
+            transaction?.replace(R.id.nav_host_fragment,SetCategoryFragment()).commit()
+        }
 
         //날짜순 버튼 누르면 날짜순 엑티비티로 이동
         val setDate: Button = root.findViewById((R.id.setDate))
-        root.setDate.setOnClickListener { activity?.let{
-            val intent = Intent(context, SetCategoryActivity::class.java)
-            startActivity(intent)
-        }
+        root.setOnClickListener {
+
+
 
         }
+
 
         return root
+    }
+
+    override fun onAttachFragment(childFragment: Fragment) {
+        super.onAttachFragment(childFragment)
     }
 
 
