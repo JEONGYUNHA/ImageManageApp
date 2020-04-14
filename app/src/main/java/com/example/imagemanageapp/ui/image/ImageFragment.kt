@@ -6,9 +6,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.GridView
+import android.widget.ListView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.example.imagemanageapp.Meta
@@ -24,13 +26,20 @@ data class Image(
     val dateStr: String? = null,
     val dateLong: Long? = null,
     val year: Int? = null,
-    val month: Int? = null
+    val month: Int? = null,
+    val simpleDate: String? = null
+)
+
+data class SimpleDate(
+    val date: String? = null,
+    var count: Int = 0
 )
 
 class ImageFragment : Fragment() {
     private lateinit var imageViewModel: ImageViewModel
     val db: FirebaseFirestore = FirebaseFirestore.getInstance()
     var images = arrayListOf<Image>()
+    var simpleDates = arrayListOf<SimpleDate>()
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -63,9 +72,11 @@ class ImageFragment : Fragment() {
                     cal.time = date
                     val year = cal.get(Calendar.YEAR)
                     val month = cal.get(Calendar.MONTH) + 1
+                    val simpleDate = String.format("%s.%s", year.toString(), month.toString())
                     val image =
-                        Image(document.get("token").toString(), dateStr, dateLong, year, month)
+                        Image(document.get("token").toString(), dateStr, dateLong, year, month, simpleDate)
                     images.add(image)
+                    CountSimpleDate(simpleDate)
                     Log.d("aaa", image.toString())
                 }
                 showImages()
@@ -76,13 +87,11 @@ class ImageFragment : Fragment() {
     }
 
     private fun showImages() {
-        val mGrid: GridView = grid
-        val mAdapter = ImageAdapter(this.activity, images)
-        mGrid.adapter = mAdapter
-        // 각 메뉴별 클릭 시 이벤트 달기
-        mGrid.setOnItemClickListener { parent, view, position, id ->
-            Toast.makeText(this.context, images[position].toString(), Toast.LENGTH_SHORT).show()
-        }
+        val mList: ListView = list
+        val transaction = parentFragmentManager.beginTransaction()
+        val mAdapter = ListAdapter(this.activity, transaction, images, simpleDates)
+        mList.adapter = mAdapter
+
     }
 
     private fun DateToString(date: Date): String {
@@ -92,5 +101,20 @@ class ImageFragment : Fragment() {
         return str
     }
 
+    private fun CountSimpleDate(sd : String) {
+        var i = 0
+        if(simpleDates.isNotEmpty()){
+           for(i in 0 until simpleDates.size) {
+               // 주어진 sd가 이미 있는 경우
+               if(simpleDates[i].date.equals(sd)){
+                   simpleDates[i].count++
+                   return
+               }
+           }
+        }
+        // 주어진 sd가 없거나 맨 처음인 경우
+        simpleDates.add(SimpleDate(sd, 1))
+        return
 
+    }
 }
