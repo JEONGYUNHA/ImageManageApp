@@ -27,6 +27,7 @@ class LoadingActivity : AppCompatActivity() {
     // Main으로 전환
     fun startApp() {
         val intent = Intent(baseContext, MainActivity::class.java)
+        /*val intent = Intent(baseContext, OpenCV::class.java)*/
         startActivity(intent)
         finish()
     }

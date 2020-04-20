@@ -104,13 +104,13 @@ class ImageFragment : Fragment() {
     private fun CountSimpleDate(sd : String) {
         var i = 0
         if(simpleDates.isNotEmpty()){
-           for(i in 0 until simpleDates.size) {
-               // 주어진 sd가 이미 있는 경우
-               if(simpleDates[i].date.equals(sd)){
-                   simpleDates[i].count++
-                   return
-               }
-           }
+            for(i in 0 until simpleDates.size) {
+                // 주어진 sd가 이미 있는 경우
+                if(simpleDates[i].date.equals(sd)){
+                    simpleDates[i].count++
+                    return
+                }
+            }
         }
         // 주어진 sd가 없거나 맨 처음인 경우
         simpleDates.add(SimpleDate(sd, 1))
