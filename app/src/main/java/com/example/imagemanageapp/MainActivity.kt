@@ -314,14 +314,39 @@ class MainActivity : AppCompatActivity() {
             .document(docTitle)
             .set(remove)
             .addOnSuccessListener { documentReference ->
-                Log.d("DB upload result", "DocumentSnapshot written with ID: ${docTitle}")
-                checkShaken(img)
+                Log.d("DB Meta upload", "DocumentSnapshot written with ID: ${docTitle}")
+                // 스크린샷이 아닌 사진들에 대해서만 태그 체크
+                if(!checkScreenshot(img)) {
+                    checkShaken(img)
+                }
             }
             .addOnFailureListener { e ->
-                Log.w("DB upload result", "Error adding document", e)
+                Log.w("DB Meta upload", "Error adding document", e)
             }
     }
+    // 스크린샷 체크하는 함수
+    fun checkScreenshot(img : Meta) : Boolean {
+        val imgTitle = img.title
+        val isScreenshot = imgTitle!!.contains("Screenshot", true)
+        if(isScreenshot) {
+            val docTitle = String.format("%s-%s", img.id, img.title)
 
+            db.collection("remove")
+                .document(docTitle)
+                .update("screenshot", true)
+                .addOnSuccessListener { documentReference ->
+                    Log.d("DB Screenshot upload", "DocumentSnapshot written with ID: ${docTitle}")
+                }
+                .addOnFailureListener { e ->
+                    Log.w("DB Screenshot upload", "Error adding document", e)
+                }
+            return true
+        }
+
+        return false
+    }
+
+    // 흔들린 사진 체크하는 함수
     fun checkShaken(img : Meta) {
         val opencv : OpenCV = OpenCV(this)
         val fm : Double = opencv.isShaken(img.path)
@@ -333,15 +358,14 @@ class MainActivity : AppCompatActivity() {
                 .document(docTitle)
                 .update("shaken", true)
                 .addOnSuccessListener { documentReference ->
-                    Log.d("Shaken result", "DocumentSnapshot written with ID: ${docTitle}")
+                    Log.d("DB Shaken upload", "DocumentSnapshot written with ID: ${docTitle}")
                 }
                 .addOnFailureListener { e ->
-                    Log.w("Shaken result", "Error adding document", e)
+                    Log.w("DB Shaken upload", "Error adding document", e)
                 }
         }
-
-
     }
+
     // 앱 켜질 때 시간 저장하는 함수
     fun saveTime() {
         // 현재 시간
