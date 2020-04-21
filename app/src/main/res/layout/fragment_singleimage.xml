@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -12,16 +13,25 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
-        tools:layout_editor_absoluteX="0dp">
+        android:background="#000000"
+        android:contentInsetLeft="0dp"
+        android:contentInsetStart="0dp"
+        app:contentInsetLeft="0dp"
+        app:contentInsetStart="0dp"
+        android:contentInsetRight="0dp"
+        android:contentInsetEnd="0dp"
+        app:contentInsetRight="0dp"
+        app:contentInsetEnd="0dp">
+        <!--tools:layout_editor_absoluteX="0dp"-->
         <!--app:layout_constraintBottom_toTopOf="@+id/singleImageLinear"-->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
+            android:layout_height="match_parent"
+            android:paddingRight="15dp">
             <ImageButton
                 android:id="@+id/backBtn"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
                 android:background="@color/fui_transparent"
                 android:scaleType="fitCenter"
                 android:src="@drawable/left_arrow"
@@ -45,18 +55,19 @@
 
             <ImageButton
                 android:id="@+id/metaBtn"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:src="@drawable/left_arrow"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:src="@drawable/info"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 android:background="@color/fui_transparent"
-                android:scaleType="fitCenter"/>
+                android:scaleType="fitCenter" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.appcompat.widget.Toolbar>
 
     <LinearLayout
+        android:id="@+id/singleImageLinear"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -66,14 +77,15 @@
         <ImageView
             android:id="@+id/imageView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="match_parent" />
     </LinearLayout>
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/singleImageBottomToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:background="#000000">
 
         <GridLayout
             android:layout_width="match_parent"
@@ -84,30 +96,30 @@
 
             <ImageButton
                 android:id="@+id/editBtn"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
                 android:layout_columnWeight="1"
                 android:background="@color/fui_transparent"
                 android:scaleType="fitCenter"
-                android:src="@drawable/left_arrow" />
+                android:src="@drawable/edit" />
 
             <ImageButton
                 android:id="@+id/deleteBtn"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
                 android:layout_columnWeight="1"
                 android:background="@color/fui_transparent"
                 android:scaleType="fitCenter"
-                android:src="@drawable/left_arrow" />
+                android:src="@drawable/delete" />
 
             <ImageButton
                 android:id="@+id/shareBtn"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
                 android:layout_columnWeight="1"
                 android:background="@color/fui_transparent"
                 android:scaleType="fitCenter"
-                android:src="@drawable/left_arrow" />
+                android:src="@drawable/share" />
         </GridLayout>
     </androidx.appcompat.widget.Toolbar>
 </androidx.constraintlayout.widget.ConstraintLayout>
