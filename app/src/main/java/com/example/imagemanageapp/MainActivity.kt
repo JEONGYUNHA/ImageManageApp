@@ -22,30 +22,35 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import com.google.android.gms.tasks.Task
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.nav_header_main.*
 import kotlinx.android.synthetic.main.nav_header_main.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
-import java.text.SimpleDateFormat
 import java.util.*
 
+// openCV에서 흔들림 정도를 판단할 임계값
+// 이 임계값보다 값이 작으면 흔들린 것, 크면 안 흔들린 것
+const val THRESHOLD : Double = 10000.0
 
 class MainActivity : AppCompatActivity() {
-
     private lateinit var appBarConfiguration: AppBarConfiguration
     val context: Context = this
     private lateinit var auth: FirebaseAuth
     private lateinit var preTimeString: String
-    var categoryList = ArrayList<String>()
+
+    // Cloud storage 인스턴스 생성
+    val storage = FirebaseStorage.getInstance()
+    // 인스턴스의 reference 생성
+    val storageRef = storage.reference
+
+    // Firestore 인스턴스 생성
+    val db = FirebaseFirestore.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,7 +65,6 @@ class MainActivity : AppCompatActivity() {
 
         // 시간 저장
         saveTime()
-        addList()
 
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         val navView: NavigationView = findViewById(R.id.nav_view)
@@ -81,7 +85,6 @@ class MainActivity : AppCompatActivity() {
         val pref = this.getSharedPreferences("id", Context.MODE_PRIVATE)
         headerView.idField.text = pref.getString("id", "User")
         headerView.emailField.text = pref.getString("email", "Email")
-
     }
 
     // 상단 메뉴 생성
@@ -140,14 +143,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun addList(){
-        categoryList.add("유사사진")
-        categoryList.add("흔들린사진")
-        categoryList.add("어두운사진")
-        categoryList.add("불균형사진")
-        categoryList.add("스크린샷")
-    }
-
     // 이미지 담을 List
     private val images = MutableLiveData<List<Meta>>()
 
@@ -159,7 +154,7 @@ class MainActivity : AppCompatActivity() {
             var size = imageList.size
             var i = 0
             Log.d("size", size.toString())
-            if (size != null) {
+            if (size != 0) {
                 for (i in 0..size - 1) {
                     uploadToStorage(imageList[i])
                 }
@@ -270,11 +265,6 @@ class MainActivity : AppCompatActivity() {
 
     // Storage에 사진 업로드
     fun uploadToStorage(img: Meta) {
-        // Cloud storage 인스턴스 생성
-        val storage = FirebaseStorage.getInstance()
-        // 인스턴스의 reference 생성
-        val storageRef = storage.reference
-
         // ??
         val mountainsRef = storageRef.child("images")
         // Storage에 올릴 위치/파일이름
@@ -305,9 +295,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun uploadToDB(img : Meta) {
-        val db: FirebaseFirestore = FirebaseFirestore.getInstance()
         val docTitle = String.format("%s-%s", img.id, img.title)
-        //db.collection("meta").document(docTitle).set(meta)
+
+        // meta DB에 업로드
         db.collection("meta")
             .document(docTitle)
             .set(img)
@@ -318,6 +308,62 @@ class MainActivity : AppCompatActivity() {
                 Log.w("DB upload result", "Error adding document", e)
             }
 
+        // remove DB에 업로드
+        val remove = Remove(img.id, img.title, similar = false, shaken = false, darked = false, unbalanced = false, screenshot = false)
+        db.collection("remove")
+            .document(docTitle)
+            .set(remove)
+            .addOnSuccessListener { documentReference ->
+                Log.d("DB Meta upload", "DocumentSnapshot written with ID: ${docTitle}")
+                // 스크린샷이 아닌 사진들에 대해서만 태그 체크
+                if(!checkScreenshot(img)) {
+                    checkShaken(img)
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.w("DB Meta upload", "Error adding document", e)
+            }
+    }
+    // 스크린샷 체크하는 함수
+    fun checkScreenshot(img : Meta) : Boolean {
+        val imgTitle = img.title
+        val isScreenshot = imgTitle!!.contains("Screenshot", true)
+        if(isScreenshot) {
+            val docTitle = String.format("%s-%s", img.id, img.title)
+
+            db.collection("remove")
+                .document(docTitle)
+                .update("screenshot", true)
+                .addOnSuccessListener { documentReference ->
+                    Log.d("DB Screenshot upload", "DocumentSnapshot written with ID: ${docTitle}")
+                }
+                .addOnFailureListener { e ->
+                    Log.w("DB Screenshot upload", "Error adding document", e)
+                }
+            return true
+        }
+
+        return false
+    }
+
+    // 흔들린 사진 체크하는 함수
+    fun checkShaken(img : Meta) {
+        val opencv : OpenCV = OpenCV(this)
+        val fm : Double = opencv.isShaken(img.path)
+        Log.d("fm", String.format("%s - %.5f", img.path, fm))
+        if(fm < THRESHOLD) {
+            val docTitle = String.format("%s-%s", img.id, img.title)
+
+            db.collection("remove")
+                .document(docTitle)
+                .update("shaken", true)
+                .addOnSuccessListener { documentReference ->
+                    Log.d("DB Shaken upload", "DocumentSnapshot written with ID: ${docTitle}")
+                }
+                .addOnFailureListener { e ->
+                    Log.w("DB Shaken upload", "Error adding document", e)
+                }
+        }
     }
 
     // 앱 켜질 때 시간 저장하는 함수

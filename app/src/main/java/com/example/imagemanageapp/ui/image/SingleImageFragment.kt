@@ -2,7 +2,6 @@ package com.example.imagemanageapp.ui.image
 
 import android.app.Activity
 import android.content.Context
-import android.content.res.Resources
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -11,19 +10,14 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProviders
+import androidx.fragment.app.FragmentManager
 import com.bumptech.glide.Glide
 import com.example.imagemanageapp.Meta
 import com.example.imagemanageapp.R
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
-import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.content_main.*
-import kotlinx.android.synthetic.main.fragment_singleimage.*
-import java.util.*
 
 class SingleImageFragment : Fragment() {
     private var meta: Meta? = null
@@ -42,6 +36,7 @@ class SingleImageFragment : Fragment() {
 
         // 프래그먼트의 상위 액티비티 받아오기
         activity = this.requireActivity() as AppCompatActivity
+
         token = arguments?.getString("token")
         txtView = root.findViewById<TextView>(R.id.titleView)
         imgView = root.findViewById<ImageView>(R.id.imageView)
@@ -50,8 +45,16 @@ class SingleImageFragment : Fragment() {
         loadImage()
         readMeta()
 
+        // 뒤로가기 버튼 눌렀을 때
+        val backBtn = root.findViewById<ImageButton>(R.id.backBtn)
+        backBtn.setOnClickListener {
+            val fragmentManager: FragmentManager = this.parentFragmentManager
+            fragmentManager.beginTransaction().remove(this).commit()
+            fragmentManager.popBackStack()
+        }
+
         // 메타 정보 버튼 눌렀을 때
-        val metaBtn = root.findViewById<Button>(R.id.metaBtn)
+        val metaBtn = root.findViewById<ImageButton>(R.id.metaBtn)
         metaBtn.setOnClickListener {
             Toast.makeText(ctx, meta.toString(), Toast.LENGTH_SHORT).show()
         }

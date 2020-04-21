@@ -30,6 +30,8 @@ data class Image(
     val simpleDate: String? = null
 )
 
+// date : 2020.4
+// count : 해당 년월에 해당하는 사진 수
 data class SimpleDate(
     val date: String? = null,
     var count: Int = 0
@@ -37,9 +39,13 @@ data class SimpleDate(
 
 class ImageFragment : Fragment() {
     private lateinit var imageViewModel: ImageViewModel
-    val db: FirebaseFirestore = FirebaseFirestore.getInstance()
-    var images = arrayListOf<Image>()
-    var simpleDates = arrayListOf<SimpleDate>()
+    private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
+    private var images = arrayListOf<Image>()
+    private var simpleDates = arrayListOf<SimpleDate>()
+
+    // 처음 열린건지 확인
+    private var isFirst = true
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -48,9 +54,16 @@ class ImageFragment : Fragment() {
         imageViewModel =
             ViewModelProviders.of(this).get(ImageViewModel::class.java)
         val root = inflater.inflate(R.layout.fragment_image, container, false)
-        readImages()
-
         return root
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        if(isFirst)
+            readImages()
+        else
+            showImages()
     }
 
     private fun readImages() {
@@ -92,8 +105,10 @@ class ImageFragment : Fragment() {
         val mAdapter = ListAdapter(this.activity, transaction, images, simpleDates)
         mList.adapter = mAdapter
 
+        isFirst = false
     }
 
+    // Date를 String으로 바꿔주는 함수
     private fun DateToString(date: Date): String {
         val dateFormat: SimpleDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
         val str = dateFormat.format(date)
@@ -101,16 +116,17 @@ class ImageFragment : Fragment() {
         return str
     }
 
+    //
     private fun CountSimpleDate(sd : String) {
         var i = 0
         if(simpleDates.isNotEmpty()){
-           for(i in 0 until simpleDates.size) {
-               // 주어진 sd가 이미 있는 경우
-               if(simpleDates[i].date.equals(sd)){
-                   simpleDates[i].count++
-                   return
-               }
-           }
+            for(i in 0 until simpleDates.size) {
+                // 주어진 sd가 이미 있는 경우
+                if(simpleDates[i].date.equals(sd)){
+                    simpleDates[i].count++
+                    return
+                }
+            }
         }
         // 주어진 sd가 없거나 맨 처음인 경우
         simpleDates.add(SimpleDate(sd, 1))

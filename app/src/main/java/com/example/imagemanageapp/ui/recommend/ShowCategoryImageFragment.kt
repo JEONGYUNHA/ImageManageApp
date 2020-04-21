@@ -71,9 +71,9 @@ class ShowCategoryImageFragment: Fragment(){
     }
 
     private fun upload(){
-        val cGrid = grid
+        /*val cGrid = grid
         val cAdapter = CategoryImageAdapter(this.activity,categoryImageData)
-        cGrid.adapter = cAdapter
+        cGrid.adapter = cAdapter*/
     }
 
 }
