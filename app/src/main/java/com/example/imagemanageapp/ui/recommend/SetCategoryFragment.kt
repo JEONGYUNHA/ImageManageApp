@@ -24,11 +24,11 @@ class SetCategoryFragment :Fragment(){
         "similar","shaken","darked","unbalanced","screenshot"
     )
 
-  /*  override fun onListItemClick(l: ListView, v: View, position: Int, id: Long) {
+    /*  override fun onListItemClick(l: ListView, v: View, position: Int, id: Long) {
 
-       super.onListItemClick(l, v, position, id)
-        Log.d("ClickItem",position.toString())*/
-     override fun onCreateView(
+         super.onListItemClick(l, v, position, id)
+          Log.d("ClickItem",position.toString())*/
+    override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -36,64 +36,49 @@ class SetCategoryFragment :Fragment(){
     ): View? {
         val root = inflater.inflate(R.layout.fragment_recommendlist, container, false)
 
-      //listView 찾아서 adapter에 달아주기
+        //listView 찾아서 adapter에 달아주기
         val listView = root.findViewById<ListView>(R.id.listview)
         val cAdapter = CategoryAdapter(this.activity,categoryList)
+
         listView.adapter = cAdapter
         listView.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
-           a()
-            // read(position)
-            //데이터 보내기
-           /* val intent = Intent(context, ShowCategoryImageActivity::class.java)
-            intent.putExtra("categoryName", categoryDBList[position]) */
-            val newFragment = ShowCategoryImageFragment()
 
-            val categoryNum = Bundle()
-            categoryNum.putString("categoryNum",categoryDBList[position])
-            newFragment.arguments = categoryNum
-
-            //fragment to fragment 전환
-            val transaction = parentFragmentManager.beginTransaction()
-            transaction?.replace(R.id.nav_host_fragment,newFragment)
-            transaction.addToBackStack(null)
-            transaction.commit()
-
-         }
-      return root
+            read(position)
+        }
+        return root
     }
 
-    private fun a(){
-        val newFragment = ShowCategoryImageFragment()
-        val titleList = Bundle()
-        titleList.putString("titleList","aa")
-        newFragment.arguments = titleList
-    }
+    //position읽어서 해당 데이터 보내는 함수
+    private fun read(position: Int) {
+        val tList = ArrayList<String>()
+        val categoryNum = categoryDBList[position]
+        Log.d("category2", categoryNum)
+        db.collection("remove")
+            .whereEqualTo(categoryNum!!, true)
+            .get()
+            .addOnSuccessListener { documents ->
+                for (document in documents) {
+                    val name = document.get("title").toString()
+                    tList.add(name)
+                }
+                //데이터 보내기
+                //position을 둔 필드에 해당하는 사진의 이름 리스트 보내기
+                val newFragment = ShowCategoryImageFragment()
+                val titleList = Bundle()
+                titleList.putString("titleList",tList.toString())
+                newFragment.arguments = titleList
 
-private fun read(position: Int) {
-    val tList = ArrayList<String>()
-    val categoryNum = categoryDBList[position]
-    Log.d("category2", categoryNum)
-    db.collection("remove")
-        .whereEqualTo(categoryNum!!, true)
-        .get()
-        .addOnSuccessListener { documents ->
-            for (document in documents) {
-                val name = document.get("title").toString()
-                tList.add(name)
+                //fragment to fragment 전환
+                val transaction = parentFragmentManager.beginTransaction()
+                transaction?.replace(R.id.nav_host_fragment,newFragment)
+                transaction.addToBackStack(null)
+                transaction.commit()
+
+                Log.d("titleList2",tList.toString())
 
             }
-
-
-            Log.d("titleList",tList.toString())
-
-        }
-        .addOnFailureListener {
-            Log.d("failUpload", "")
-        }
-    val newFragment = ShowCategoryImageFragment()
-    val titleList = Bundle()
-    titleList.putString("titleList",categoryDBList[position])
-    newFragment.arguments = titleList
-
+            .addOnFailureListener {
+                Log.d("failUpload", "")
+            }
     }
 }

@@ -12,11 +12,10 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.bumptech.glide.Glide
 import com.example.imagemanageapp.R
+import kotlinx.android.synthetic.main.fragment_showcategory_image.view.*
 
 class CategoryImageAdapter : BaseAdapter{
 
-    //
-    data class CategoryImage(var token:String,var name:String)
 
     private val ctx: Context?
     private val data: ArrayList<CategoryImage>
@@ -40,22 +39,24 @@ class CategoryImageAdapter : BaseAdapter{
 
     @SuppressLint("ViewHolder")
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-        var view = convertView
+        var cView = convertView
 
         val inflater = LayoutInflater.from(ctx)
-        view = inflater.inflate(R.layout.fragment_showcategory_image,parent,false)
+        cView = inflater.inflate(R.layout.fragment_showcategory_image,parent,false)
+        val image = cView.img
+      //val title = cView.title
 
-        val image = view.findViewById<ImageView>(R.id.img)
         val c = data[position]
 
+        // 이미지 띄우기
         Glide.with(ctx)
             .load(c.token)
             .into(image)
 
+    //    title.text = c.title
 
 
-
-        return view
+        return cView
 
 
     }

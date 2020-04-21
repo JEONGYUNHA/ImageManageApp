@@ -5,7 +5,16 @@
 
     <ImageView
         android:id="@+id/img"
-        android:layout_width="100dp"
-        android:layout_height="100dp"/>
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_gravity="center"
+        android:scaleType="fitXY" />
+
+  <!--  <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="18dp"
+        android:layout_gravity="center_horizontal"/> -->
 
 </LinearLayout>
