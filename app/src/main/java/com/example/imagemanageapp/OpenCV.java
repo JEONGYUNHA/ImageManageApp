@@ -1,13 +1,8 @@
 package com.example.imagemanageapp;
 
 
-import android.util.Log;
-
 import androidx.appcompat.app.AppCompatActivity;
 
-import org.opencv.android.BaseLoaderCallback;
-import org.opencv.android.LoaderCallbackInterface;
-import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;

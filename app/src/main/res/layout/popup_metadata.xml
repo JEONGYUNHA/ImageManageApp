@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="5dp"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:columnCount="2"
+        android:useDefaultMargins="true">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="title" />
+
+        <TextView
+            android:id="@+id/titleField"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="..." />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="path" />
+
+        <TextView
+            android:id="@+id/pathField"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="..." />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="date" />
+
+        <TextView
+            android:id="@+id/dateField"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="..." />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="location" />
+
+        <TextView
+            android:id="@+id/locationField"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="..." />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="tag" />
+
+        <TextView
+            android:id="@+id/tagField"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="..." />
+    </GridLayout>
+
+    <Button
+        android:id="@+id/closeBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="close" />
+</LinearLayout>
