@@ -15,26 +15,29 @@ class PopupActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.popup_metadata)
+    }
 
+    override fun onStart() {
+        super.onStart()
+
+        // 메타 정보 넘겨받음
         val meta = intent.getParcelableExtra<Meta>("datas")
 
         // 위경도로 주소 불러오기
         var location = ""
         if(meta.latitude != 0.0 && meta.longitude != 0.0) {
             try{
-                val mGeocoder : Geocoder = Geocoder(baseContext)
+                val mGeocoder = Geocoder(baseContext)
                 location = mGeocoder.getFromLocation(meta.latitude, meta.longitude, 1)[0].getAddressLine(0)
                 Log.d("location", location)
             } catch (e : IOException) {
                 e.printStackTrace()
-                Log.d("loaction", "failed")
+                Log.d("location", "failed")
             }
         }
 
         // 날짜 Long타입에서 Date타입으로 바꾸기
         var date = DateToString(Date(meta.date))
-
-
 
         titleField.text = meta.title
         pathField.text = meta.path

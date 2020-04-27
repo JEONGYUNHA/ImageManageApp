@@ -50,7 +50,15 @@ class ListAdapter : BaseAdapter {
 
         // 현재 리스트뷰의 날짜
         var currentDate = date[position].date
-        mText.text = currentDate
+        val year = currentDate!!.split(".")[0]
+        val month = currentDate!!.split(".")[1].toInt()
+        // 한 자리 수 달(1~9)은 앞에 0 붙여서 출력(01~09)
+        if(month < 10) {
+            mText.text = String.format("%s.0%s", year, month)
+        } else {
+            mText.text = currentDate
+        }
+
 
         // 현재 리스트뷰의 날짜에 해당하는 사진만 전달
         var currentData = arrayListOf<Image>()

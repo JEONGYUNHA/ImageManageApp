@@ -1,4 +1,4 @@
-package com.example.imagemanageapp.ui.image
+package com.example.imagemanageapp.ui.trash
 
 import android.app.Activity
 import android.app.AlertDialog
@@ -26,10 +26,11 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.content_main.*
 import kotlinx.android.synthetic.main.fragment_singleimage.*
 
-class SingleImageFragment : Fragment() {
-    private var meta: Meta? = null
+class SingleTrashImageFragment : Fragment() {
     private var token: String? = null
+    private var id: String? = null
     private var title: String? = null
+
     private var txtView: TextView? = null
     private var imgView: ImageView? = null
     private var ctx: Context? = null
@@ -44,7 +45,7 @@ class SingleImageFragment : Fragment() {
     ): View? {
         // 프래그먼트의 상위 액티비티 받아오기
         activity = this.requireActivity() as AppCompatActivity
-        root = inflater.inflate(R.layout.fragment_singleimage, container, false)
+        root = inflater.inflate(R.layout.fragment_singletrashimage,container, false)
         token = arguments?.getString("token")
         txtView = root!!.findViewById<TextView>(R.id.titleView)
         imgView = root!!.findViewById<ImageView>(R.id.imageView)
@@ -103,15 +104,8 @@ class SingleImageFragment : Fragment() {
             .get()
             .addOnSuccessListener { documents ->
                 for (document in documents) {
-                    val id = document.get("id").toString()
-                    val title = document.get("title").toString()
-                    val path = document.get("path").toString()
-                    val date = document.get("date").toString().toLong()
-                    val latitude = document.get("latitude").toString().toDouble()
-                    val longitude = document.get("longitude").toString().toDouble()
-                    val token = document.get("token").toString()
-
-                    meta = Meta(id, title, path, date, latitude, longitude, token, false)
+                    id = document.get("id").toString()
+                    title = document.get("title").toString()
 
                     this.title = title
                     txtView!!.text = title
@@ -119,8 +113,8 @@ class SingleImageFragment : Fragment() {
                     txtView!!.isSingleLine = true
                     txtView!!.maxLines = 1
 
-                    loadImage()
                 }
+                loadImage()
             }
             .addOnFailureListener { exception ->
                 Log.d("read img:", "Error getting documents: ", exception)
@@ -148,25 +142,33 @@ class SingleImageFragment : Fragment() {
             back()
         }
 
-        // 메타 정보 버튼 눌렀을 때
-        val metaBtn = root!!.findViewById<ImageButton>(R.id.metaBtn)
-        metaBtn.setOnClickListener {
-            val intent = Intent(activity as AppCompatActivity, PopupActivity::class.java)
-            intent.putExtra("datas", meta!!)
-            startActivity(intent)
+
+
+        // 복원 버튼 눌렀을 때
+        val restoreBtn = root!!.findViewById<Button>(R.id.restoreBtn)
+        restoreBtn.setOnClickListener {
+            val builder: AlertDialog.Builder = AlertDialog.Builder(ctx)
+            builder.setTitle("복원하시겠습니까?")
+            builder.setMessage("YES 누르면 복원한당당구리")
+            builder.setPositiveButton("YES") { dialogInterface, i ->
+                restoreImage()
+            }.setNegativeButton("NO") { dialogInterface, i ->
+            }
+            val dialog: AlertDialog = builder.create()
+            dialog.setOnShowListener {
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(ContextCompat.getColor(ctx!!, R.color.colorPrimary))
+                dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(ContextCompat.getColor(ctx!!, R.color.colorPrimary))
+            }
+            dialog.show()
+
         }
 
-        // edit 버튼 눌렀을 때
-        val editBtn = root!!.findViewById<ImageButton>(R.id.editBtn)
-        editBtn.setOnClickListener {
-            editImage()
-        }
-
-        // delete 버튼 눌렀을 때
-        val deleteBtn = root!!.findViewById<ImageButton>(R.id.deleteBtn)
+        // 영구삭제 버튼 눌렀을 때
+        val deleteBtn = root!!.findViewById<Button>(R.id.deleteBtn)
         deleteBtn.setOnClickListener {
             val builder: AlertDialog.Builder = AlertDialog.Builder(ctx)
-            builder.setTitle("삭제 하시겠습니까?")
+            builder.setTitle("영구 삭제 하시겠습니까?")
+            builder.setMessage("한번 영구 삭제된 사진은 다시 돌아오지 않는당당구리")
             builder.setPositiveButton("YES") { dialogInterface, i ->
                 deleteImage()
             }.setNegativeButton("NO") { dialogInterface, i ->
@@ -180,36 +182,22 @@ class SingleImageFragment : Fragment() {
 
         }
 
-        // share 버튼 눌렀을 때
-        val shareBtn = root!!.findViewById<ImageButton>(R.id.shareBtn)
-        shareBtn.setOnClickListener {
-            shareImage()
-        }
-
     }
-    private fun editImage() {
-
-    }
-
     private fun deleteImage() {
-        val docTitle = String.format("%s-%s", meta!!.id, meta!!.title)
-        /*db!!.collection("remove").document(docTitle).delete()
+        val docTitle = String.format("%s-%s", id, title)
+        db!!.collection("remove").document(docTitle).delete()
         db!!.collection("auto").document(docTitle).delete()
         db!!.collection("usertag").document(docTitle).delete()
-        db!!.collection("meta").document(docTitle).delete()*/
-        db!!.collection("meta").document(docTitle).update("deleted", true)
+        db!!.collection("meta").document(docTitle).delete()
 
         back()
     }
 
-    private fun shareImage() {
-        val shareIntent: Intent = Intent().apply {
-            action = Intent.ACTION_SEND
-            val uri : Uri = Uri.parse(meta!!.token)
-            putExtra(Intent.EXTRA_STREAM, uri)
-            type = "image/*"
-        }
-        startActivity(Intent.createChooser(shareIntent, "Share Image"))
+    private fun restoreImage() {
+        val docTitle = String.format("%s-%s", id, title)
+        db!!.collection("meta").document(docTitle).update("deleted", false)
+
+        back()
     }
 
     override fun onStop() {

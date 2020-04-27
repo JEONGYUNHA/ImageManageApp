@@ -252,7 +252,7 @@ class MainActivity : AppCompatActivity() {
                         val token = ""
 
                         // 이미지 배열에 이미지 저장
-                        val image = Meta(id, title, path, date, latitude, longitude,token)
+                        val image = Meta(id, title, path, date, latitude, longitude,token, false)
                         images += image
                         Log.d("pre", preTimeString)
                         Log.d("date", date.toString())

@@ -34,14 +34,14 @@ class ShowCategoryImageFragment: Fragment(){
     ): View? {
         val root = inflater.inflate(R.layout.fragment_showcategory_image_list, container, false)
         val aAdapter = CategoryImageAdapter(this.activity,categoryImageData)
-        val check: CheckBox = root.findViewById((R.id.itemCheckBox))
+     //   val check: CheckBox = root.findViewById((R.id.itemCheckBox))
         //툴바 메뉴사용하려면 꼭 필요
         setHasOptionsMenu(true)
         read()
 
 
         root.selectBtn.setOnClickListener {
-            checkBox(check)
+         //   checkBox(check)
             read()
 
         }

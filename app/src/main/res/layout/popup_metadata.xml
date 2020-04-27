@@ -2,7 +2,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="5dp"
     android:gravity="center"
     android:orientation="vertical">
 
@@ -10,62 +9,68 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:columnCount="2"
-        android:useDefaultMargins="true">
+        android:useDefaultMargins="true"
+        android:padding="10dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="title" />
+            android:text="title"
+            android:textStyle="bold"/>
 
         <TextView
             android:id="@+id/titleField"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="..." />
+            android:layout_gravity="fill_horizontal"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="path" />
+            android:text="path"
+            android:textStyle="bold"/>
 
         <TextView
             android:id="@+id/pathField"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="..." />
+            android:layout_gravity="fill_horizontal"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="date" />
+            android:text="date"
+            android:textStyle="bold"/>
 
         <TextView
             android:id="@+id/dateField"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="..." />
+            android:layout_gravity="fill_horizontal"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="location" />
+            android:text="location"
+            android:textStyle="bold"/>
 
         <TextView
             android:id="@+id/locationField"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="..." />
+            android:layout_gravity="fill_horizontal"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="tag" />
+            android:text="tag"
+            android:textStyle="bold"/>
 
         <TextView
             android:id="@+id/tagField"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="..." />
+            android:layout_gravity="fill_horizontal"/>
     </GridLayout>
 
     <Button
