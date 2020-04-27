@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.example.imagemanageapp.R
@@ -39,14 +40,15 @@ class RecommendFrament : Fragment() {
         val setCategoty: Button = root.findViewById((R.id.setCategory))
         val transaction = parentFragmentManager.beginTransaction()
 
+
         root.setCategory.setOnClickListener {
-            transaction?.replace(R.id.nav_host_fragment,SetCategoryFragment()).commit()
+            transaction?.replace(R.id.nav_host_fragment,SetCategoryFragment())
+            back(transaction)
         }
 
         //날짜순 버튼 누르면 날짜순 엑티비티로 이동
         val setDate: Button = root.findViewById((R.id.setDate))
         root.setOnClickListener {
-
 
 
         }
@@ -57,6 +59,13 @@ class RecommendFrament : Fragment() {
 
     override fun onAttachFragment(childFragment: Fragment) {
         super.onAttachFragment(childFragment)
+    }
+
+
+    //뒤로가기 누르면 이전 fragment로 가는 함수
+    fun back(t:FragmentTransaction){
+        t?.addToBackStack(null)
+        t?.commit()
     }
 
 
