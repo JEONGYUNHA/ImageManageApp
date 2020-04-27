@@ -1,7 +1,12 @@
 package com.example.imagemanageapp.ui.image
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Context
+import android.content.DialogInterface
+import android.content.Intent
+import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -11,6 +16,7 @@ import android.view.WindowManager
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.bumptech.glide.Glide
@@ -18,6 +24,7 @@ import com.example.imagemanageapp.Meta
 import com.example.imagemanageapp.R
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.content_main.*
+import kotlinx.android.synthetic.main.fragment_singleimage.*
 
 class SingleImageFragment : Fragment() {
     private var meta: Meta? = null
@@ -27,43 +34,78 @@ class SingleImageFragment : Fragment() {
     private var imgView: ImageView? = null
     private var ctx: Context? = null
     private var activity: Activity? = null
+    private var db: FirebaseFirestore? = null
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val root = inflater.inflate(R.layout.fragment_singleimage, container, false)
-
         // 프래그먼트의 상위 액티비티 받아오기
         activity = this.requireActivity() as AppCompatActivity
-
+        val root = inflater.inflate(R.layout.fragment_singleimage, container, false)
         token = arguments?.getString("token")
         txtView = root.findViewById<TextView>(R.id.titleView)
         imgView = root.findViewById<ImageView>(R.id.imageView)
+        db = FirebaseFirestore.getInstance()
         ctx = this.context
-
-        loadImage()
-        readMeta()
 
         // 뒤로가기 버튼 눌렀을 때
         val backBtn = root.findViewById<ImageButton>(R.id.backBtn)
         backBtn.setOnClickListener {
-            val fragmentManager: FragmentManager = this.parentFragmentManager
-            fragmentManager.beginTransaction().remove(this).commit()
-            fragmentManager.popBackStack()
+            back()
         }
 
         // 메타 정보 버튼 눌렀을 때
         val metaBtn = root.findViewById<ImageButton>(R.id.metaBtn)
         metaBtn.setOnClickListener {
-            Toast.makeText(ctx, meta.toString(), Toast.LENGTH_SHORT).show()
+            val intent = Intent(activity as AppCompatActivity, PopupActivity::class.java)
+            intent.putExtra("datas", meta!!)
+            startActivity(intent)
         }
+
+        // edit 버튼 눌렀을 때
+        val editBtn = root.findViewById<ImageButton>(R.id.editBtn)
+        editBtn.setOnClickListener {
+            editImage()
+        }
+
+        // delete 버튼 눌렀을 때
+        val deleteBtn = root.findViewById<ImageButton>(R.id.deleteBtn)
+        deleteBtn.setOnClickListener {
+            val builder: AlertDialog.Builder = AlertDialog.Builder(ctx)
+            builder.setTitle("삭제 하시겠습니까?")
+            builder.setPositiveButton("YES") { dialogInterface, i ->
+                deleteImage()
+            }.setNegativeButton("NO") { dialogInterface, i ->
+            }
+            val dialog: AlertDialog = builder.create()
+            dialog.setOnShowListener {
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(ContextCompat.getColor(ctx!!, R.color.colorPrimary))
+                dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(ContextCompat.getColor(ctx!!, R.color.colorPrimary))
+            }
+            dialog.show()
+
+        }
+
+        // share 버튼 눌렀을 때
+        val shareBtn = root.findViewById<ImageButton>(R.id.shareBtn)
+        shareBtn.setOnClickListener {
+            shareImage()
+        }
+
         return root
     }
 
     override fun onStart() {
         super.onStart()
+        hideBars()
 
+        loadImage()
+        readMeta()
+    }
+
+    fun hideBars() {
         // ToolBar 숨김
         (activity as AppCompatActivity).supportActionBar!!.hide()
 
@@ -83,9 +125,25 @@ class SingleImageFragment : Fragment() {
         layout.layoutParams = params
     }
 
+    fun showBars() {
+        // Toolbar 다시 보이게
+        (activity as AppCompatActivity).supportActionBar!!.show()
+        // 상태바 다시 보이게
+        (activity as AppCompatActivity).window.clearFlags(
+            WindowManager.LayoutParams.FLAG_FULLSCREEN
+        )
+        // Fragment가 들어가는 layout의 marginTop을 50dp으로 줌 (Toolbar가 들어가기 위해)
+        val layout: LinearLayout = (activity as AppCompatActivity).linear
+        val params: CoordinatorLayout.LayoutParams = CoordinatorLayout.LayoutParams(
+            CoordinatorLayout.LayoutParams.MATCH_PARENT,
+            CoordinatorLayout.LayoutParams.MATCH_PARENT
+        )
+        params.topMargin = resources.getDimensionPixelOffset(R.dimen.fragment_margin)
+        layout.layoutParams = params
+    }
+
     fun readMeta() {
-        val db: FirebaseFirestore = FirebaseFirestore.getInstance()
-        db.collection("meta")
+        db!!.collection("meta")
             .whereEqualTo("token", token)
             .get()
             .addOnSuccessListener { documents ->
@@ -102,9 +160,7 @@ class SingleImageFragment : Fragment() {
 
                     this.title = title
                     txtView!!.text = title
-
                 }
-
             }
             .addOnFailureListener { exception ->
                 Log.d("read img:", "Error getting documents: ", exception)
@@ -117,21 +173,38 @@ class SingleImageFragment : Fragment() {
             .into(imgView)
     }
 
+    private fun back() {
+        val fragmentManager: FragmentManager = this.parentFragmentManager
+        fragmentManager.beginTransaction().remove(this).commit()
+        fragmentManager.popBackStack()
+    }
+
+    private fun editImage() {
+
+    }
+
+    private fun deleteImage() {
+        val docTitle = String.format("%s-%s", meta!!.id, meta!!.title)
+        db!!.collection("meta").document(docTitle).delete()
+        db!!.collection("remove").document(docTitle).delete()
+        db!!.collection("auto").document(docTitle).delete()
+        db!!.collection("usertag").document(docTitle).delete()
+
+        back()
+    }
+
+    private fun shareImage() {
+        val shareIntent: Intent = Intent().apply {
+            action = Intent.ACTION_SEND
+            val uri : Uri = Uri.parse(meta!!.token)
+            putExtra(Intent.EXTRA_STREAM, uri)
+            type = "image/*"
+        }
+        startActivity(Intent.createChooser(shareIntent, "Share Image"))
+    }
+
     override fun onStop() {
         super.onStop()
-        // Toolbar 다시 보이게
-        (activity as AppCompatActivity).supportActionBar!!.show()
-        // 상태바 다시 보이게
-        (activity as AppCompatActivity).window.clearFlags(
-            WindowManager.LayoutParams.FLAG_FULLSCREEN
-        )
-        // Fragment가 들어가는 layout의 marginTop을 0으로 줌 (Toolbar의 원래 위치까지 채우기 위해)
-        val layout: LinearLayout = (activity as AppCompatActivity).linear
-        val params: CoordinatorLayout.LayoutParams = CoordinatorLayout.LayoutParams(
-            CoordinatorLayout.LayoutParams.MATCH_PARENT,
-            CoordinatorLayout.LayoutParams.MATCH_PARENT
-        )
-        params.topMargin = resources.getDimensionPixelOffset(R.dimen.fragment_margin)
-        layout.layoutParams = params
+        showBars()
     }
 }

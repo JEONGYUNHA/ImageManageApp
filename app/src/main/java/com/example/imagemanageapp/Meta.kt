@@ -1,12 +1,11 @@
 package com.example.imagemanageapp
 
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
 
-data class Meta(
-    var id: String? = null,
-    var title: String? = null,
-    var path: String? = null,
-    var date: Long? = null,
-    var latitude: Double? = null,
-    var longitude: Double? = null,
-    var token: String? = null
-)
+
+@Parcelize
+data class Meta(var id : String, var title : String, var path : String, var date : Long, var latitude : Double,
+                var longitude : Double, var token : String) : Parcelable {
+
+}
