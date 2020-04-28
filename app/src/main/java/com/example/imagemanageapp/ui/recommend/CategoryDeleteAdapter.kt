@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
+import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.TextView
 import com.bumptech.glide.Glide
@@ -24,6 +25,8 @@ class CategoryDeleteAdapter : BaseAdapter{
         ctx = _ctx
         data = _data
     }
+
+    private val checkedImages = mutableListOf<Int>()
 
     override fun getCount(): Int {
         return data.size
@@ -53,12 +56,23 @@ class CategoryDeleteAdapter : BaseAdapter{
             .load(c.token)
             .into(image)
 
-    //    title.text = c.title
+        val check = cView.findViewById<CheckBox>(R.id.itemCheckBox)
+        check.setOnCheckedChangeListener { buttonView, isChecked ->
+
+        }
+        if(check.isChecked == true){
+            checkedImages.add(position)
+        }
 
 
         return cView
 
 
+    }
+
+
+    fun checkList():List<Int>{
+        return checkedImages
     }
 
 }

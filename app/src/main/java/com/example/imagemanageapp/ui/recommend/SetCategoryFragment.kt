@@ -64,9 +64,11 @@ class SetCategoryFragment :Fragment(){
                 //데이터 보내기
                 //position을 둔 필드에 해당하는 사진의 이름 리스트 보내기
                 val newFragment = ShowCategoryImageFragment()
+               // val newFragment2 = DeleteCategoryImageFragment()
                 val titleList = Bundle()
                 titleList.putString("titleList",tList.toString())
                 newFragment.arguments = titleList
+              //  newFragment2.arguments = titleList
 
                 //fragment to fragment 전환
                 val transaction = parentFragmentManager.beginTransaction()
