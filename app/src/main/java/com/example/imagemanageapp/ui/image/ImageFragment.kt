@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.viewpager.widget.ViewPager
 import com.example.imagemanageapp.Meta
 import com.example.imagemanageapp.R
 import com.google.firebase.firestore.FirebaseFirestore
@@ -43,16 +44,12 @@ class ImageFragment : Fragment() {
     private var images = arrayListOf<Image>()
     private var simpleDates = arrayListOf<SimpleDate>()
 
-    // 처음 열린건지 확인
-    private var isFirst = true
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        imageViewModel =
-            ViewModelProviders.of(this).get(ImageViewModel::class.java)
+        //imageViewModel = ViewModelProviders.of(this).get(ImageViewModel::class.java)
         val root = inflater.inflate(R.layout.fragment_image, container, false)
         return root
     }
@@ -60,14 +57,24 @@ class ImageFragment : Fragment() {
     override fun onStart() {
         super.onStart()
 
-        if(isFirst)
+        swipe.setOnRefreshListener {
             readImages()
-        else
-            showImages()
+            swipe.isRefreshing = false
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        readImages()
+
     }
 
     private fun readImages() {
-        db.collection("meta").orderBy("date", Query.Direction.DESCENDING)
+        images.clear()
+        db.collection("meta")
+            .whereEqualTo("deleted", false)
+            /*.orderBy("date", Query.Direction.DESCENDING)*/
             .get()
             .addOnSuccessListener { documents ->
                 for (document in documents) {
@@ -92,6 +99,7 @@ class ImageFragment : Fragment() {
                     CountSimpleDate(simpleDate)
                     Log.d("aaa", image.toString())
                 }
+                images.sortByDescending { image: Image -> image.dateLong}
                 showImages()
             }
             .addOnFailureListener { exception ->
@@ -104,8 +112,6 @@ class ImageFragment : Fragment() {
         val transaction = parentFragmentManager.beginTransaction()
         val mAdapter = ListAdapter(this.activity, transaction, images, simpleDates)
         mList.adapter = mAdapter
-
-        isFirst = false
     }
 
     // Date를 String으로 바꿔주는 함수

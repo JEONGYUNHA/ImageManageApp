@@ -35,7 +35,7 @@
 
     <fragment
         android:id="@+id/nav_trash"
-        android:name="com.example.imagemanageapp.ui.trash.TrashFrament"
+        android:name="com.example.imagemanageapp.ui.trash.TrashFragment"
         android:label="@string/menu_trash"
         tools:layout="@layout/fragment_trash" />
 </navigation>
