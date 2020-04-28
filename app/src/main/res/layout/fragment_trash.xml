@@ -7,7 +7,7 @@
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipe"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"/>
 
         <LinearLayout
             android:id="@+id/linear"
@@ -26,5 +26,4 @@
                 android:stretchMode="columnWidth"
                 android:verticalSpacing="2dp" />
         </LinearLayout>
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

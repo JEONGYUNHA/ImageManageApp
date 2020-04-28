@@ -19,12 +19,15 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import androidx.viewpager.widget.PagerAdapter
+import androidx.viewpager.widget.ViewPager
 import com.bumptech.glide.Glide
 import com.example.imagemanageapp.Meta
 import com.example.imagemanageapp.R
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.content_main.*
 import kotlinx.android.synthetic.main.fragment_singleimage.*
+import java.util.*
 
 class SingleImageFragment : Fragment() {
     private var meta: Meta? = null
@@ -49,7 +52,7 @@ class SingleImageFragment : Fragment() {
         txtView = root!!.findViewById<TextView>(R.id.titleView)
         imgView = root!!.findViewById<ImageView>(R.id.imageView)
         db = FirebaseFirestore.getInstance()
-        ctx = this.context
+            ctx = this.context
         return root
     }
 
@@ -57,9 +60,11 @@ class SingleImageFragment : Fragment() {
         super.onStart()
 
         hideBars()
+
         readMeta()
     }
 
+    private var images = arrayListOf<Meta>()
     fun hideBars() {
         // ToolBar 숨김
         (activity as AppCompatActivity).supportActionBar!!.hide()
@@ -131,7 +136,6 @@ class SingleImageFragment : Fragment() {
         Glide.with(this.context)
             .load(token)
             .into(imgView)
-
         buttonActions()
     }
 
@@ -173,8 +177,10 @@ class SingleImageFragment : Fragment() {
             }
             val dialog: AlertDialog = builder.create()
             dialog.setOnShowListener {
-                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(ContextCompat.getColor(ctx!!, R.color.colorPrimary))
-                dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(ContextCompat.getColor(ctx!!, R.color.colorPrimary))
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                    .setTextColor(ContextCompat.getColor(ctx!!, R.color.colorPrimary))
+                dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+                    .setTextColor(ContextCompat.getColor(ctx!!, R.color.colorPrimary))
             }
             dialog.show()
 
@@ -187,6 +193,7 @@ class SingleImageFragment : Fragment() {
         }
 
     }
+
     private fun editImage() {
 
     }
@@ -205,7 +212,7 @@ class SingleImageFragment : Fragment() {
     private fun shareImage() {
         val shareIntent: Intent = Intent().apply {
             action = Intent.ACTION_SEND
-            val uri : Uri = Uri.parse(meta!!.token)
+            val uri: Uri = Uri.parse(meta!!.token)
             putExtra(Intent.EXTRA_STREAM, uri)
             type = "image/*"
         }

@@ -23,6 +23,8 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import androidx.viewpager.widget.ViewPager
+import com.example.imagemanageapp.ui.image.ViewPagerAdapter
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -324,6 +326,7 @@ class MainActivity : AppCompatActivity() {
             .addOnFailureListener { e ->
                 Log.w("DB Meta upload", "Error adding document", e)
             }
+
     }
     // 스크린샷 체크하는 함수
     fun checkScreenshot(img : Meta) : Boolean {

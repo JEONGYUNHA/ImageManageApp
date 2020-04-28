@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.viewpager.widget.ViewPager
 import com.example.imagemanageapp.Meta
 import com.example.imagemanageapp.R
 import com.google.firebase.firestore.FirebaseFirestore
