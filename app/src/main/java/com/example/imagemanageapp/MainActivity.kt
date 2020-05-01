@@ -4,6 +4,8 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -321,7 +323,7 @@ class MainActivity : AppCompatActivity() {
                 // 스크린샷이 아닌 사진들에 대해서만 태그 체크
                 if(!checkScreenshot(img)) {
                     checkShaken(img)
-                    checkDark(img)
+                    checkDarkImage(img)
                     //!!!!! 여기서 하면 된다!!!!!!!!!!
 
                 }
@@ -372,17 +374,25 @@ class MainActivity : AppCompatActivity() {
                 }
         }
     }
-    
-    //어두운 사진 체크하는 함수
-    fun checkDark(img: Meta){
 
-        storageRef.child("images/" + img.title).getBytes(Long.MAX_VALUE).addOnSuccessListener {
-            //use the bytes to display the image
-        }.addOnFailureListener{
-            //Handle any errors
+    // 어두운 사진 체크하는 함수
+    fun checkDarkImage(img : Meta) {
+        val isDark : DarkImage = DarkImage(this)
+        val final: String = isDark.checkDarkImg(img.path)
+        val docTitle = String.format("%s-%s", img.id, img.title)
+
+        if(final.equals("dark")) {
+            db.collection("remove")
+                .document(docTitle)
+                .update("darked", true)
+                .addOnSuccessListener { documentReference ->
+                    Log.d("DB darked upload", "DocumentSnapshot written with ID: ${docTitle}")
+                }
+                .addOnFailureListener { e ->
+                    Log.w("DB darked upload", "Error adding document", e)
+                }
         }
     }
-
     // 앱 켜질 때 시간 저장하는 함수
     fun saveTime() {
         // 현재 시간
