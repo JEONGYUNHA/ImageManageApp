@@ -355,6 +355,8 @@ class MainActivity : AppCompatActivity() {
         return false
     }
 
+    //check Shaken!!!!!!
+
     // 흔들린 사진 체크하는 함수
     fun checkShaken(img : Meta) {
         val opencv : OpenCV = OpenCV(this)
