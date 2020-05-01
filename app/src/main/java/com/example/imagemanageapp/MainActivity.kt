@@ -254,7 +254,7 @@ class MainActivity : AppCompatActivity() {
                         val token = ""
 
                         // 이미지 배열에 이미지 저장
-                        val image = Meta(id, title, path, date, latitude, longitude,token, false)
+                        val image = Meta(id, title, path, date, latitude, longitude, token, false)
                         images += image
                         Log.d("pre", preTimeString)
                         Log.d("date", date.toString())
@@ -321,6 +321,9 @@ class MainActivity : AppCompatActivity() {
                 // 스크린샷이 아닌 사진들에 대해서만 태그 체크
                 if(!checkScreenshot(img)) {
                     checkShaken(img)
+                    checkDark(img)
+                    //!!!!! 여기서 하면 된다!!!!!!!!!!
+
                 }
             }
             .addOnFailureListener { e ->
@@ -367,6 +370,16 @@ class MainActivity : AppCompatActivity() {
                 .addOnFailureListener { e ->
                     Log.w("DB Shaken upload", "Error adding document", e)
                 }
+        }
+    }
+    
+    //어두운 사진 체크하는 함수
+    fun checkDark(img: Meta){
+
+        storageRef.child("images/" + img.title).getBytes(Long.MAX_VALUE).addOnSuccessListener {
+            //use the bytes to display the image
+        }.addOnFailureListener{
+            //Handle any errors
         }
     }
 
