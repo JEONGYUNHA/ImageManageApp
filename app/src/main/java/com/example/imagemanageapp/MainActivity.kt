@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -41,7 +42,7 @@ import java.util.*
 
 // openCV에서 흔들림 정도를 판단할 임계값
 // 이 임계값보다 값이 작으면 흔들린 것, 크면 안 흔들린 것
-const val THRESHOLD : Double = 10000.0
+const val THRESHOLD: Double = 400.0
 
 class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
@@ -290,7 +291,7 @@ class MainActivity : AppCompatActivity() {
             // 업로드 성공 시
             Log.d("Storage upload result", img.path)
             mountainImagesRef.downloadUrl.addOnCompleteListener {
-                if(it.isComplete) {
+                if (it.isComplete) {
                     Log.d("token", it.toString())
                     img.token = it.result.toString()
                     uploadToDB(img)
@@ -299,7 +300,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun uploadToDB(img : Meta) {
+    fun uploadToDB(img: Meta) {
         val docTitle = String.format("%s-%s", img.id, img.title)
 
         // meta DB에 업로드
@@ -314,16 +315,26 @@ class MainActivity : AppCompatActivity() {
             }
 
         // remove DB에 업로드
-        val remove = Remove(img.id, img.title, similar = false, shaken = false, darked = false, unbalanced = false, screenshot = false)
+        val remove = Remove(
+            img.id,
+            img.title,
+            similar = false,
+            shaken = false,
+            darked = false,
+            unbalanced = false,
+            screenshot = false
+        )
         db.collection("remove")
             .document(docTitle)
             .set(remove)
             .addOnSuccessListener { documentReference ->
                 Log.d("DB Meta upload", "DocumentSnapshot written with ID: ${docTitle}")
+                saveColor(img)
                 // 스크린샷이 아닌 사진들에 대해서만 태그 체크
-                if(!checkScreenshot(img)) {
+                if (!checkScreenshot(img)) {
                     checkShaken(img)
                     checkDarkImage(img)
+                    checkSimilar(img)
                     //!!!!! 여기서 하면 된다!!!!!!!!!!
 
                 }
@@ -333,11 +344,12 @@ class MainActivity : AppCompatActivity() {
             }
 
     }
+
     // 스크린샷 체크하는 함수
-    fun checkScreenshot(img : Meta) : Boolean {
+    fun checkScreenshot(img: Meta): Boolean {
         val imgTitle = img.title
         val isScreenshot = imgTitle!!.contains("Screenshot", true)
-        if(isScreenshot) {
+        if (isScreenshot) {
             val docTitle = String.format("%s-%s", img.id, img.title)
 
             db.collection("remove")
@@ -355,14 +367,12 @@ class MainActivity : AppCompatActivity() {
         return false
     }
 
-    //check Shaken!!!!!!
-
     // 흔들린 사진 체크하는 함수
-    fun checkShaken(img : Meta) {
-        val opencv : OpenCV = OpenCV(this)
-        val fm : Double = opencv.isShaken(img.path)
+    fun checkShaken(img: Meta) {
+        val opencv: OpenCV = OpenCV(this)
+        val fm: Double = opencv.isShaken(img.path)
         Log.d("fm", String.format("%s - %.5f", img.path, fm))
-        if(fm < THRESHOLD) {
+        if (fm < THRESHOLD) {
             val docTitle = String.format("%s-%s", img.id, img.title)
 
             db.collection("remove")
@@ -378,12 +388,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     // 어두운 사진 체크하는 함수
-    fun checkDarkImage(img : Meta) {
-        val isDark : DarkImage = DarkImage(this)
+    fun checkDarkImage(img: Meta) {
+        val isDark: DarkImage = DarkImage(this)
         val final: String = isDark.checkDarkImg(img.path)
         val docTitle = String.format("%s-%s", img.id, img.title)
 
-        if(final.equals("dark")) {
+        if (final.equals("dark")) {
             db.collection("remove")
                 .document(docTitle)
                 .update("darked", true)
@@ -395,6 +405,49 @@ class MainActivity : AppCompatActivity() {
                 }
         }
     }
+
+    // Color 3가지 추출하여 저장
+    fun saveColor(img: Meta) {
+        val opencv : OpenCV = OpenCV(this)
+        val rgbList = opencv.color(img.path)
+        val docTitle = String.format("%s-%s", img.id, img.title)
+
+        // color 3가지 저장
+        var colorList = MutableList<Int>(3, {i -> i})
+        for(i in 0..2) {
+            Log.d("color1", rgbList[i].toString())
+            colorList[i] = Color.rgb(rgbList[i].r, rgbList[i].g, rgbList[i].b)
+            Log.d("color2", colorList[i].toString())
+        }
+        var colors = Color(colorList[0], colorList[1], colorList[2])
+
+        db.collection("color")
+            .document(docTitle)
+            .set(colors)
+            .addOnSuccessListener {
+            }
+            .addOnFailureListener {
+            }
+    }
+
+    // 유사 사진 체크하는 함수
+    fun checkSimilar(img: Meta) {
+        db.collection("meta")
+            // 현재 사진 3초 전~ 현재 사진 시간
+            .whereGreaterThan("date", img.date - 3000)
+            .whereLessThan("date", img.date)
+            .get()
+            .addOnSuccessListener { documents ->
+                if(documents.size() >= 3) {
+                    for(document in documents) {
+                        Log.d("similar", String.format("%s-%s", img.title, document.get("title").toString()))
+
+                    }
+                }
+
+            }
+    }
+
     // 앱 켜질 때 시간 저장하는 함수
     fun saveTime() {
         // 현재 시간

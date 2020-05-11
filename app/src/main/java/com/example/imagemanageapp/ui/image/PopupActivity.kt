@@ -3,49 +3,70 @@ package com.example.imagemanageapp.ui.image
 import android.location.Geocoder
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.example.imagemanageapp.Meta
 import com.example.imagemanageapp.R
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.popup_metadata.*
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 class PopupActivity : AppCompatActivity() {
+    private var db: FirebaseFirestore? = null
+    private var meta : Meta? = null
+    private var docTitle: String = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.popup_metadata)
+        db = FirebaseFirestore.getInstance()
+
+        // 메타 정보 넘겨받음
+        meta = intent.getParcelableExtra<Meta>("datas")
+        docTitle = String.format("%s-%s", meta!!.id, meta!!.title)
     }
 
     override fun onStart() {
         super.onStart()
 
-        // 메타 정보 넘겨받음
-        val meta = intent.getParcelableExtra<Meta>("datas")
+        // 색 3가지 띄우기
+        /*db!!.collection("remove").document(docTitle).get().addOnSuccessListener {
+            if (!(it.get("screenshot") as Boolean)) {
+                showColors()
+            }
+        }*/
+        showColors()
+
+        // Tag 띄우기
+        showTags()
 
         // 위경도로 주소 불러오기
         var location = ""
-        if(meta.latitude != 0.0 && meta.longitude != 0.0) {
-            try{
+        if (meta!!.latitude != 0.0 && meta!!.longitude != 0.0) {
+            try {
                 val mGeocoder = Geocoder(baseContext)
-                location = mGeocoder.getFromLocation(meta.latitude, meta.longitude, 1)[0].getAddressLine(0)
+                location =
+                    mGeocoder.getFromLocation(meta!!.latitude, meta!!.longitude, 1)[0].getAddressLine(0)
                 Log.d("location", location)
-            } catch (e : IOException) {
+            } catch (e: IOException) {
                 e.printStackTrace()
                 Log.d("location", "failed")
             }
         }
 
         // 날짜 Long타입에서 Date타입으로 바꾸기
-        var date = DateToString(Date(meta.date))
+        var date = DateToString(Date(meta!!.date))
 
-        titleField.text = meta.title
-        pathField.text = meta.path
+        titleField.text = meta!!.title
+        pathField.text = meta!!.path
         dateField.text = date
         locationField.text = location
-        tagField.text = "null"
 
-        closeBtn.setOnClickListener {
+
+        closeBtn.setOnClickListener() {
             finish()
         }
 
@@ -58,5 +79,33 @@ class PopupActivity : AppCompatActivity() {
         val str = dateFormat.format(date)
 
         return str
+    }
+
+    // 저장된 3개의 색을 불러와 view 3개에 띄워줌
+    private fun showColors() {
+        var c1: Int = 0
+        var c2: Int = 0
+        var c3: Int = 0
+
+        db!!.collection("color").document(docTitle).get().addOnSuccessListener {
+            c1 = it.get("color1").toString().toInt()
+            c2 = it.get("color2").toString().toInt()
+            c3 = it.get("color3").toString().toInt()
+
+            color1.setBackgroundColor(c1)
+            color2.setBackgroundColor(c2)
+            color3.setBackgroundColor(c3)
+        }
+
+    }
+
+    // Tag 띄우기
+    private fun showTags() {
+        db!!.collection("remove").document(docTitle).get().addOnSuccessListener {
+            if(it.get("shaken") as Boolean) { tagField.append("#흔들린 ") }
+            if(it.get("darked") as Boolean) { tagField.append("#어두운 ") }
+            if(it.get("screenshot") as Boolean) { tagField.append("#스크린샷 ") }
+            if(it.get("similar") as Boolean) { tagField.append("#유사한 ") }
+        }
     }
 }

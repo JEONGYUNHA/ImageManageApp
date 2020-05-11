@@ -52,7 +52,7 @@ class SingleImageFragment : Fragment() {
         txtView = root!!.findViewById<TextView>(R.id.titleView)
         imgView = root!!.findViewById<ImageView>(R.id.imageView)
         db = FirebaseFirestore.getInstance()
-            ctx = this.context
+        ctx = this.context
         return root
     }
 
@@ -200,10 +200,6 @@ class SingleImageFragment : Fragment() {
 
     private fun deleteImage() {
         val docTitle = String.format("%s-%s", meta!!.id, meta!!.title)
-        /*db!!.collection("remove").document(docTitle).delete()
-        db!!.collection("auto").document(docTitle).delete()
-        db!!.collection("usertag").document(docTitle).delete()
-        db!!.collection("meta").document(docTitle).delete()*/
         db!!.collection("meta").document(docTitle).update("deleted", true)
 
         back()

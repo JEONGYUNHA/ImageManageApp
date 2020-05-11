@@ -1,15 +1,43 @@
 package com.example.imagemanageapp;
 
 
+import android.util.Log;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfDouble;
+import org.opencv.core.Point;
+import org.opencv.core.Scalar;
 import org.opencv.core.Size;
+import org.opencv.core.TermCriteria;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
+
+import java.util.ArrayList;
+import java.util.List;
+
+class RGB {
+    public int r;
+    public int g;
+    public int b;
+
+    public RGB(int r, int g, int b) {
+        this.r = r;
+        this.g = g;
+        this.b = b;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "(" + r +"," + g + "," + b + ")";
+    }
+}
 
 public class OpenCV {
     private static final String TAG = "opencv";
@@ -59,8 +87,9 @@ public class OpenCV {
 
             //String path = "/storage/emulated/0/DCIM/Camera/noshake.jpg";
             image = Imgcodecs.imread(path);
-
-            Imgproc.resize(image, image, new Size(300, 300));
+            double width = (image.width() * 0.5);
+            double height = (image.height() * 0.5);
+            Imgproc.resize(image, image, new Size(width, height));
             Imgproc.cvtColor(image, gray, Imgproc.COLOR_BGR2GRAY);
 
             Imgproc.Laplacian(gray, dst, ddepth, 3, 1, 0);
@@ -79,4 +108,76 @@ public class OpenCV {
         }
         return 0.0;
     }
+
+    public List<RGB> color(String path) {
+        Mat image = new Mat();
+        image = Imgcodecs.imread(path);
+        double width = (image.width() * 0.5);
+        double height = (image.height() * 0.5);
+        Imgproc.resize(image, image, new Size(width, height));
+        Imgproc.cvtColor(image, image, Imgproc.COLOR_BGR2RGB);
+        List<RGB> rgb = cluster(image, 3);
+
+        return rgb;
+    }
+
+    public static List<RGB> cluster(Mat cutout, int k) {
+        Mat samples = cutout.reshape(1, cutout.cols() * cutout.rows());
+        Mat samples32f = new Mat();
+        samples.convertTo(samples32f, CvType.CV_32F, 1.0 / 255.0);
+
+        Mat labels = new Mat();
+        TermCriteria criteria = new TermCriteria(TermCriteria.COUNT, 100, 1);
+        Mat centers = new Mat();
+        Core.kmeans(samples32f, k, labels, criteria, 1, Core.KMEANS_PP_CENTERS, centers);
+
+        centers.convertTo(centers, CvType.CV_8UC1, 255.0);
+        centers.reshape(3);
+
+        List<RGB> rgbList = new ArrayList<RGB>();
+        boolean first = false;
+        boolean second = false;
+        boolean third = false;
+
+        int rows = 0;
+
+        for (int y = 0; y < cutout.rows(); y++) {
+            for (int x = 0; x < cutout.cols(); x++) {
+                int label = (int) labels.get(rows, 0)[0];
+                if (label == 0) {
+                    if (!first) {
+                        int r = (int) centers.get(label, 2)[0];
+                        int g = (int) centers.get(label, 1)[0];
+                        int b = (int) centers.get(label, 0)[0];
+                        first = true;
+                        rgbList.add(new RGB(r, g, b));
+                    }
+                }
+                if (label == 1) {
+                    if (!second) {
+                        int r = (int) centers.get(label, 2)[0];
+                        int g = (int) centers.get(label, 1)[0];
+                        int b = (int) centers.get(label, 0)[0];
+                        second = true;
+                        rgbList.add(new RGB(r, g, b));
+                    }
+                }
+                if (label == 2) {
+                    if (!third) {
+                        int r = (int) centers.get(label, 2)[0];
+                        int g = (int) centers.get(label, 1)[0];
+                        int b = (int) centers.get(label, 0)[0];
+                        third = true;
+                        rgbList.add(new RGB(r, g, b));
+                    }
+                }
+                if (first && second && third)
+                    break;
+                rows++;
+            }
+        }
+
+        return rgbList;
+    }
+
 }

@@ -189,7 +189,7 @@ class SingleTrashImageFragment : Fragment() {
         db!!.collection("auto").document(docTitle).delete()
         db!!.collection("usertag").document(docTitle).delete()
         db!!.collection("meta").document(docTitle).delete()
-
+        db!!.collection("color").document(docTitle).delete()
         back()
     }
 
