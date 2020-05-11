@@ -308,6 +308,10 @@ class MainActivity : AppCompatActivity() {
             .set(img)
             .addOnSuccessListener { documentReference ->
                 Log.d("DB upload result", "DocumentSnapshot written with ID: ${docTitle}")
+
+
+                //meta 하기!!!
+
             }
             .addOnFailureListener { e ->
                 Log.w("DB upload result", "Error adding document", e)
