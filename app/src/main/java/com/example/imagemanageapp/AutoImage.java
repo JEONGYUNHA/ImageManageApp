@@ -34,10 +34,9 @@ public class AutoImage {
 
         final List<Classifier.Recognition> results = detector.recognizeImage(img);
 
-        String[] a = new String[3];
+        String[] a = new String[2];
         a[0] = results.get(0).getTitle();
         a[1] = results.get(1).getTitle();
-        a[2] = results.get(2).getTitle();
 
         return a;
 

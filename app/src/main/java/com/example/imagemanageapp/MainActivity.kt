@@ -4,8 +4,6 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -13,7 +11,6 @@ import android.provider.Settings
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
@@ -25,8 +22,6 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import androidx.viewpager.widget.ViewPager
-import com.example.imagemanageapp.ui.image.ViewPagerAdapter
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -309,10 +304,23 @@ class MainActivity : AppCompatActivity() {
             .set(img)
             .addOnSuccessListener { documentReference ->
                 Log.d("DB upload result", "DocumentSnapshot written with ID: ${docTitle}")
-                checkAuto(img)
             }
             .addOnFailureListener { e ->
                 Log.w("DB upload result", "Error adding document", e)
+            }
+
+        // auto DB에 업로드
+        val auto = Auto(img.id, img.title, person = false, animal = false, traffic = false, furniture = false, book = false, bag = false, sport = false, device = false, plant = false, food = false, things = false)
+        db.collection("auto")
+            .document(docTitle)
+            .set(auto)
+            .addOnSuccessListener { documentReference ->
+                Log.d("DB Meta upload", "DocumentSnapshot written with ID: ${docTitle}")
+                // 스크린샷이 아닌 사진들에 대해서만 태그 체크
+                checkAuto(img)
+            }
+            .addOnFailureListener { e ->
+                Log.w("DB Meta upload", "Error adding document", e)
             }
 
         // remove DB에 업로드
@@ -333,6 +341,7 @@ class MainActivity : AppCompatActivity() {
             }
 
     }
+
     // 스크린샷 체크하는 함수
     fun checkScreenshot(img : Meta) : Boolean {
         val imgTitle = img.title
@@ -351,7 +360,6 @@ class MainActivity : AppCompatActivity() {
                 }
             return true
         }
-
         return false
     }
 
@@ -397,14 +405,179 @@ class MainActivity : AppCompatActivity() {
 
     //auto 태그 체크해주는 함수
     fun checkAuto(img : Meta){
+        var highPercent : Array<String> = emptyArray()
+        val docTitle = String.format("%s-%s", img.id, img.title)
+
+        var person: Array<String> = arrayOf("person", "tie")
+        var animal: Array<String> = arrayOf("bird", "cat", "dog", "horse", "sheep", "cow", "elephant", "bear", "zebra", "giraffe", "teddy bear")
+        var traffic: Array<String> = arrayOf("bicycle", "car", "motorcycle", "airplane", "bus", "train", "truck", "boat", "traffic light", "stop sign", "parking meter", "fire hydrant")
+        var furniture: Array<String> = arrayOf("chair", "couch", "bed", "refrigerator", "sink", "toilet", "dining table", "clock")
+        var book: Array<String> = arrayOf("book")
+        var bag: Array<String> = arrayOf("handbag", "backpack", "suitcase")
+        var sport: Array<String> = arrayOf("frisbee", "skis", "snowboard", "sports ball", "kite", "baseball bat", "baseball glove", "skateboard", "surfboard", "tennis racket")
+        var food: Array<String> = arrayOf("wine glass", "cup", "fork", "knife", "spoon", "bowl", "banana", "apple", "sandwich", "orange", "broccoli", "carrot", "hot dog", "pizza", "donut", "cake", "bottle")
+        var device: Array<String> = arrayOf("hair drier", "toaster", "oven", "microwave", "cell phone", "keyboard", "remote", "mouse", "laptop", "tv", "refrigerator")
+        var plant: Array<String> = arrayOf("potted plant", "vase", "bench")
+        var things: Array<String> = arrayOf("umbrella", "scissors", "toothbrush")
+
         var isAuto : AutoImage = AutoImage(this)
         var final: Array<String> = isAuto.checkAutoImg(img.path)
 
-        Log.d("여기 1", final[0])
-        Log.d("여기 2", final[1])
-        Log.d("여기 3", final[2])
+        if(final[0]==final[1]){
+            highPercent = arrayOf(final[0])
+            Log.d("highPercent", highPercent[0])
+        }
+        else if(final[0]!=final[1]){
+            highPercent = arrayOf(final[0], final[1])
+            Log.d("highPercent", highPercent[0])
+            Log.d("highPercent", highPercent[1])
+        }
 
-
+        for (highPercentIndex in highPercent){
+            for(p in person){
+                if(highPercentIndex == p) {
+                    db.collection("auto")
+                        .document(docTitle)
+                        .update("person", true)
+                        .addOnSuccessListener { documentReference ->
+                            Log.d("DB auto upload", "DocumentSnapshot written with ID: ${docTitle}")
+                        }
+                        .addOnFailureListener { e ->
+                            Log.w("DB auto upload", "Error adding document", e)
+                        }
+                }
+            }
+            for(a in animal){
+                if(highPercentIndex == a) {
+                    db.collection("auto")
+                        .document(docTitle)
+                        .update("animal", true)
+                        .addOnSuccessListener { documentReference ->
+                            Log.d("DB auto upload", "DocumentSnapshot written with ID: ${docTitle}")
+                        }
+                        .addOnFailureListener { e ->
+                            Log.w("DB auto upload", "Error adding document", e)
+                        }
+                }
+            }
+            for(t in traffic){
+                if(highPercentIndex == t) {
+                    db.collection("auto")
+                        .document(docTitle)
+                        .update("traffic", true)
+                        .addOnSuccessListener { documentReference ->
+                            Log.d("DB auto upload", "DocumentSnapshot written with ID: ${docTitle}")
+                        }
+                        .addOnFailureListener { e ->
+                            Log.w("DB auto upload", "Error adding document", e)
+                        }
+                }
+            }
+            for(f in furniture){
+                if(highPercentIndex == f) {
+                    db.collection("auto")
+                        .document(docTitle)
+                        .update("furniture", true)
+                        .addOnSuccessListener { documentReference ->
+                            Log.d("DB auto upload", "DocumentSnapshot written with ID: ${docTitle}")
+                        }
+                        .addOnFailureListener { e ->
+                            Log.w("DB auto upload", "Error adding document", e)
+                        }
+                }
+            }
+            for(b in book){
+                if(highPercentIndex == b) {
+                    db.collection("auto")
+                        .document(docTitle)
+                        .update("book", true)
+                        .addOnSuccessListener { documentReference ->
+                            Log.d("DB auto upload", "DocumentSnapshot written with ID: ${docTitle}")
+                        }
+                        .addOnFailureListener { e ->
+                            Log.w("DB auto upload", "Error adding document", e)
+                        }
+                }
+            }
+            for(b in bag){
+                if(highPercentIndex == b) {
+                    db.collection("auto")
+                        .document(docTitle)
+                        .update("bag", true)
+                        .addOnSuccessListener { documentReference ->
+                            Log.d("DB auto upload", "DocumentSnapshot written with ID: ${docTitle}")
+                        }
+                        .addOnFailureListener { e ->
+                            Log.w("DB auto upload", "Error adding document", e)
+                        }
+                }
+            }
+            for(s in sport){
+                if(highPercentIndex == s) {
+                    db.collection("auto")
+                        .document(docTitle)
+                        .update("sport", true)
+                        .addOnSuccessListener { documentReference ->
+                            Log.d("DB auto upload", "DocumentSnapshot written with ID: ${docTitle}")
+                        }
+                        .addOnFailureListener { e ->
+                            Log.w("DB auto upload", "Error adding document", e)
+                        }
+                }
+            }
+            for(f in food){
+                if(highPercentIndex == f) {
+                    db.collection("auto")
+                        .document(docTitle)
+                        .update("food", true)
+                        .addOnSuccessListener { documentReference ->
+                            Log.d("DB auto upload", "DocumentSnapshot written with ID: ${docTitle}")
+                        }
+                        .addOnFailureListener { e ->
+                            Log.w("DB auto upload", "Error adding document", e)
+                        }
+                }
+            }
+            for(d in device){
+                if(highPercentIndex == d) {
+                    db.collection("auto")
+                        .document(docTitle)
+                        .update("device", true)
+                        .addOnSuccessListener { documentReference ->
+                            Log.d("DB auto upload", "DocumentSnapshot written with ID: ${docTitle}")
+                        }
+                        .addOnFailureListener { e ->
+                            Log.w("DB auto upload", "Error adding document", e)
+                        }
+                }
+            }
+            for(p in plant){
+                if(highPercentIndex == p) {
+                    db.collection("auto")
+                        .document(docTitle)
+                        .update("plant", true)
+                        .addOnSuccessListener { documentReference ->
+                            Log.d("DB auto upload", "DocumentSnapshot written with ID: ${docTitle}")
+                        }
+                        .addOnFailureListener { e ->
+                            Log.w("DB auto upload", "Error adding document", e)
+                        }
+                }
+            }
+            for(t in things){
+                if(highPercentIndex == t) {
+                    db.collection("auto")
+                        .document(docTitle)
+                        .update("things", true)
+                        .addOnSuccessListener { documentReference ->
+                            Log.d("DB auto upload", "DocumentSnapshot written with ID: ${docTitle}")
+                        }
+                        .addOnFailureListener { e ->
+                            Log.w("DB auto upload", "Error adding document", e)
+                        }
+                }
+            }
+        }
     }
 
     // 앱 켜질 때 시간 저장하는 함수
