@@ -36,6 +36,8 @@
         <activity android:name=".SearchActivity"/>
         <activity android:name=".ui.image.PopupActivity"
             android:theme="@style/Theme.MyDialog"/>
+        <activity android:name=".ui.recommend.RecommendActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
 
 
     </application>
