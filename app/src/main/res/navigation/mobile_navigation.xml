@@ -21,11 +21,11 @@
         android:name="com.example.imagemanageapp.ui.album.AlbumFragment"
         android:label="@string/menu_album"
         tools:layout="@layout/fragment_album" />
-    <fragment
+    <activity
         android:id="@+id/nav_recommend"
-        android:name="com.example.imagemanageapp.ui.recommend.RecommendFrament"
+        android:name="com.example.imagemanageapp.ui.recommend.RecommendActivity"
         android:label="@string/menu_recommend"
-        tools:layout="@layout/fragment_recommend" />
+        tools:layout="@layout/activity_recommand" />
 
     <fragment
         android:id="@+id/nav_mypage"
