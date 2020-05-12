@@ -146,27 +146,27 @@ public class OpenCV {
                 int label = (int) labels.get(rows, 0)[0];
                 if (label == 0) {
                     if (!first) {
-                        int r = (int) centers.get(label, 2)[0];
+                        int b = (int) centers.get(label, 2)[0];
                         int g = (int) centers.get(label, 1)[0];
-                        int b = (int) centers.get(label, 0)[0];
+                        int r = (int) centers.get(label, 0)[0];
                         first = true;
                         rgbList.add(new RGB(r, g, b));
                     }
                 }
                 if (label == 1) {
                     if (!second) {
-                        int r = (int) centers.get(label, 2)[0];
+                        int b = (int) centers.get(label, 2)[0];
                         int g = (int) centers.get(label, 1)[0];
-                        int b = (int) centers.get(label, 0)[0];
+                        int r = (int) centers.get(label, 0)[0];
                         second = true;
                         rgbList.add(new RGB(r, g, b));
                     }
                 }
                 if (label == 2) {
                     if (!third) {
-                        int r = (int) centers.get(label, 2)[0];
+                        int b = (int) centers.get(label, 2)[0];
                         int g = (int) centers.get(label, 1)[0];
-                        int b = (int) centers.get(label, 0)[0];
+                        int r = (int) centers.get(label, 0)[0];
                         third = true;
                         rgbList.add(new RGB(r, g, b));
                     }

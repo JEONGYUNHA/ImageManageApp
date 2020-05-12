@@ -30,7 +30,10 @@ import androidx.viewpager.widget.ViewPager
 import com.example.imagemanageapp.ui.image.ViewPagerAdapter
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.firestore.model.Document
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.nav_header_main.view.*
 import kotlinx.coroutines.Dispatchers
@@ -432,20 +435,106 @@ class MainActivity : AppCompatActivity() {
 
     // 유사 사진 체크하는 함수
     fun checkSimilar(img: Meta) {
+        /*if(compareTime(img)) {
+            if(compareLocation(img)) {
+                if(compareColor(img)){
+                    db.collection("remove").document(img.title).update("similar", true)
+                }
+            }
+        }
+*/
+        compareTime(img)
+    }
+
+    // 유사사진 - 시간
+    fun compareTime(img: Meta) {
+        // 시간 비교
         db.collection("meta")
-            // 현재 사진 3초 전~ 현재 사진 시간
-            .whereGreaterThan("date", img.date - 3000)
-            .whereLessThan("date", img.date)
+            // 현재 사진 3초 전 ~ 현재 사진 ~ 현재 사진 3초 후 시간인게 하나라도 있으면 위치 비교 실행
+            .whereGreaterThanOrEqualTo("date", img.date - 3000)
+            .whereLessThanOrEqualTo("date", img.date + 3000)
             .get()
             .addOnSuccessListener { documents ->
-                if(documents.size() >= 3) {
-                    for(document in documents) {
-                        Log.d("similar", String.format("%s-%s", img.title, document.get("title").toString()))
+                Log.d("compare", "time")
+                if(documents.size() != 0)
+                    compareLocation(img, documents)
+            }
 
+    }
+
+    // 유사사진 - 위치
+    fun compareLocation(img: Meta, documents : QuerySnapshot) {
+        Log.d("compare", "location")
+        // 위경도 비교
+        // 현재 이미지의 위경도를 넘겨받은 문서들의 위경도와 비교하여 하나라도 있으면 색 비교 실행
+        for(document in documents) {
+            if(document.get("latitude").toString().toDouble() == img.latitude &&
+                document.get("longitude").toString().toDouble() == img.longitude ) {
+                compareColor(img, documents)
+                break;
+            }
+        }
+        /*db.collection("meta")
+            // 위경도 같은게 1개라도 있으면 색 비교
+            .whereEqualTo("latitude", img.latitude)
+            .whereEqualTo("longitude", img.longitude)
+            .get()
+            .addOnSuccessListener { documents ->
+                if(documents.size() != 0)
+                    compareColor(img)
+            }*/
+    }
+
+    // 유사사진 - 색
+    fun compareColor(img: Meta, documents : QuerySnapshot) {
+        Log.d("compare", "color")
+        var docTitle = String.format("%s-%s", img.id, img.title)
+        var docTitle2 : String
+        var c1 : Int
+        var c2 : Int
+        var c3 : Int
+        var cc1 : Int
+        var cc2 : Int
+        var cc3 : Int
+        // 현재 이미지의 색 3가지를 불러와 넘겨받은 문서들과 비교
+        db.collection("color").document(docTitle).get().addOnSuccessListener {
+            // 현재 이미지의 색 3가지 저장
+            c1 = it.get("color1").toString().toInt()
+            c2 = it.get("color2").toString().toInt()
+            c3 = it.get("color3").toString().toInt()
+
+            // 넘겨받은 문서들의 색과 비교
+            // 모든 색이 같으면 현재 이미지 similar 태그 true
+            for(document in documents) {
+                docTitle2 = String.format("%s-%s", document.get("id").toString(), document.get("title").toString())
+                db.collection("color").document(docTitle2).get().addOnSuccessListener {
+                    cc1 = it.get("color1").toString().toInt()
+                    cc2 = it.get("color2").toString().toInt()
+                    cc3 = it.get("color3").toString().toInt()
+                    var cTotal = c1+c2+c3
+                    var ccTotal = cc1 +cc2 + cc3
+                    /*if(it.get("color1").toString().toInt() == c1 &&
+                        it.get("color2").toString().toInt() == c2 &&
+                        it.get("color3").toString().toInt() == c3)*/
+                    if((cTotal - 400000 < ccTotal) || (ccTotal < cTotal + 400000))
+                    {
+                        db.collection("remove").document(docTitle).update("similar", true)
                     }
                 }
 
             }
+            /*// 모든 색이 같으면 similar 태그 true
+            db.collection("color")
+                .whereEqualTo("color1", c1)
+                .whereEqualTo("color2", c2)
+                .whereEqualTo("color3", c3)
+                .get()
+                .addOnSuccessListener { documents ->
+                    if(documents.size() != 0)
+                        db.collection("remove").document(docTitle).update("similar", true)
+                }*/
+        }
+
     }
 
     // 앱 켜질 때 시간 저장하는 함수

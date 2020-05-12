@@ -65,13 +65,13 @@ class ImageFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-
         readImages()
 
     }
 
     private fun readImages() {
         images.clear()
+        simpleDates.clear()
         db.collection("meta")
             .whereEqualTo("deleted", false)
             /*.orderBy("date", Query.Direction.DESCENDING)*/
@@ -97,7 +97,6 @@ class ImageFragment : Fragment() {
                         Image(document.get("token").toString(), dateStr, dateLong, year, month, simpleDate)
                     images.add(image)
                     CountSimpleDate(simpleDate)
-                    Log.d("aaa", image.toString())
                 }
                 images.sortByDescending { image: Image -> image.dateLong}
                 showImages()
@@ -110,6 +109,7 @@ class ImageFragment : Fragment() {
     private fun showImages() {
         val mList: ListView = list
         val transaction = parentFragmentManager.beginTransaction()
+        simpleDates.reverse()
         val mAdapter = ListAdapter(this.activity, transaction, images, simpleDates)
         mList.adapter = mAdapter
     }
