@@ -38,6 +38,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.*
+import kotlin.collections.ArrayList
 
 // openCV에서 흔들림 정도를 판단할 임계값
 // 이 임계값보다 값이 작으면 흔들린 것, 크면 안 흔들린 것
@@ -308,10 +309,7 @@ class MainActivity : AppCompatActivity() {
             .set(img)
             .addOnSuccessListener { documentReference ->
                 Log.d("DB upload result", "DocumentSnapshot written with ID: ${docTitle}")
-
-
-                //meta 하기!!!
-
+                checkAuto(img)
             }
             .addOnFailureListener { e ->
                 Log.w("DB upload result", "Error adding document", e)
@@ -328,8 +326,6 @@ class MainActivity : AppCompatActivity() {
                 if(!checkScreenshot(img)) {
                     checkShaken(img)
                     checkDarkImage(img)
-                    //!!!!! 여기서 하면 된다!!!!!!!!!!
-
                 }
             }
             .addOnFailureListener { e ->
@@ -358,8 +354,6 @@ class MainActivity : AppCompatActivity() {
 
         return false
     }
-
-    //check Shaken!!!!!!
 
     // 흔들린 사진 체크하는 함수
     fun checkShaken(img : Meta) {
@@ -398,7 +392,21 @@ class MainActivity : AppCompatActivity() {
                     Log.w("DB darked upload", "Error adding document", e)
                 }
         }
+
     }
+
+    //auto 태그 체크해주는 함수
+    fun checkAuto(img : Meta){
+        var isAuto : AutoImage = AutoImage(this)
+        var final: Array<String> = isAuto.checkAutoImg(img.path)
+
+        Log.d("여기 1", final[0])
+        Log.d("여기 2", final[1])
+        Log.d("여기 3", final[2])
+
+
+    }
+
     // 앱 켜질 때 시간 저장하는 함수
     fun saveTime() {
         // 현재 시간
