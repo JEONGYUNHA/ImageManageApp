@@ -4,9 +4,6 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -14,7 +11,6 @@ import android.provider.Settings
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
@@ -26,14 +22,10 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import androidx.viewpager.widget.ViewPager
-import com.example.imagemanageapp.ui.image.ViewPagerAdapter
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
-import com.google.firebase.firestore.model.Document
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.nav_header_main.view.*
 import kotlinx.coroutines.Dispatchers
@@ -42,10 +34,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.*
+import kotlin.collections.ArrayList
 
 // openCV에서 흔들림 정도를 판단할 임계값
 // 이 임계값보다 값이 작으면 흔들린 것, 크면 안 흔들린 것
-const val THRESHOLD: Double = 400.0
+const val THRESHOLD : Double = 400.0
 
 class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
@@ -294,7 +287,7 @@ class MainActivity : AppCompatActivity() {
             // 업로드 성공 시
             Log.d("Storage upload result", img.path)
             mountainImagesRef.downloadUrl.addOnCompleteListener {
-                if (it.isComplete) {
+                if(it.isComplete) {
                     Log.d("token", it.toString())
                     img.token = it.result.toString()
                     uploadToDB(img)
@@ -303,7 +296,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun uploadToDB(img: Meta) {
+    fun uploadToDB(img : Meta) {
         val docTitle = String.format("%s-%s", img.id, img.title)
 
         // meta DB에 업로드
@@ -317,29 +310,34 @@ class MainActivity : AppCompatActivity() {
                 Log.w("DB upload result", "Error adding document", e)
             }
 
+        // auto DB에 업로드
+        val auto = Auto(img.id, img.title, person = false, animal = false, traffic = false, furniture = false, book = false, bag = false, sport = false, device = false, plant = false, food = false, things = false)
+        db.collection("auto")
+            .document(docTitle)
+            .set(auto)
+            .addOnSuccessListener { documentReference ->
+                Log.d("DB Meta upload", "DocumentSnapshot written with ID: ${docTitle}")
+                // 스크린샷이 아닌 사진들에 대해서만 태그 체크
+                checkAuto(img)
+            }
+            .addOnFailureListener { e ->
+                Log.w("DB Meta upload", "Error adding document", e)
+            }
+
         // remove DB에 업로드
-        val remove = Remove(
-            img.id,
-            img.title,
-            similar = false,
-            shaken = false,
-            darked = false,
-            unbalanced = false,
-            screenshot = false
-        )
+        val remove = Remove(img.id, img.title, similar = false, shaken = false, darked = false, unbalanced = false, screenshot = false)
         db.collection("remove")
             .document(docTitle)
             .set(remove)
             .addOnSuccessListener { documentReference ->
                 Log.d("DB Meta upload", "DocumentSnapshot written with ID: ${docTitle}")
+                // 색 추출 후 저장
                 saveColor(img)
                 // 스크린샷이 아닌 사진들에 대해서만 태그 체크
-                if (!checkScreenshot(img)) {
+                if(!checkScreenshot(img)) {
                     checkShaken(img)
                     checkDarkImage(img)
                     checkSimilar(img)
-                    //!!!!! 여기서 하면 된다!!!!!!!!!!
-
                 }
             }
             .addOnFailureListener { e ->
@@ -349,10 +347,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     // 스크린샷 체크하는 함수
-    fun checkScreenshot(img: Meta): Boolean {
+    fun checkScreenshot(img : Meta) : Boolean {
         val imgTitle = img.title
         val isScreenshot = imgTitle!!.contains("Screenshot", true)
-        if (isScreenshot) {
+        if(isScreenshot) {
             val docTitle = String.format("%s-%s", img.id, img.title)
 
             db.collection("remove")
@@ -366,16 +364,15 @@ class MainActivity : AppCompatActivity() {
                 }
             return true
         }
-
         return false
     }
 
     // 흔들린 사진 체크하는 함수
-    fun checkShaken(img: Meta) {
-        val opencv: OpenCV = OpenCV(this)
-        val fm: Double = opencv.isShaken(img.path)
+    fun checkShaken(img : Meta) {
+        val opencv : OpenCV = OpenCV(this)
+        val fm : Double = opencv.isShaken(img.path)
         Log.d("fm", String.format("%s - %.5f", img.path, fm))
-        if (fm < THRESHOLD) {
+        if(fm < THRESHOLD) {
             val docTitle = String.format("%s-%s", img.id, img.title)
 
             db.collection("remove")
@@ -391,12 +388,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     // 어두운 사진 체크하는 함수
-    fun checkDarkImage(img: Meta) {
-        val isDark: DarkImage = DarkImage(this)
+    fun checkDarkImage(img : Meta) {
+        val isDark : DarkImage = DarkImage(this)
         val final: String = isDark.checkDarkImg(img.path)
         val docTitle = String.format("%s-%s", img.id, img.title)
 
-        if (final.equals("dark")) {
+        if(final.equals("dark")) {
             db.collection("remove")
                 .document(docTitle)
                 .update("darked", true)
@@ -406,6 +403,96 @@ class MainActivity : AppCompatActivity() {
                 .addOnFailureListener { e ->
                     Log.w("DB darked upload", "Error adding document", e)
                 }
+        }
+
+    }
+
+    //auto 태그 체크해주는 함수
+    fun checkAuto(img : Meta){
+        var highPercent : Array<String> = emptyArray()
+        val docTitle = String.format("%s-%s", img.id, img.title)
+
+        var person: Array<String> = arrayOf("person", "tie")
+        var animal: Array<String> = arrayOf("bird", "cat", "dog", "horse", "sheep", "cow", "elephant", "bear", "zebra", "giraffe", "teddy bear")
+        var traffic: Array<String> = arrayOf("bicycle", "car", "motorcycle", "airplane", "bus", "train", "truck", "boat", "traffic light", "stop sign", "parking meter", "fire hydrant")
+        var furniture: Array<String> = arrayOf("chair", "couch", "bed", "refrigerator", "sink", "toilet", "dining table", "clock")
+        var book: Array<String> = arrayOf("book")
+        var bag: Array<String> = arrayOf("handbag", "backpack", "suitcase")
+        var sport: Array<String> = arrayOf("frisbee", "skis", "snowboard", "sports ball", "kite", "baseball bat", "baseball glove", "skateboard", "surfboard", "tennis racket")
+        var food: Array<String> = arrayOf("wine glass", "cup", "fork", "knife", "spoon", "bowl", "banana", "apple", "sandwich", "orange", "broccoli", "carrot", "hot dog", "pizza", "donut", "cake", "bottle")
+        var device: Array<String> = arrayOf("hair drier", "toaster", "oven", "microwave", "cell phone", "keyboard", "remote", "mouse", "laptop", "tv", "refrigerator")
+        var plant: Array<String> = arrayOf("potted plant", "vase", "bench")
+        var things: Array<String> = arrayOf("umbrella", "scissors", "toothbrush")
+
+        var isAuto : AutoImage = AutoImage(this)
+        var final: Array<String> = isAuto.checkAutoImg(img.path)
+
+        if(final[0]==final[1]){
+            highPercent = arrayOf(final[0])
+            Log.d("highPercent", highPercent[0])
+        }
+        else if(final[0]!=final[1]){
+            highPercent = arrayOf(final[0], final[1])
+            Log.d("highPercent", highPercent[0])
+            Log.d("highPercent", highPercent[1])
+        }
+        var doc = db.collection("auto").document(docTitle)
+        for (highPercentIndex in highPercent){
+            for(p in person){
+                if(highPercentIndex == p) {
+                    doc.update("person", true)
+                }
+            }
+            for(a in animal){
+                if(highPercentIndex == a) {
+                    doc.update("animal", true)
+                }
+            }
+            for(t in traffic){
+                if(highPercentIndex == t) {
+                    doc.update("traffic", true)
+                }
+            }
+            for(f in furniture){
+                if(highPercentIndex == f) {
+                    doc.update("furniture", true)
+                }
+            }
+            for(b in book){
+                if(highPercentIndex == b) {
+                    doc.update("book", true)
+                }
+            }
+            for(b in bag){
+                if(highPercentIndex == b) {
+                    doc.update("bag", true)
+                }
+            }
+            for(s in sport){
+                if(highPercentIndex == s) {
+                    doc.update("sport", true)
+                }
+            }
+            for(f in food){
+                if(highPercentIndex == f) {
+                    doc.update("food", true)
+                }
+            }
+            for(d in device){
+                if(highPercentIndex == d) {
+                    doc.update("device", true)
+                }
+            }
+            for(p in plant){
+                if(highPercentIndex == p) {
+                    doc.update("plant", true)
+                }
+            }
+            for(t in things){
+                if(highPercentIndex == t) {
+                    doc.update("things", true)
+                }
+            }
         }
     }
 
@@ -418,9 +505,7 @@ class MainActivity : AppCompatActivity() {
         // color 3가지 저장
         var colorList = MutableList<Int>(3, {i -> i})
         for(i in 0..2) {
-            Log.d("color1", rgbList[i].toString())
-            colorList[i] = Color.rgb(rgbList[i].r, rgbList[i].g, rgbList[i].b)
-            Log.d("color2", colorList[i].toString())
+            colorList[i] = android.graphics.Color.rgb(rgbList[i].r, rgbList[i].g, rgbList[i].b)
         }
         var colors = Color(colorList[0], colorList[1], colorList[2])
 
@@ -435,14 +520,6 @@ class MainActivity : AppCompatActivity() {
 
     // 유사 사진 체크하는 함수
     fun checkSimilar(img: Meta) {
-        /*if(compareTime(img)) {
-            if(compareLocation(img)) {
-                if(compareColor(img)){
-                    db.collection("remove").document(img.title).update("similar", true)
-                }
-            }
-        }
-*/
         compareTime(img)
     }
 
@@ -474,15 +551,6 @@ class MainActivity : AppCompatActivity() {
                 break;
             }
         }
-        /*db.collection("meta")
-            // 위경도 같은게 1개라도 있으면 색 비교
-            .whereEqualTo("latitude", img.latitude)
-            .whereEqualTo("longitude", img.longitude)
-            .get()
-            .addOnSuccessListener { documents ->
-                if(documents.size() != 0)
-                    compareColor(img)
-            }*/
     }
 
     // 유사사진 - 색
@@ -513,9 +581,6 @@ class MainActivity : AppCompatActivity() {
                     cc3 = it.get("color3").toString().toInt()
                     var cTotal = c1+c2+c3
                     var ccTotal = cc1 +cc2 + cc3
-                    /*if(it.get("color1").toString().toInt() == c1 &&
-                        it.get("color2").toString().toInt() == c2 &&
-                        it.get("color3").toString().toInt() == c3)*/
                     if((cTotal - 400000 < ccTotal) || (ccTotal < cTotal + 400000))
                     {
                         db.collection("remove").document(docTitle).update("similar", true)
@@ -523,19 +588,10 @@ class MainActivity : AppCompatActivity() {
                 }
 
             }
-            /*// 모든 색이 같으면 similar 태그 true
-            db.collection("color")
-                .whereEqualTo("color1", c1)
-                .whereEqualTo("color2", c2)
-                .whereEqualTo("color3", c3)
-                .get()
-                .addOnSuccessListener { documents ->
-                    if(documents.size() != 0)
-                        db.collection("remove").document(docTitle).update("similar", true)
-                }*/
         }
 
     }
+
 
     // 앱 켜질 때 시간 저장하는 함수
     fun saveTime() {
