@@ -1,21 +1,24 @@
 
 package com.example.imagemanageapp.ui.recommend
 
+import android.graphics.Color
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 import android.os.Bundle
+import android.provider.SyncStateContract.Helpers.update
 import android.util.Log
-import android.util.SparseBooleanArray
 import android.view.*
 import android.widget.GridView
-import android.widget.ListView
+import android.widget.ImageView
 import androidx.core.view.get
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
 import com.example.imagemanageapp.R
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.android.synthetic.main.fragment_image.*
 import kotlinx.android.synthetic.main.fragment_showcategory_checkbox.*
-import kotlinx.android.synthetic.main.fragment_showcategory_checkbox.view.*
 import kotlinx.android.synthetic.main.fragment_showcategory_image_list.*
 import kotlinx.android.synthetic.main.fragment_showcategory_image_list.view.*
+import kotlinx.android.synthetic.main.fragment_showcategory_image.view.*
 
 
 data class CategoryImage(
@@ -33,6 +36,8 @@ class ShowCategoryImageFragment: Fragment(){
     private var cAdapter : CategoryImageAdapter? = null
 
     private var checkedImages = mutableListOf<String>()
+    private var img : ImageView? = null
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -48,22 +53,50 @@ class ShowCategoryImageFragment: Fragment(){
 
 
         val aAdapter = CategoryImageAdapter(this.activity,categoryImageData)
-     //   val check: CheckBox = root.findViewById((R.id.itemCheckBox))
+        img = root.findViewById((R.id.img))
 
         //툴바 메뉴사용하려면 꼭 필요
         setHasOptionsMenu(true)
         read()
 
         root.selectBtn.setOnClickListener {
-
-
-
-         //   checkBox(check)
-            read()
+            btnAction()
+            refresh()
 
         }
 
         return root
+    }
+
+    //gridview 새로고침
+    private fun refresh(){
+        val titleLIst1 = arguments?.getString("titleList")
+        val titleList = Bundle()
+        titleList.putString("titleList",titleLIst1)
+        //fragment to fragment 전환
+        val newFragment = ShowCategoryImageFragment()
+        newFragment.arguments = titleList
+        val transaction = parentFragmentManager.beginTransaction()
+        transaction?.replace(R.id.nav_host_fragment,newFragment)
+        transaction.commit()
+    }
+
+    //ok버튼 누르면 deteled=true로 update
+    private fun btnAction(){
+       // Log.d("cc",checkedImages.toString())
+        val titleLIst = checkedImages.toString()
+        var titles = titleLIst!!.substring(1,titleLIst.length-1).split(", ")
+
+
+        for(t in titles){
+            //id나중에 수정
+            val doc = String.format("%s-%s","hankki1998",t)
+            Log.d("docList",doc)
+
+            db.collection("meta")
+                .document(doc)
+                .update("deleted",true)
+        }
     }
 
 
@@ -74,11 +107,11 @@ class ShowCategoryImageFragment: Fragment(){
         for(t in titles){
             Log.d("t",t)
             db.collection("meta")
+                .whereEqualTo("deleted",false)
                 .whereEqualTo("title",t)
                 .get()
                 .addOnSuccessListener { documents ->
                     for(document in documents) {
-                        Log.d("two","two")
                         val token = document.get("token").toString()
                         Log.d("token",token.toString())
                         categoryImageData.add(CategoryImage(token,t))
@@ -110,10 +143,6 @@ class ShowCategoryImageFragment: Fragment(){
         cGrid = grid
         cAdapter = CategoryImageAdapter(this.activity,categoryImageData)
         cGrid!!.adapter = cAdapter
-      /*  cGrid.setOnItemClickListener { parent, view, position, id ->
-            checkedImage(categoryImageData[position].title)
-
-        } */
     }
 
     override fun onCreateOptionsMenu(menu: Menu,inflater:MenuInflater) {
@@ -130,7 +159,8 @@ class ShowCategoryImageFragment: Fragment(){
             cGrid!!.setOnItemClickListener { parent, view, position, id ->
 
                 checkItem(categoryImageData[position].title)
-              //  checkremove(categoryImageData[position].title)
+                changeColor(position,categoryImageData[position].title)
+               // Log.d("getPosition",position.toString())
 
 
             }
@@ -143,44 +173,28 @@ class ShowCategoryImageFragment: Fragment(){
         }
     }
 
-    private fun checkItem(title: String?){
-      //  checknum++
-
-   /*    if(checknum%2 == 1) {
-            checkedImages.add(title!!)
-           // val listcheck = checkedImages.distinct()
-            Log.d("checkdImages",checkedImages.toString())
+    private fun changeColor(position:Int?,title: String?){
+        val color=Color.GRAY
+        val mode = PorterDuff.Mode.SCREEN
+        if(checkedImages.contains(title)) {
+            cGrid!![position!!].img!!.setColorFilter(color,mode)
         }else{
-            checkedImages.remove(title!!)
-            Log.d("checkdImages",checkedImages.toString())
+            cGrid!![position!!].img!!.setColorFilter(null)
         }
-*/
 
-        checkedImages.add(title!!)
-        Log.d("checkImage",checkedImages.toString())
-     /*   Log.d("checkdImages",checkedImages.toString())
-        while (checkedImages.listIterator().hasNext()){
-            if(checkedImages.contains(title)){
-                checkedImages.remove(title!!)
-                Log.d("checkdImagesRemove",checkedImages.toString())
-            }
-        }
-*/
+
     }
 
-    private fun checkremove(title: String?){
+    //사진클릭시 리스트에 넘어감
+    //다시 클릭시 선택취소
+    private fun checkItem(title: String?){
+        if(!checkedImages.contains(title)) {
+            checkedImages.add(title!!)
 
-       for(a in 0..checkedImages.size-1){
-            if(checkedImages.get(a).equals(title)){
-                val b=a+1
-                for(b in 0..checkedImages.size-1) {
-                    if (checkedImages.get(b).equals(title)) {
-                        checkedImages.remove(title!!)
-                        Log.d("checkdImagesRemove", checkedImages.toString())
-                    }
-                }
-            }
+        }else{
+            checkedImages.remove(title!!)
         }
+        Log.d("checkdImagesRemove", checkedImages.toString())
 
     }
 

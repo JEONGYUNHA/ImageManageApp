@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "254529947622-iq6pffp2425qir5312f60hhh0fjpd417.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.imagemanageapp",
+            "certificate_hash": "b5d7c5deb2a8b97b826f67da8d7f6d2f26e296a4"
+          }
+        },
+        {
           "client_id": "254529947622-6jdinfqbji3nlle3drllpop4cuchl7dc.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
