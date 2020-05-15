@@ -92,5 +92,4 @@ dependencies {
     //버튼 라이브러리
     implementation 'com.getbase:floatingactionbutton:1.10.1'
 
-
 }

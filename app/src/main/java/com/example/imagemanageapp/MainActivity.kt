@@ -24,8 +24,7 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.firestore.*
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.nav_header_main.view.*
 import kotlinx.coroutines.Dispatchers
@@ -38,7 +37,10 @@ import kotlin.collections.ArrayList
 
 // openCV에서 흔들림 정도를 판단할 임계값
 // 이 임계값보다 값이 작으면 흔들린 것, 크면 안 흔들린 것
-const val THRESHOLD : Double = 400.0
+const val SHAKEN_THRESHOLD: Double = 350.0
+
+// 유사사진 판단할 초(10초)
+const val SIMILAR_TIME: Int = 10000
 
 class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
@@ -287,7 +289,7 @@ class MainActivity : AppCompatActivity() {
             // 업로드 성공 시
             Log.d("Storage upload result", img.path)
             mountainImagesRef.downloadUrl.addOnCompleteListener {
-                if(it.isComplete) {
+                if (it.isComplete) {
                     Log.d("token", it.toString())
                     img.token = it.result.toString()
                     uploadToDB(img)
@@ -296,7 +298,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun uploadToDB(img : Meta) {
+    fun uploadToDB(img: Meta) {
         val docTitle = String.format("%s-%s", img.id, img.title)
 
         // meta DB에 업로드
@@ -311,7 +313,21 @@ class MainActivity : AppCompatActivity() {
             }
 
         // auto DB에 업로드
-        val auto = Auto(img.id, img.title, person = false, animal = false, traffic = false, furniture = false, book = false, bag = false, sport = false, device = false, plant = false, food = false, things = false)
+        val auto = Auto(
+            img.id,
+            img.title,
+            person = false,
+            animal = false,
+            traffic = false,
+            furniture = false,
+            book = false,
+            bag = false,
+            sport = false,
+            device = false,
+            plant = false,
+            food = false,
+            things = false
+        )
         db.collection("auto")
             .document(docTitle)
             .set(auto)
@@ -325,7 +341,14 @@ class MainActivity : AppCompatActivity() {
             }
 
         // remove DB에 업로드
-        val remove = Remove(img.id, img.title, similar = false, shaken = false, darked = false, unbalanced = false, screenshot = false)
+        val remove = Remove(
+            img.id,
+            img.title,
+            similar = false,
+            shaken = false,
+            darked = false,
+            screenshot = false
+        )
         db.collection("remove")
             .document(docTitle)
             .set(remove)
@@ -334,7 +357,7 @@ class MainActivity : AppCompatActivity() {
                 // 색 추출 후 저장
                 saveColor(img)
                 // 스크린샷이 아닌 사진들에 대해서만 태그 체크
-                if(!checkScreenshot(img)) {
+                if (!checkScreenshot(img)) {
                     checkShaken(img)
                     checkDarkImage(img)
                     checkSimilar(img)
@@ -347,10 +370,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     // 스크린샷 체크하는 함수
-    fun checkScreenshot(img : Meta) : Boolean {
+    fun checkScreenshot(img: Meta): Boolean {
         val imgTitle = img.title
         val isScreenshot = imgTitle!!.contains("Screenshot", true)
-        if(isScreenshot) {
+        if (isScreenshot) {
             val docTitle = String.format("%s-%s", img.id, img.title)
 
             db.collection("remove")
@@ -368,11 +391,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     // 흔들린 사진 체크하는 함수
-    fun checkShaken(img : Meta) {
-        val opencv : OpenCV = OpenCV(this)
-        val fm : Double = opencv.isShaken(img.path)
+    fun checkShaken(img: Meta) {
+        val opencv: OpenCV = OpenCV(this)
+        val fm: Double = opencv.isShaken(img.path)
         Log.d("fm", String.format("%s - %.5f", img.path, fm))
-        if(fm < THRESHOLD) {
+        if (fm < SHAKEN_THRESHOLD) {
             val docTitle = String.format("%s-%s", img.id, img.title)
 
             db.collection("remove")
@@ -388,12 +411,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     // 어두운 사진 체크하는 함수
-    fun checkDarkImage(img : Meta) {
-        val isDark : DarkImage = DarkImage(this)
+    fun checkDarkImage(img: Meta) {
+        val isDark: DarkImage = DarkImage(this)
         val final: String = isDark.checkDarkImg(img.path)
         val docTitle = String.format("%s-%s", img.id, img.title)
 
-        if(final.equals("dark")) {
+        if (final.equals("dark")) {
             db.collection("remove")
                 .document(docTitle)
                 .update("darked", true)
@@ -408,88 +431,162 @@ class MainActivity : AppCompatActivity() {
     }
 
     //auto 태그 체크해주는 함수
-    fun checkAuto(img : Meta){
-        var highPercent : Array<String> = emptyArray()
+    fun checkAuto(img: Meta) {
+        var highPercent: Array<String> = emptyArray()
         val docTitle = String.format("%s-%s", img.id, img.title)
 
         var person: Array<String> = arrayOf("person", "tie")
-        var animal: Array<String> = arrayOf("bird", "cat", "dog", "horse", "sheep", "cow", "elephant", "bear", "zebra", "giraffe", "teddy bear")
-        var traffic: Array<String> = arrayOf("bicycle", "car", "motorcycle", "airplane", "bus", "train", "truck", "boat", "traffic light", "stop sign", "parking meter", "fire hydrant")
-        var furniture: Array<String> = arrayOf("chair", "couch", "bed", "refrigerator", "sink", "toilet", "dining table", "clock")
+        var animal: Array<String> = arrayOf(
+            "bird",
+            "cat",
+            "dog",
+            "horse",
+            "sheep",
+            "cow",
+            "elephant",
+            "bear",
+            "zebra",
+            "giraffe",
+            "teddy bear"
+        )
+        var traffic: Array<String> = arrayOf(
+            "bicycle",
+            "car",
+            "motorcycle",
+            "airplane",
+            "bus",
+            "train",
+            "truck",
+            "boat",
+            "traffic light",
+            "stop sign",
+            "parking meter",
+            "fire hydrant"
+        )
+        var furniture: Array<String> = arrayOf(
+            "chair",
+            "couch",
+            "bed",
+            "refrigerator",
+            "sink",
+            "toilet",
+            "dining table",
+            "clock"
+        )
         var book: Array<String> = arrayOf("book")
         var bag: Array<String> = arrayOf("handbag", "backpack", "suitcase")
-        var sport: Array<String> = arrayOf("frisbee", "skis", "snowboard", "sports ball", "kite", "baseball bat", "baseball glove", "skateboard", "surfboard", "tennis racket")
-        var food: Array<String> = arrayOf("wine glass", "cup", "fork", "knife", "spoon", "bowl", "banana", "apple", "sandwich", "orange", "broccoli", "carrot", "hot dog", "pizza", "donut", "cake", "bottle")
-        var device: Array<String> = arrayOf("hair drier", "toaster", "oven", "microwave", "cell phone", "keyboard", "remote", "mouse", "laptop", "tv", "refrigerator")
+        var sport: Array<String> = arrayOf(
+            "frisbee",
+            "skis",
+            "snowboard",
+            "sports ball",
+            "kite",
+            "baseball bat",
+            "baseball glove",
+            "skateboard",
+            "surfboard",
+            "tennis racket"
+        )
+        var food: Array<String> = arrayOf(
+            "wine glass",
+            "cup",
+            "fork",
+            "knife",
+            "spoon",
+            "bowl",
+            "banana",
+            "apple",
+            "sandwich",
+            "orange",
+            "broccoli",
+            "carrot",
+            "hot dog",
+            "pizza",
+            "donut",
+            "cake",
+            "bottle"
+        )
+        var device: Array<String> = arrayOf(
+            "hair drier",
+            "toaster",
+            "oven",
+            "microwave",
+            "cell phone",
+            "keyboard",
+            "remote",
+            "mouse",
+            "laptop",
+            "tv",
+            "refrigerator"
+        )
         var plant: Array<String> = arrayOf("potted plant", "vase", "bench")
         var things: Array<String> = arrayOf("umbrella", "scissors", "toothbrush")
 
-        var isAuto : AutoImage = AutoImage(this)
+        var isAuto: AutoImage = AutoImage(this)
         var final: Array<String> = isAuto.checkAutoImg(img.path)
 
-        if(final[0]==final[1]){
+        if (final[0] == final[1]) {
             highPercent = arrayOf(final[0])
             Log.d("highPercent", highPercent[0])
-        }
-        else if(final[0]!=final[1]){
+        } else if (final[0] != final[1]) {
             highPercent = arrayOf(final[0], final[1])
             Log.d("highPercent", highPercent[0])
             Log.d("highPercent", highPercent[1])
         }
         var doc = db.collection("auto").document(docTitle)
-        for (highPercentIndex in highPercent){
-            for(p in person){
-                if(highPercentIndex == p) {
+        for (highPercentIndex in highPercent) {
+            for (p in person) {
+                if (highPercentIndex == p) {
                     doc.update("person", true)
                 }
             }
-            for(a in animal){
-                if(highPercentIndex == a) {
+            for (a in animal) {
+                if (highPercentIndex == a) {
                     doc.update("animal", true)
                 }
             }
-            for(t in traffic){
-                if(highPercentIndex == t) {
+            for (t in traffic) {
+                if (highPercentIndex == t) {
                     doc.update("traffic", true)
                 }
             }
-            for(f in furniture){
-                if(highPercentIndex == f) {
+            for (f in furniture) {
+                if (highPercentIndex == f) {
                     doc.update("furniture", true)
                 }
             }
-            for(b in book){
-                if(highPercentIndex == b) {
+            for (b in book) {
+                if (highPercentIndex == b) {
                     doc.update("book", true)
                 }
             }
-            for(b in bag){
-                if(highPercentIndex == b) {
+            for (b in bag) {
+                if (highPercentIndex == b) {
                     doc.update("bag", true)
                 }
             }
-            for(s in sport){
-                if(highPercentIndex == s) {
+            for (s in sport) {
+                if (highPercentIndex == s) {
                     doc.update("sport", true)
                 }
             }
-            for(f in food){
-                if(highPercentIndex == f) {
+            for (f in food) {
+                if (highPercentIndex == f) {
                     doc.update("food", true)
                 }
             }
-            for(d in device){
-                if(highPercentIndex == d) {
+            for (d in device) {
+                if (highPercentIndex == d) {
                     doc.update("device", true)
                 }
             }
-            for(p in plant){
-                if(highPercentIndex == p) {
+            for (p in plant) {
+                if (highPercentIndex == p) {
                     doc.update("plant", true)
                 }
             }
-            for(t in things){
-                if(highPercentIndex == t) {
+            for (t in things) {
+                if (highPercentIndex == t) {
                     doc.update("things", true)
                 }
             }
@@ -498,24 +595,22 @@ class MainActivity : AppCompatActivity() {
 
     // Color 3가지 추출하여 저장
     fun saveColor(img: Meta) {
-        val opencv : OpenCV = OpenCV(this)
+        val opencv: OpenCV = OpenCV(this)
         val rgbList = opencv.color(img.path)
         val docTitle = String.format("%s-%s", img.id, img.title)
 
-        // color 3가지 저장
-        var colorList = MutableList<Int>(3, {i -> i})
-        for(i in 0..2) {
-            colorList[i] = android.graphics.Color.rgb(rgbList[i].r, rgbList[i].g, rgbList[i].b)
-        }
-        var colors = Color(colorList[0], colorList[1], colorList[2])
+        var collection = db.collection("color").document(docTitle).collection("colors")
 
-        db.collection("color")
-            .document(docTitle)
-            .set(colors)
-            .addOnSuccessListener {
-            }
-            .addOnFailureListener {
-            }
+        // color 3가지 저장
+        for (i in 0..2) {
+            var color: Color = Color(
+                android.graphics.Color.rgb(rgbList[i].r, rgbList[i].g, rgbList[i].b),
+                rgbList[i].r,
+                rgbList[i].g,
+                rgbList[i].b
+            )
+            collection.document(String.format("%s%d", "color", i + 1)).set(color)
+        }
     }
 
     // 유사 사진 체크하는 함수
@@ -527,71 +622,97 @@ class MainActivity : AppCompatActivity() {
     fun compareTime(img: Meta) {
         // 시간 비교
         db.collection("meta")
-            // 현재 사진 3초 전 ~ 현재 사진 ~ 현재 사진 3초 후 시간인게 하나라도 있으면 위치 비교 실행
-            .whereGreaterThanOrEqualTo("date", img.date - 3000)
-            .whereLessThanOrEqualTo("date", img.date + 3000)
+            // 현재 사진 10초 전 ~ 현재 사진 ~ 현재 사진 10초 후 시간인게 하나라도 있으면 위치 비교 실행
+            .whereGreaterThan("date", img.date - SIMILAR_TIME)
+            .whereLessThan("date", img.date + SIMILAR_TIME)
             .get()
             .addOnSuccessListener { documents ->
                 Log.d("compare", "time")
-                if(documents.size() != 0)
-                    compareLocation(img, documents)
+                var resultDocuments = documents.documents
+                resultDocuments.clear()
+                for(d in documents) {
+                    if(!(d.get("title").toString().equals(img.title)))
+                        resultDocuments.add(d)
+                }
+                if (resultDocuments.size != 0)
+                    compareLocation(img, resultDocuments)
             }
 
     }
 
     // 유사사진 - 위치
-    fun compareLocation(img: Meta, documents : QuerySnapshot) {
+    fun compareLocation(img: Meta, resultDocuments: List<DocumentSnapshot>) {
         Log.d("compare", "location")
         // 위경도 비교
         // 현재 이미지의 위경도를 넘겨받은 문서들의 위경도와 비교하여 하나라도 있으면 색 비교 실행
-        for(document in documents) {
-            if(document.get("latitude").toString().toDouble() == img.latitude &&
-                document.get("longitude").toString().toDouble() == img.longitude ) {
-                compareColor(img, documents)
+        for (d in resultDocuments) {
+            if (d.get("latitude").toString().toDouble() == img.latitude &&
+                d.get("longitude").toString().toDouble() == img.longitude
+            ) {
+                compareColor(img, resultDocuments)
                 break;
             }
         }
     }
 
     // 유사사진 - 색
-    fun compareColor(img: Meta, documents : QuerySnapshot) {
+    fun compareColor(img: Meta, resultDocuments: List<DocumentSnapshot>) {
         Log.d("compare", "color")
         var docTitle = String.format("%s-%s", img.id, img.title)
-        var docTitle2 : String
-        var c1 : Int
-        var c2 : Int
-        var c3 : Int
-        var cc1 : Int
-        var cc2 : Int
-        var cc3 : Int
-        // 현재 이미지의 색 3가지를 불러와 넘겨받은 문서들과 비교
-        db.collection("color").document(docTitle).get().addOnSuccessListener {
-            // 현재 이미지의 색 3가지 저장
-            c1 = it.get("color1").toString().toInt()
-            c2 = it.get("color2").toString().toInt()
-            c3 = it.get("color3").toString().toInt()
+        var colors = arrayListOf<Color>()
+        var docTitle2: String
+        var compareColors = arrayListOf<Color>()
 
-            // 넘겨받은 문서들의 색과 비교
-            // 모든 색이 같으면 현재 이미지 similar 태그 true
-            for(document in documents) {
-                docTitle2 = String.format("%s-%s", document.get("id").toString(), document.get("title").toString())
-                db.collection("color").document(docTitle2).get().addOnSuccessListener {
-                    cc1 = it.get("color1").toString().toInt()
-                    cc2 = it.get("color2").toString().toInt()
-                    cc3 = it.get("color3").toString().toInt()
-                    var cTotal = c1+c2+c3
-                    var ccTotal = cc1 +cc2 + cc3
-                    if((cTotal - 400000 < ccTotal) || (ccTotal < cTotal + 400000))
-                    {
-                        db.collection("remove").document(docTitle).update("similar", true)
-                    }
+        // 현재 이미지를 intColor가 큰 순으로 정렬하여 colors에 저장함
+        db.collection("color").document(docTitle).collection("colors")
+            .orderBy("intColor").get().addOnSuccessListener { documents ->
+                for (d in documents) {  // 3번 실행
+                    var color = Color(
+                        d.get("intColor").toString().toInt(),
+                        d.get("r").toString().toInt(),
+                        d.get("g").toString().toInt(),
+                        d.get("b").toString().toInt()
+                    )
+                    colors.add(color)
+                }
+                // 넘겨받은 문서 값 받아와서 비교
+                for (d in resultDocuments) {
+                    docTitle2 = String.format("%s-%s", d.get("id").toString(), d.get("title").toString())
+                    db.collection("color").document(docTitle2).collection("colors")
+                        .orderBy("intColor").get().addOnSuccessListener { documents ->
+                            for (d in documents) {  // 3번 실행
+                                var color = Color(
+                                    d.get("intColor").toString().toInt(),
+                                    d.get("r").toString().toInt(),
+                                    d.get("g").toString().toInt(),
+                                    d.get("b").toString().toInt()
+                                )
+                                compareColors.add(color)
+                            }
+                            compareRGB(docTitle, colors, compareColors)
+                            compareColors.clear()
+                        }
                 }
 
             }
-        }
+
 
     }
+    // RGB 각각 범위 비교 (오차범위 : +- 20)
+    fun isInRange(n1: Int, n2: Int) = n2 in n1 - 20..n1 + 20
+    fun compareRGB(docTitle : String, colors: ArrayList<Color>, compareColors: ArrayList<Color>)  : Boolean{
+        if (isInRange(colors[0].r, compareColors[0].r) && isInRange(colors[0].g, compareColors[0].g) && isInRange(colors[0].g, compareColors[0].g)) {
+            if (isInRange(colors[1].r, compareColors[1].r) && isInRange(colors[1].g, compareColors[1].g) && isInRange(colors[1].g, compareColors[1].g)) {
+                if (isInRange(colors[2].r, compareColors[2].r) && isInRange(colors[2].g, compareColors[2].g) && isInRange(colors[2].g, compareColors[2].g)) {
+                    db.collection("remove").document(docTitle)
+                        .update("similar", true)
+                    return true
+                }
+            }
+        }
+        return false
 
+    }
 
     // 앱 켜질 때 시간 저장하는 함수
     fun saveTime() {

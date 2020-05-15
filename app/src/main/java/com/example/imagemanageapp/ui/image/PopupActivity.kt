@@ -83,18 +83,15 @@ class PopupActivity : AppCompatActivity() {
 
     // 저장된 3개의 색을 불러와 view 3개에 띄워줌
     private fun showColors() {
-        var c1: Int = 0
-        var c2: Int = 0
-        var c3: Int = 0
+        var c = arrayListOf<Int>()
+        db!!.collection("color").document(docTitle).collection("colors").get().addOnSuccessListener {documents->
+            for(d in documents) {
+                c.add(d.get("intColor").toString().toInt())
+            }
+            color1.setBackgroundColor(c[0])
+            color2.setBackgroundColor(c[1])
+            color3.setBackgroundColor(c[2])
 
-        db!!.collection("color").document(docTitle).get().addOnSuccessListener {
-            c1 = it.get("color1").toString().toInt()
-            c2 = it.get("color2").toString().toInt()
-            c3 = it.get("color3").toString().toInt()
-
-            color1.setBackgroundColor(c1)
-            color2.setBackgroundColor(c2)
-            color3.setBackgroundColor(c3)
         }
 
     }
