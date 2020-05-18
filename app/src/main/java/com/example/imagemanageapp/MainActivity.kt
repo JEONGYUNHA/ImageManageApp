@@ -11,6 +11,8 @@ import android.provider.Settings
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Switch
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
@@ -62,6 +64,7 @@ class MainActivity : AppCompatActivity() {
 
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
+
     }
 
     override fun onStart() {
@@ -94,10 +97,25 @@ class MainActivity : AppCompatActivity() {
     // 상단 메뉴 생성
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main, menu)
-        return true
+
+        //자동 삭제 item에서 빼오기
+        val item: MenuItem = menu.findItem(R.id.app_bar_switch)
+        val deleteSwitch: Switch = item.actionView.findViewById<Switch>(R.id.switch1)
+
+        deleteSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
+            if(isChecked){
+                Toast.makeText(this, "Switch On", Toast.LENGTH_SHORT).show()
+            }
+            else{
+                Toast.makeText(this, "Switch Off", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+            return true
     }
 
-    // 상단 메뉴 중 검색 버튼 선택 시
+
+    // 상단 메뉴 중 검색 선택 시
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         val id = item?.getItemId()
         if (id == R.id.action_search) {
@@ -332,12 +350,12 @@ class MainActivity : AppCompatActivity() {
             .document(docTitle)
             .set(auto)
             .addOnSuccessListener { documentReference ->
-                Log.d("DB Meta upload", "DocumentSnapshot written with ID: ${docTitle}")
+                Log.d("DB auto upload", "DocumentSnapshot written with ID: ${docTitle}")
                 // 스크린샷이 아닌 사진들에 대해서만 태그 체크
                 checkAuto(img)
             }
             .addOnFailureListener { e ->
-                Log.w("DB Meta upload", "Error adding document", e)
+                Log.w("DB auto upload", "Error adding document", e)
             }
 
         // remove DB에 업로드
@@ -353,7 +371,7 @@ class MainActivity : AppCompatActivity() {
             .document(docTitle)
             .set(remove)
             .addOnSuccessListener { documentReference ->
-                Log.d("DB Meta upload", "DocumentSnapshot written with ID: ${docTitle}")
+                Log.d("DB remove upload", "DocumentSnapshot written with ID: ${docTitle}")
                 // 색 추출 후 저장
                 saveColor(img)
                 // 스크린샷이 아닌 사진들에 대해서만 태그 체크
@@ -364,7 +382,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             .addOnFailureListener { e ->
-                Log.w("DB Meta upload", "Error adding document", e)
+                Log.w("DB remove upload", "Error adding document", e)
             }
 
     }
