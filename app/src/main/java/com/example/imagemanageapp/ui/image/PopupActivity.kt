@@ -104,5 +104,18 @@ class PopupActivity : AppCompatActivity() {
             if(it.get("screenshot") as Boolean) { tagField.append("#스크린샷 ") }
             if(it.get("similar") as Boolean) { tagField.append("#유사한 ") }
         }
+        db!!.collection("auto").document(docTitle).get().addOnSuccessListener {
+            if(it.get("person") as Boolean) { tagField.append("#사람 ") }
+            if(it.get("animal") as Boolean) { tagField.append("#동물 ") }
+            if(it.get("traffic") as Boolean) { tagField.append("#교통수단 ") }
+            if(it.get("furniture") as Boolean) { tagField.append("#가구 ") }
+            if(it.get("book") as Boolean) { tagField.append("#책 ") }
+            if(it.get("bag") as Boolean) { tagField.append("#가방 ") }
+            if(it.get("sport") as Boolean) { tagField.append("#스포츠 ") }
+            if(it.get("device") as Boolean) { tagField.append("#전자기기 ") }
+            if(it.get("plant") as Boolean) { tagField.append("#식물 ") }
+            if(it.get("food") as Boolean) { tagField.append("#음식 ") }
+            if(it.get("things") as Boolean) { tagField.append("#잡동사니 ") }
+        }
     }
 }

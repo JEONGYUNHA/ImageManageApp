@@ -54,13 +54,11 @@ class AlbumGridAdapter : BaseAdapter {
             .centerCrop()
             .into(imageView)
 
-
         val fragment = SingleImageFragment()
         val bundle = Bundle(1)
         bundle.putString("token", d)
         fragment.arguments = bundle
         Log.d("bundle", bundle.toString())
-
 
         // 클릭 시 사진 확대
         mView.setOnClickListener {

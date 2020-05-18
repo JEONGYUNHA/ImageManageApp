@@ -24,12 +24,13 @@ class AlbumFragment : Fragment() {
 
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
     private var tokens = arrayListOf<String>()
+    private var root : View? = null
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val root = inflater.inflate(R.layout.fragment_album, container, false)
+        root = inflater.inflate(R.layout.fragment_album, container, false)
 
 
         return root
@@ -52,9 +53,10 @@ class AlbumFragment : Fragment() {
                     db.collection("meta").document(docTitle).get().addOnSuccessListener {
                         val token = it.get("token").toString()
                         tokens.add(token)
+                        Log.d("albumToken", tokens.toString())
                     }
-                    showImages()
                 }
+                showImages()
             }
     }
 
@@ -63,6 +65,9 @@ class AlbumFragment : Fragment() {
         val transaction = parentFragmentManager.beginTransaction()
         val mAdapter = AlbumGridAdapter(this.activity, transaction, tokens)
         mGrid.adapter = mAdapter
+        Log.d("tokensSize", tokens.size.toString())
+        // GridView의 numColumns를 불러온 이미지 갯수로 지정해주기
+        root!!.findViewById<GridView>(R.id.gridView).numColumns = tokens.size
     }
 
     // Date를 String으로 바꿔주는 함수
