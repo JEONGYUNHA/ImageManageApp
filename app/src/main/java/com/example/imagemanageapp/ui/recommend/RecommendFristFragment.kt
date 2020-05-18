@@ -16,7 +16,6 @@ import androidx.fragment.app.FragmentTransaction
 import com.example.imagemanageapp.R
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.fragment_recommend_secondfragment.*
-import kotlinx.android.synthetic.main.fragment_showcategory_checkbox.*
 import kotlinx.android.synthetic.main.fragment_showcategory_image_list.*
 import kotlinx.android.synthetic.main.fragment_showcategory_image_list.view.*
 import kotlinx.android.synthetic.main.fragment_showcategory_image.view.*

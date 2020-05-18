@@ -45,7 +45,7 @@ class CategoryDeleteAdapter : BaseAdapter{
         var cView = convertView
 
         val inflater = LayoutInflater.from(ctx)
-        cView = inflater.inflate(R.layout.fragment_showcategory_checkbox,parent,false)
+        cView = inflater.inflate(R.layout.fragment_showcategory_image,parent,false)
         val image = cView.img
       //val title = cView.title
 
@@ -56,13 +56,6 @@ class CategoryDeleteAdapter : BaseAdapter{
             .load(c.token)
             .into(image)
 
-        val check = cView.findViewById<CheckBox>(R.id.itemCheckBox)
-        check.setOnCheckedChangeListener { buttonView, isChecked ->
-
-        }
-        if(check.isChecked == true){
-            checkedImages.add(position)
-        }
 
 
         return cView

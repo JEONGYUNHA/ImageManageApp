@@ -109,5 +109,4 @@ class RecommendThirdFragment : Fragment() {
         cAdapter = CategoryImageAdapter(this.activity,categoryImageData)
         cGrid!!.adapter = cAdapter
     }
-
 }
