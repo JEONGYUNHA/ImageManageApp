@@ -5,56 +5,47 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.GridView
 import android.widget.ListView
+import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.ItemDecoration
+import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
+import androidx.viewpager.widget.ViewPager
+import com.example.imagemanageapp.Meta
 import com.example.imagemanageapp.R
-import com.example.imagemanageapp.ui.image.Image
-import com.example.imagemanageapp.ui.image.ListAdapter
-import com.example.imagemanageapp.ui.image.SingleImageFragment
-import com.google.android.gms.tasks.Task
-import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.firestore.Query
 import kotlinx.android.synthetic.main.fragment_album.*
 import kotlinx.android.synthetic.main.fragment_image.*
 import java.text.SimpleDateFormat
 import java.util.*
 
-class AlbumFragment : Fragment() {
-
+class AlbumImageFragment : Fragment() {
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
     private var tokens = arrayListOf<String>()
     private var root : View? = null
+    private var tagName : String? = null
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        root = inflater.inflate(R.layout.fragment_album, container, false)
-
-        val fragment = AlbumImageFragment()
-        val bundle = Bundle(1)
-        bundle.putString("tagName", "사람")
-        fragment.arguments = bundle
-
-        val transaction = parentFragmentManager.beginTransaction()
-        root!!.findViewById<Button>(R.id.moreBtn).setOnClickListener {
-            transaction?.replace(R.id.nav_host_fragment, fragment)
-            transaction?.addToBackStack(null)
-            transaction?.commit()
-        }
+        //imageViewModel = ViewModelProviders.of(this).get(ImageViewModel::class.java)
+        root = inflater.inflate(R.layout.fragment_albumimage, container, false)
+        tagName = arguments?.getString("tagName")
         return root
+    }
+
+    override fun onStart() {
+        super.onStart()
     }
 
     override fun onResume() {
         super.onResume()
         readImages()
-
 
     }
 
@@ -83,18 +74,7 @@ class AlbumFragment : Fragment() {
         val transaction = parentFragmentManager.beginTransaction()
         val mAdapter = AlbumGridAdapter(this.activity, transaction, tokens)
         mGrid.adapter = mAdapter
-        Log.d("tokensSize", tokens.size.toString())
         // GridView의 numColumns를 불러온 이미지 갯수로 지정해주기
-        root!!.findViewById<GridView>(R.id.gridView).numColumns = tokens.size
+        root!!.findViewById<TextView>(R.id.textView).text = tagName
     }
-
-    // Date를 String으로 바꿔주는 함수
-    private fun DateToString(date: Date): String {
-        val dateFormat: SimpleDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-        val str = dateFormat.format(date)
-
-        return str
-    }
-
-
 }
