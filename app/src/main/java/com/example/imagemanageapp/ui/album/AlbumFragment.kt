@@ -28,11 +28,21 @@ import java.util.*
 class AlbumFragment : Fragment() {
 
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
-    private var tokens = arrayListOf<String>()
-    private var root : View? = null
-    private var tags : HashMap<String, String> = hashMapOf("사람" to "person", "동물" to "animal",
-        "교통수단" to "traffic", "가구" to "furniture", "책" to "book", "가방" to "bag", "스포츠" to "sport", "전자기기" to "device",
-        "식물" to "plant", "음식" to "food", "잡동사니" to "things")
+    private var datas = arrayListOf<Album>()
+    private var root: View? = null
+    private var tags: HashMap<String, String> = hashMapOf(
+        "사람" to "person",
+        "동물" to "animal",
+        "교통수단" to "traffic",
+        "가구" to "furniture",
+        "책" to "book",
+        "가방" to "bag",
+        "스포츠" to "sport",
+        "전자기기" to "device",
+        "식물" to "plant",
+        "음식" to "food",
+        "잡동사니" to "things"
+    )
     private var koreanTags: ArrayList<String> = arrayListOf(
         "사람", "동물",
         "교통수단",
@@ -71,12 +81,36 @@ class AlbumFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-
-        val transaction = parentFragmentManager.beginTransaction()
-        val mAdapter = AlbumListAdapter(this.activity, transaction, koreanTags, englishTags)
-        listView.adapter = mAdapter
-
+        datas.clear()
+        readImages()
     }
 
+    private fun readImages(){
+        for (i in 0..englishTags.size - 1) {
+            var size = 0
+            var token: String
+            db.collection("auto")
+                .whereEqualTo(englishTags[i], true)
+                .get()
+                .addOnSuccessListener { documents ->
+                    if(documents.size() != 0) {
+                        var title = documents.documents[documents.size()-1].get("title").toString()
+                        db.collection("meta").whereEqualTo("title", title).get().addOnSuccessListener {
+                            size = documents.size()
+                            token = it.documents[0].get("token").toString()
+                            datas.add(Album(koreanTags[i], englishTags[i], size, token))
+                            Log.d("datas", datas.toString())
+                            setAdapter()
+                        }
+                    }
+                }
+        }
+    }
+
+    private fun setAdapter() {
+        val transaction = parentFragmentManager.beginTransaction()
+        val mAdapter = AlbumGridAdapter(this.activity, transaction, datas)
+        albumGridView.adapter = mAdapter
+    }
 
 }

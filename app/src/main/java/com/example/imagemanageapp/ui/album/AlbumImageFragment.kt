@@ -20,13 +20,18 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import kotlinx.android.synthetic.main.album_row.*
 import kotlinx.android.synthetic.main.fragment_album.*
+import kotlinx.android.synthetic.main.fragment_albumimage.*
 import kotlinx.android.synthetic.main.fragment_image.*
 import java.text.SimpleDateFormat
 import java.util.*
 
+data class AlbumImage (
+    var token : String? = null,
+    var date : Long = 0
+)
 class AlbumImageFragment : Fragment() {
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
-    private var tokens = arrayListOf<String>()
+    private var tokens = arrayListOf<AlbumImage>()
     private var root : View? = null
     private var krTag : String? = null
     private var enTag : String? = null
@@ -49,7 +54,7 @@ class AlbumImageFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         readImages()
-        root!!.findViewById<TextView>(R.id.textView).text = krTag!!
+        root!!.findViewById<TextView>(R.id.titleView).text = krTag!!
 
     }
 
@@ -63,8 +68,8 @@ class AlbumImageFragment : Fragment() {
                     val docTitle = String.format("%s-%s", document.get("id").toString(), document.get("title").toString())
                     db.collection("meta").document(docTitle).get().addOnSuccessListener {
                         val token = it.get("token").toString()
-                        tokens.add(token)
-                        Log.d("albumToken", tokens.toString())
+                        var date = it.get("date").toString().toLong()
+                        tokens.add(AlbumImage(token, date))
                         if(documents.size() == tokens.size)
                             showImages()
                     }
@@ -76,7 +81,8 @@ class AlbumImageFragment : Fragment() {
     private fun showImages() {
         val mGrid : GridView = gridView
         val transaction = parentFragmentManager.beginTransaction()
-        val mAdapter = AlbumGridAdapter(this.activity, transaction, tokens)
+        tokens.sortByDescending { data: AlbumImage -> data.date }
+        val mAdapter = AlbumImageGridAdapter(this.activity, transaction, krTag!!, enTag!!, tokens)
         mGrid.adapter = mAdapter
     }
 }
