@@ -541,16 +541,21 @@ class MainActivity : AppCompatActivity() {
         var things: Array<String> = arrayOf("umbrella", "scissors", "toothbrush")
 
         var isAuto: AutoImage = AutoImage(this)
-        var final: Array<String> = isAuto.checkAutoImg(img.path)
+        var final: Array<Array<String>> = isAuto.checkAutoImg(img.path)
 
-        if (final[0] == final[1]) {
-            highPercent = arrayOf(final[0])
-            Log.d("highPercent", highPercent[0])
-        } else if (final[0] != final[1]) {
-            highPercent = arrayOf(final[0], final[1])
+
+        if(final[0][1].toDouble()>= 0.5&&final[1][1].toDouble()>= 0.5){
+            highPercent = arrayOf(final[0][0], final[1][0])
             Log.d("highPercent", highPercent[0])
             Log.d("highPercent", highPercent[1])
+        }else if(final[0][1].toDouble()>= 0.5 &&final[1][1].toDouble() < 0.5){
+            highPercent = arrayOf(final[0][0])
+            Log.d("highPercent", highPercent[0])
+        }else if(final[0][1].toDouble() < 0.5 &&final[1][1].toDouble() >= 0.5){
+            highPercent = arrayOf(final[1][0])
+            Log.d("highPercent", highPercent[0])
         }
+
         var doc = db.collection("auto").document(docTitle)
         for (highPercentIndex in highPercent) {
             for (p in person) {
