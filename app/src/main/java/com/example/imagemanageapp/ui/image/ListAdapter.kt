@@ -2,16 +2,12 @@ package com.example.imagemanageapp.ui.image
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import com.example.imagemanageapp.R
-import com.google.android.gms.dynamic.SupportFragmentWrapper
 
 
 class ListAdapter : BaseAdapter {
@@ -43,7 +39,7 @@ class ListAdapter : BaseAdapter {
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         var mView = convertView
         val inflater = LayoutInflater.from(ctx)
-        mView = inflater.inflate(R.layout.row, parent, false)
+        mView = inflater.inflate(R.layout.image_row, parent, false)
 
         val mGrid: GridView = mView.findViewById(R.id.gridView)
         val mText: TextView = mView.findViewById(R.id.textView)

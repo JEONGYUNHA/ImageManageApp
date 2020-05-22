@@ -2,6 +2,7 @@ package com.example.imagemanageapp.ui.album
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.media.ExifInterface
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -47,10 +48,9 @@ class AlbumGridAdapter : BaseAdapter {
         val imageView = mView.img
 
         val d = data[position]
-
         // 이미지 띄워주기
         Glide.with(ctx)
-            .load(d)
+            .load(d).thumbnail(0.1f)
             .centerCrop()
             .into(imageView)
 

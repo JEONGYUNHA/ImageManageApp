@@ -30,6 +30,34 @@ class AlbumFragment : Fragment() {
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
     private var tokens = arrayListOf<String>()
     private var root : View? = null
+    private var tags : HashMap<String, String> = hashMapOf("사람" to "person", "동물" to "animal",
+        "교통수단" to "traffic", "가구" to "furniture", "책" to "book", "가방" to "bag", "스포츠" to "sport", "전자기기" to "device",
+        "식물" to "plant", "음식" to "food", "잡동사니" to "things")
+    private var koreanTags: ArrayList<String> = arrayListOf(
+        "사람", "동물",
+        "교통수단",
+        "가구",
+        "책",
+        "가방",
+        "스포츠",
+        "전자기기",
+        "식물",
+        "음식",
+        "잡동사니"
+    )
+    private var englishTags: ArrayList<String> = arrayListOf(
+        "person", "animal",
+        "traffic",
+        "furniture",
+        "book",
+        "bag",
+        "sport",
+        "device",
+        "plant",
+        "food",
+        "things"
+    )
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -37,63 +65,17 @@ class AlbumFragment : Fragment() {
     ): View? {
         root = inflater.inflate(R.layout.fragment_album, container, false)
 
-        val fragment = AlbumImageFragment()
-        val bundle = Bundle(1)
-        bundle.putString("tagName", "사람")
-        fragment.arguments = bundle
 
-        val transaction = parentFragmentManager.beginTransaction()
-        root!!.findViewById<Button>(R.id.moreBtn).setOnClickListener {
-            transaction?.replace(R.id.nav_host_fragment, fragment)
-            transaction?.addToBackStack(null)
-            transaction?.commit()
-        }
         return root
     }
 
     override fun onResume() {
         super.onResume()
-        readImages()
 
-
-    }
-
-    private fun readImages() {
-        tokens.clear()
-        db.collection("auto")
-            .whereEqualTo("person", true)
-            .get()
-            .addOnSuccessListener { documents ->
-                for (document in documents) {
-                    val docTitle = String.format("%s-%s", document.get("id").toString(), document.get("title").toString())
-                    db.collection("meta").document(docTitle).get().addOnSuccessListener {
-                        val token = it.get("token").toString()
-                        tokens.add(token)
-                        Log.d("albumToken", tokens.toString())
-                        if(documents.size() == tokens.size)
-                            showImages()
-                    }
-                }
-            }
-
-    }
-
-    private fun showImages() {
-        val mGrid : GridView = gridView
         val transaction = parentFragmentManager.beginTransaction()
-        val mAdapter = AlbumGridAdapter(this.activity, transaction, tokens)
-        mGrid.adapter = mAdapter
-        Log.d("tokensSize", tokens.size.toString())
-        // GridView의 numColumns를 불러온 이미지 갯수로 지정해주기
-        root!!.findViewById<GridView>(R.id.gridView).numColumns = tokens.size
-    }
+        val mAdapter = AlbumListAdapter(this.activity, transaction, koreanTags, englishTags)
+        listView.adapter = mAdapter
 
-    // Date를 String으로 바꿔주는 함수
-    private fun DateToString(date: Date): String {
-        val dateFormat: SimpleDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-        val str = dateFormat.format(date)
-
-        return str
     }
 
 

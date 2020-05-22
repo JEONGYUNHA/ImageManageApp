@@ -18,6 +18,7 @@ import com.example.imagemanageapp.Meta
 import com.example.imagemanageapp.R
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import kotlinx.android.synthetic.main.album_row.*
 import kotlinx.android.synthetic.main.fragment_album.*
 import kotlinx.android.synthetic.main.fragment_image.*
 import java.text.SimpleDateFormat
@@ -27,7 +28,8 @@ class AlbumImageFragment : Fragment() {
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
     private var tokens = arrayListOf<String>()
     private var root : View? = null
-    private var tagName : String? = null
+    private var krTag : String? = null
+    private var enTag : String? = null
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -35,7 +37,8 @@ class AlbumImageFragment : Fragment() {
     ): View? {
         //imageViewModel = ViewModelProviders.of(this).get(ImageViewModel::class.java)
         root = inflater.inflate(R.layout.fragment_albumimage, container, false)
-        tagName = arguments?.getString("tagName")
+        krTag = arguments?.getString("krTag")
+        enTag = arguments?.getString("enTag")
         return root
     }
 
@@ -46,13 +49,14 @@ class AlbumImageFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         readImages()
+        root!!.findViewById<TextView>(R.id.textView).text = krTag!!
 
     }
 
     private fun readImages() {
         tokens.clear()
         db.collection("auto")
-            .whereEqualTo("person", true)
+            .whereEqualTo(enTag!!, true)
             .get()
             .addOnSuccessListener { documents ->
                 for (document in documents) {
@@ -74,7 +78,5 @@ class AlbumImageFragment : Fragment() {
         val transaction = parentFragmentManager.beginTransaction()
         val mAdapter = AlbumGridAdapter(this.activity, transaction, tokens)
         mGrid.adapter = mAdapter
-        // GridView의 numColumns를 불러온 이미지 갯수로 지정해주기
-        root!!.findViewById<TextView>(R.id.textView).text = tagName
     }
 }
