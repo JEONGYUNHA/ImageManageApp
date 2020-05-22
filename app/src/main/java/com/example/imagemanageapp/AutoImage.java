@@ -2,6 +2,7 @@ package com.example.imagemanageapp;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -26,7 +27,7 @@ public class AutoImage {
         this.act = activity;
     }
 
-    public String[] checkAutoImg(String path) {
+    public String[][] checkAutoImg(String path) {
         initTensorFlowAndLoadModel();
 
         Bitmap img = BitmapFactory.decodeFile(path);
@@ -34,12 +35,23 @@ public class AutoImage {
 
         final List<Classifier.Recognition> results = detector.recognizeImage(img);
 
-        String[] a = new String[2];
-        a[0] = results.get(0).getTitle();
-        a[1] = results.get(1).getTitle();
+        Log.d("result auto result", String.valueOf(results));
 
-        return a;
+//        String[] a = new String[2];
+        String[][] b = new String[2][2];
+//        a[0] = results.get(0).getTitle();
+        b[0][0] = String.valueOf(results.get(0).getTitle());
+        b[0][1] = String.valueOf(results.get(0).getConfidence());
+        Log.d("result auto", b[0][0]);
+        Log.d("result auto", b[0][1]);
+//        a[1] = results.get(1).getTitle();
+        b[1][0] = String.valueOf(results.get(1).getTitle());
+        b[1][1] = String.valueOf(results.get(1).getConfidence());
+        Log.d("result auto", b[1][0]);
+        Log.d("result auto", b[1][1]);
 
+
+        return b;
     }
 
     private void initTensorFlowAndLoadModel() {
