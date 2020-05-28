@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.example.imagemanageapp.MainActivity
 import com.example.imagemanageapp.R
 import com.example.imagemanageapp.ui.trash.GridAdapter
 import com.example.imagemanageapp.ui.image.Image
@@ -37,6 +38,7 @@ class TrashFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+        (this.activity as MainActivity).autoDelete()
         readImages()
     }
 

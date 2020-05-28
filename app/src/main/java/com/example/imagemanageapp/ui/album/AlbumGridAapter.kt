@@ -25,6 +25,7 @@ class AlbumGridAdapter : BaseAdapter {
         ctx = _ctx
         transaction = _transaction
         data = _data
+        Log.d("adapter", "true")
     }
 
     override fun getCount(): Int {

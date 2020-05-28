@@ -13,5 +13,6 @@ data class Auto(
     var device: Boolean? = null,
     var plant: Boolean? = null,
     var food: Boolean? = null,
-    var things: Boolean? = null
+    var things: Boolean? = null,
+    var deleted: Boolean? = null
 )

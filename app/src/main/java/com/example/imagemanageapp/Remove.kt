@@ -7,5 +7,6 @@ data class Remove(
     var similar: Boolean? = null,
     var shaken: Boolean? = null,
     var darked: Boolean? = null,
-    var screenshot: Boolean? = null
+    var screenshot: Boolean? = null,
+    var remove: Boolean? = null
 )
