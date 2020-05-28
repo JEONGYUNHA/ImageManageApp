@@ -45,6 +45,12 @@ android {
         }
 
     }
+    //liveData
+    dataBinding {
+        enabled = true
+    }
+
+
 }
 
 dependencies {
@@ -100,6 +106,11 @@ dependencies {
     //버튼 라이브러리
     implementation 'com.getbase:floatingactionbutton:1.10.1'
     implementation project(path:':opencv')
+
+    //viewmodel livveData 사용
+    def lifecycle_version = "1.1.1"
+    implementation "android.arch.lifecycle:extensions:$lifecycle_version"
+
 
 
 }

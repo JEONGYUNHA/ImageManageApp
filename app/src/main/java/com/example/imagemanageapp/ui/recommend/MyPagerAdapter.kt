@@ -1,5 +1,6 @@
 package com.example.imagemanageapp.ui.recommend
 
+import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
@@ -11,9 +12,15 @@ class MyPagerAdapter(supportFragmentManager: FragmentManager) : FragmentStatePag
     private val rFragmentCategoryList = arrayListOf<String>()
 
     override fun getItem(position: Int): Fragment {
-        return rFragmentList.get(position)
+        return when (position) {
+            0 -> RecommendFristFragment()
+            1 -> RecommendSecondFragment()
+            2 -> RecommendThirdFragment()
+            else -> {
+                return RecommendForthFragment()
+            }
+        }
     }
-
     override fun getCount(): Int {
         return rFragmentList.size
     }

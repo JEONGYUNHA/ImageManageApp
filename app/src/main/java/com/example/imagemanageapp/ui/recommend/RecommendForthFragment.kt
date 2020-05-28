@@ -1,25 +1,27 @@
 package com.example.imagemanageapp.ui.recommend
 
+import android.graphics.Color
+import android.graphics.PorterDuff
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.GridView
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import com.example.imagemanageapp.R
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.fragment_recommend_secondfragment.*
-import kotlinx.android.synthetic.main.fragment_recommend_secondfragment.grid
-import kotlinx.android.synthetic.main.fragment_showcategory_image_list.*
+
 
 class RecommendForthFragment : Fragment() {
 
     private val categoryImageData = arrayListOf<CategoryImage>()
     private val db = FirebaseFirestore.getInstance()
     private var cGrid : GridView? = grid
-    private var cAdapter : CategoryImageAdapter? = null
+   // private var cAdapter : CategoryImageAdapter? = null
     private var img : ImageView? = null
     var tList = ArrayList<String>()
 
@@ -34,7 +36,7 @@ class RecommendForthFragment : Fragment() {
     ): View? {
         val root = inflater.inflate(R.layout.fragment_recommend_forthfragment, container, false)
 
-        cAdapter = CategoryImageAdapter(this.activity,categoryImageData)
+
         img = root.findViewById((R.id.img))
 
 
@@ -105,8 +107,16 @@ class RecommendForthFragment : Fragment() {
     }
 
     private fun upload(){
+        val color= Color.GRAY
+        val mode = PorterDuff.Mode.SCREEN
+        var num=0
+
         cGrid = grid
-        cAdapter = CategoryImageAdapter(this.activity,categoryImageData)
+        val cAdapter = CategoryImageAdapter(this.activity,categoryImageData)
         cGrid!!.adapter = cAdapter
+
+
+
     }
+
 }

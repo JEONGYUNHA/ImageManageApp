@@ -1,25 +1,31 @@
 package com.example.imagemanageapp.ui.recommend
 
-import android.content.Context
+import android.R.attr.left
+import android.app.PendingIntent.getActivity
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.PorterDuff
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Button
-import android.widget.GridView
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.drawerlayout.widget.DrawerLayout
+import androidx.core.view.get
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.ui.AppBarConfiguration
 import com.example.imagemanageapp.R
-import com.example.imagemanageapp.R.id.tabss
 import com.example.imagemanageapp.SearchActivity
 import com.google.android.material.tabs.TabLayout
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_recommand.*
-
+import kotlinx.android.synthetic.main.fragment_recommend_secondfragment.*
+import kotlinx.android.synthetic.main.fragment_showcategory_image.view.*
+import kotlinx.android.synthetic.main.fragment_showcategory_image_list.*
+import kotlinx.android.synthetic.main.fragment_showcategory_image_list.grid
 
 
 class RecommendActivity  : AppCompatActivity() {
@@ -30,26 +36,59 @@ class RecommendActivity  : AppCompatActivity() {
     )
     private val list by lazy { findViewById<GridView>(R.id.list) }
     private lateinit var appBarConfiguration: AppBarConfiguration
+    private lateinit var model: MyViewModel
 
 
     val db = FirebaseFirestore.getInstance()
     var tList = ArrayList<String>()
+    var num = 0
+    val adapter = MyPagerAdapter(supportFragmentManager)
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_recommand)
+        val view = R.layout.activity_recommand
+        setContentView(view)
+
+
 
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
-        //뒤로가기버튼 추가
+        //상단에 뒤로가기버튼 추가
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
 
-       val tabLayout: TabLayout = findViewById(R.id.tabss)
 
 
-        val adapter = MyPagerAdapter(supportFragmentManager)
+   /*     for(i in 0..3) {
+            val newFragment = adapter.getItem(i)
+            val num = Bundle()
+            num.putString("num", num.toString())
+            newFragment.arguments = num
+
+            //fragment to fragment 전환
+            val transaction = supportFragmentManager.beginTransaction()
+            transaction?.replace(R.id.nav_host_fragment, newFragment)
+            transaction.addToBackStack(null)
+            transaction.commit()
+        }
+*/
+
+        val newFragment = RecommendSecondFragment()
+        val num1 = Bundle()
+        num1.putInt("num",num)
+        newFragment.arguments = num1
+
+        //fragment to fragment 전환
+        val transaction = supportFragmentManager.beginTransaction()
+        transaction?.replace(R.id.nav_host_fragment,newFragment)
+        transaction.addToBackStack(null)
+        transaction.commit()
+
+
+
         // Adapter에 Fragment 추가하기
         adapter.addFragment(RecommendFristFragment(), "유사사진")
         adapter.addFragment(RecommendSecondFragment(), "흔들린사진")
@@ -59,14 +98,23 @@ class RecommendActivity  : AppCompatActivity() {
         tabss.setupWithViewPager(viewPager)
 
 
+
+
         viewPager.addOnPageChangeListener( TabLayout.TabLayoutOnPageChangeListener(tabss))
         tabss.addOnTabSelectedListener(object:TabLayout.OnTabSelectedListener{
             override fun onTabSelected(tab: TabLayout.Tab) {
                 var i = tab.position
                 viewPager.currentItem = i
-                tabSelect()
+                if (tab.isSelected) {
+                    deleteBtn1.setOnClickListener {
+                        setParams(deleteBtn1,adapter.getItem(i))
+
+                    }
+
+                }
 
 
+             //   tabSelect()
 
             }
             override fun onTabUnselected(tab: TabLayout.Tab) {
@@ -77,24 +125,50 @@ class RecommendActivity  : AppCompatActivity() {
             }
         })
         tabss.setupWithViewPager(viewPager)
-    }
 
+
+
+    }
+/*
     fun tabSelect() {
         for (i in 0..3) {
             val tab = tabss.getTabAt(i)!!
             if (tab.isSelected) {
-                deleteBtn.setOnClickListener {
-                    var button = Button(this)
-                  //  button.background =
+                deleteBtn1.setOnClickListener {
+                    setParams(deleteBtn1,adapter.getItem(i))
+
+
+
                 }
             }
-            // TabBtnText.get(i).setTextColor(resources.getColor(R.color.point))
-            // } else {
-            // tab.setIcon(tabBtnImgOff[i])
-            // TabBtnText.get(i).setTextColor(resources.getColor(R.color.lightGray)) }
-
+        }
+    }
+*/
+    //삭제버튼 눌렀는지 확인하고 num값 보내기
+    fun setParams(btn:Button,fragment: Fragment){
+    //var model : MyViewModel
+    model= ViewModelProvider(this)[MyViewModel::class.java]
+   // model = ViewModelProviders.of(this).get(MyViewModel::class.java)
+    if(num == 0){ //deleteBtn이 처음눌렸을때
+            Toast.makeText(this, "삭제할 사진을 선택하세요", Toast.LENGTH_SHORT).show()
+            val iParam =
+                btn.getLayoutParams() as RelativeLayout.LayoutParams
+            btn.setBackgroundResource(R.drawable.checkbtn)
+            btn.setLayoutParams(iParam)
+            num++
+            model.numsPlus()
+        }else{//체크버튼 눌렸을때 (num == 1)
+            val iParam =
+                btn.getLayoutParams() as RelativeLayout.LayoutParams
+            btn.setBackgroundResource(R.drawable.deletebtn)
+            btn.setLayoutParams(iParam)
+            num--
+            model.numsMinus()
+            //model.checkPlus()
+            model.checkPlus()
 
         }
+
     }
 
 
@@ -106,26 +180,8 @@ class RecommendActivity  : AppCompatActivity() {
         if(actionBar != null) actionBar.setDisplayShowTitleEnabled(false)
 
 
-        val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
-       // val navView: NavigationView = findViewById(R.id.nav_view)
-      //  val navController = findNavController(R.id.nav_host_fragment)
-      /*  appBarConfiguration = AppBarConfiguration(
-            setOf(
-                R.id.nav_home, R.id.nav_image, R.id.nav_album, R.id.nav_recommend,
-                R.id.nav_mypage, R.id.nav_trash
-            ), drawerLayout
-        )
-        setupActionBarWithNavController(navController, appBarConfiguration)
-        navView.setupWithNavController(navController)
 
 
-        // HeaderView 접근하여 프로필 변경
-        val headerView = navView.getHeaderView(0)
-        val pref = this.getSharedPreferences("id", Context.MODE_PRIVATE)
-        headerView.idField.text = pref.getString("id", "User")
-        headerView.emailField.text = pref.getString("email", "Email")
-
-*/
     }
 
     // 상단 메뉴 생성
@@ -151,12 +207,6 @@ class RecommendActivity  : AppCompatActivity() {
 
     }
 
-
- /*   // 왼쪽 카테고리 메뉴
-    override fun onSupportNavigateUp(): Boolean {
-        val navController = findNavController(R.id.nav_host_fragment)
-        return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
-    }*/
 
     private fun getTitleList(pos:Int,fragment:Fragment):String{
 

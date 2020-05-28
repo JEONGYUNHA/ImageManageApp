@@ -26,7 +26,7 @@ class RecommendFristFragment: Fragment(){
     private val categoryImageData = arrayListOf<CategoryImage>()
     private val db = FirebaseFirestore.getInstance()
     private var cGrid : GridView? = grid
-    private var cAdapter : CategoryImageAdapter? = null
+ //   private var cAdapter : CategoryImageAdapter? = null
     private var img : ImageView? = null
     var tList = ArrayList<String>()
 
@@ -41,7 +41,7 @@ class RecommendFristFragment: Fragment(){
     ): View? {
         val root = inflater.inflate(R.layout.fragment_recommend_firstfragment, container, false)
 
-        cAdapter = CategoryImageAdapter(this.activity,categoryImageData)
+        val cAdapter = CategoryImageAdapter(this.activity,categoryImageData)
         img = root.findViewById((R.id.img))
 
 
@@ -113,7 +113,7 @@ class RecommendFristFragment: Fragment(){
 
     private fun upload(){
         cGrid = grid
-        cAdapter = CategoryImageAdapter(this.activity,categoryImageData)
+        val cAdapter = CategoryImageAdapter(this.activity,categoryImageData)
         cGrid!!.adapter = cAdapter
     }
 

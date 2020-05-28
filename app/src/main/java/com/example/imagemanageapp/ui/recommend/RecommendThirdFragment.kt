@@ -1,25 +1,32 @@
+
 package com.example.imagemanageapp.ui.recommend
 
+import android.graphics.Color
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 import android.os.Bundle
+import android.provider.SyncStateContract.Helpers.update
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.GridView
 import android.widget.ImageView
+import androidx.core.view.get
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
 import com.example.imagemanageapp.R
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.fragment_recommend_secondfragment.*
-import kotlinx.android.synthetic.main.fragment_recommend_secondfragment.grid
 import kotlinx.android.synthetic.main.fragment_showcategory_image_list.*
+import kotlinx.android.synthetic.main.fragment_showcategory_image_list.view.*
+import kotlinx.android.synthetic.main.fragment_showcategory_image.view.*
+import kotlinx.android.synthetic.main.fragment_showcategory_image_list.grid
 
-class RecommendThirdFragment : Fragment() {
 
+class RecommendThirdFragment: Fragment(){
     private val categoryImageData = arrayListOf<CategoryImage>()
     private val db = FirebaseFirestore.getInstance()
     private var cGrid : GridView? = grid
-    private var cAdapter : CategoryImageAdapter? = null
+  // private var cAdapter : CategoryImageAdapter? = null
     private var img : ImageView? = null
     var tList = ArrayList<String>()
 
@@ -34,7 +41,7 @@ class RecommendThirdFragment : Fragment() {
     ): View? {
         val root = inflater.inflate(R.layout.fragment_recommend_thirdfragment, container, false)
 
-        cAdapter = CategoryImageAdapter(this.activity,categoryImageData)
+
         img = root.findViewById((R.id.img))
 
 
@@ -106,7 +113,12 @@ class RecommendThirdFragment : Fragment() {
 
     private fun upload(){
         cGrid = grid
-        cAdapter = CategoryImageAdapter(this.activity,categoryImageData)
+        val cAdapter = CategoryImageAdapter(this.activity,categoryImageData)
         cGrid!!.adapter = cAdapter
     }
+
 }
+
+
+
+
