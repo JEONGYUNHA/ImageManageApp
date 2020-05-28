@@ -13,6 +13,7 @@ import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ItemDecoration
+import com.example.imagemanageapp.MainActivity
 import com.example.imagemanageapp.R
 import com.example.imagemanageapp.ui.image.Image
 import com.example.imagemanageapp.ui.image.ListAdapter
@@ -78,7 +79,6 @@ class AlbumFragment : Fragment() {
     ): View? {
         root = inflater.inflate(R.layout.fragment_album, container, false)
 
-
         return root
     }
 
@@ -86,6 +86,7 @@ class AlbumFragment : Fragment() {
         super.onResume()
         datas.clear()
         count = 0
+        (this.activity as MainActivity).autoDelete()
         readImages()
     }
 

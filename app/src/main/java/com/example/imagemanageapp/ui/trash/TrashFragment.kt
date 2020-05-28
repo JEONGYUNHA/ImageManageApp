@@ -34,12 +34,11 @@ class TrashFragment : Fragment() {
             readImages()
             swipe.isRefreshing = false
         }
-
-        (this.activity as MainActivity).autoDelete()
     }
 
     override fun onResume() {
         super.onResume()
+        (this.activity as MainActivity).autoDelete()
         readImages()
     }
 
