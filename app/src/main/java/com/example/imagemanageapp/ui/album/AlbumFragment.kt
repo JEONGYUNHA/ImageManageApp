@@ -9,6 +9,7 @@ import android.widget.Button
 import android.widget.GridView
 import android.widget.ListView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ItemDecoration
@@ -24,6 +25,8 @@ import kotlinx.android.synthetic.main.fragment_album.*
 import kotlinx.android.synthetic.main.fragment_image.*
 import java.text.SimpleDateFormat
 import java.util.*
+
+const val TAG_NUMBER: Int = 11
 
 class AlbumFragment : Fragment() {
 
@@ -67,7 +70,7 @@ class AlbumFragment : Fragment() {
         "food",
         "things"
     )
-
+    private var count = 0
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -82,35 +85,62 @@ class AlbumFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         datas.clear()
+        count = 0
         readImages()
     }
 
-    private fun readImages(){
-        for (i in 0..englishTags.size - 1) {
-            var size = 0
-            var token: String
-            db.collection("auto")
-                .whereEqualTo(englishTags[i], true)
-                .get()
-                .addOnSuccessListener { documents ->
-                    if(documents.size() != 0) {
-                        var title = documents.documents[documents.size()-1].get("title").toString()
-                        db.collection("meta").whereEqualTo("title", title).get().addOnSuccessListener {
-                            size = documents.size()
-                            token = it.documents[0].get("token").toString()
-                            datas.add(Album(koreanTags[i], englishTags[i], size, token))
-                            Log.d("datas", datas.toString())
-                            setAdapter()
-                        }
-                    }
-                }
+    private fun readImages() {
+        for (i in 0..TAG_NUMBER - 1) {
+            readAuto(i)
         }
     }
 
+    private fun readAuto(i: Int) {
+        var titleList: ArrayList<String> = arrayListOf()
+        db.collection("auto")
+            .whereEqualTo(englishTags[i], true)
+            .get()
+            .addOnSuccessListener { documents ->
+                if(documents.isEmpty)
+                    count += 1
+                for (d in documents) {
+                    val bool = d.get("deleted").toString().toBoolean()
+                    if (!bool) {
+                        val title = d.get("title").toString()
+                        val id = d.get("id").toString()
+                        val docTitle = String.format("%s-%s", id, title)
+                        titleList.add(docTitle)
+                    }
+                    if (documents.documents[documents.size() - 1].reference == d.reference)
+                        readMeta(titleList, i)
+                }
+            }
+    }
+
+    private fun readMeta(titleList: ArrayList<String>, i: Int) {
+        count += 1
+        val size = titleList.size
+        var token = ""
+        val title = titleList[0]
+        db.collection("meta").document(title).get().addOnSuccessListener {
+            token = it.get("token").toString()
+            datas.add(Album(koreanTags[i], englishTags[i], size, token))
+            if (i == TAG_NUMBER - 1) {
+                setAdapter()
+            }
+            else if (count == TAG_NUMBER) {
+                setAdapter()
+            }
+        }
+
+    }
+
     private fun setAdapter() {
+        Log.d("setAdapter", datas.toString())
+        val mGrid: GridView = albumGridView
         val transaction = parentFragmentManager.beginTransaction()
         val mAdapter = AlbumGridAdapter(this.activity, transaction, datas)
-        albumGridView.adapter = mAdapter
+        mGrid.adapter = mAdapter
     }
 
 }

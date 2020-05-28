@@ -59,6 +59,7 @@ class AlbumImageFragment : Fragment() {
     }
 
     private fun readImages() {
+        var count = 0
         tokens.clear()
         db.collection("auto")
             .whereEqualTo(enTag!!, true)
@@ -66,12 +67,15 @@ class AlbumImageFragment : Fragment() {
             .addOnSuccessListener { documents ->
                 for (document in documents) {
                     val docTitle = String.format("%s-%s", document.get("id").toString(), document.get("title").toString())
-                    db.collection("meta").document(docTitle).get().addOnSuccessListener {
-                        val token = it.get("token").toString()
-                        var date = it.get("date").toString().toLong()
-                        tokens.add(AlbumImage(token, date))
-                        if(documents.size() == tokens.size)
-                            showImages()
+                    if(!document.get("deleted").toString().toBoolean()) {
+                        count += 1
+                        db.collection("meta").document(docTitle).get().addOnSuccessListener {
+                            val token = it.get("token").toString()
+                            var date = it.get("date").toString().toLong()
+                            tokens.add(AlbumImage(token, date))
+                            if (count == tokens.size)
+                                showImages()
+                        }
                     }
                 }
             }

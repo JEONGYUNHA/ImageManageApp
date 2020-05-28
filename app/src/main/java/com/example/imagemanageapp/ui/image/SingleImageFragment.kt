@@ -115,8 +115,9 @@ class SingleImageFragment : Fragment() {
                     val latitude = document.get("latitude").toString().toDouble()
                     val longitude = document.get("longitude").toString().toDouble()
                     val token = document.get("token").toString()
+                    val upload = document.get("upload").toString().toLong()
 
-                    meta = Meta(id, title, path, date, latitude, longitude, token, false)
+                    meta = Meta(id, title, path, date, latitude, longitude, token, false, upload)
 
                     this.title = title
                     txtView!!.text = title
@@ -134,7 +135,7 @@ class SingleImageFragment : Fragment() {
 
     private fun loadImage() {
         Glide.with(this.context)
-            .load(token)
+            .load(token).thumbnail(0.5f)
             .into(imgView)
         buttonActions()
     }
@@ -178,9 +179,9 @@ class SingleImageFragment : Fragment() {
             val dialog: AlertDialog = builder.create()
             dialog.setOnShowListener {
                 dialog.getButton(AlertDialog.BUTTON_POSITIVE)
-                    .setTextColor(ContextCompat.getColor(ctx!!, R.color.colorPrimary))
+                    .setTextColor(ContextCompat.getColor(ctx!!, R.color.colorAccent))
                 dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
-                    .setTextColor(ContextCompat.getColor(ctx!!, R.color.colorPrimary))
+                    .setTextColor(ContextCompat.getColor(ctx!!, R.color.colorAccent))
             }
             dialog.show()
 
@@ -201,7 +202,7 @@ class SingleImageFragment : Fragment() {
     private fun deleteImage() {
         val docTitle = String.format("%s-%s", meta!!.id, meta!!.title)
         db!!.collection("meta").document(docTitle).update("deleted", true)
-
+        db!!.collection("auto").document(docTitle).update("deleted", true)
         back()
     }
 

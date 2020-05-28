@@ -1,11 +1,16 @@
 package com.example.imagemanageapp;
 
 
+import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import org.opencv.android.BaseLoaderCallback;
+import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
@@ -39,26 +44,31 @@ class RGB {
     }
 }
 
-public class OpenCV {
+public class OpenCV extends AppCompatActivity {
     private static final String TAG = "opencv";
     private AppCompatActivity act;
+
 
     public OpenCV(AppCompatActivity activity) {
         this.act = activity;
     }
 
-    static {
-        System.loadLibrary("opencv_java4");
-        //System.loadLibrary("native-lib");
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState) {
+        super.onCreate(savedInstanceState, persistentState);
     }
 
-/*
-    private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(act) {
+    static {
+        /*System.loadLibrary("c++_shared");*/
+        System.loadLibrary("opencv_java4");
+        System.loadLibrary("native-lib");
+    }
+
+   private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(act) {
         @Override
         public void onManagerConnected(int status) {
             switch (status) {
                 case LoaderCallbackInterface.SUCCESS: {
-                    isShaken("");
                 }
                 break;
                 default: {
@@ -69,15 +79,17 @@ public class OpenCV {
         }
     };
 
-    public void checkShaken() {
+    @Override
+    protected void onResume() {
+        super.onResume();
         if (!OpenCVLoader.initDebug()) {
             Log.d(TAG, "onResume :: Internal OpenCV library not found.");
             OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_2_0, act, mLoaderCallback);
         } else {
-            Log.d(TAG, "onResum :: OpenCV library found inside package. Using it!");
+            Log.d(TAG, "onResume :: OpenCV library found inside package. Using it!");
             mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
         }
-    }*/
+    }
 
     public Double isShaken(String path) {
         try {

@@ -14,7 +14,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="SDK DRIVE"
+            android:text="@string/app_name"
             android:textColor="#FFFFFF"
             android:textSize="55dp"
             android:textStyle="bold"

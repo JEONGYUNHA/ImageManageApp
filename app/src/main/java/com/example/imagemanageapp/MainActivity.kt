@@ -1,6 +1,7 @@
 package com.example.imagemanageapp
 
 import android.Manifest
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -12,11 +13,13 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Switch
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.view.isNotEmpty
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.findNavController
@@ -24,6 +27,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.example.imagemanageapp.ui.image.ImageFragment
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.*
@@ -34,6 +38,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -43,6 +48,10 @@ const val SHAKEN_THRESHOLD: Double = 350.0
 
 // 유사사진 판단할 초(10초)
 const val SIMILAR_TIME: Int = 10000
+
+// 자동삭제 기간(타임스탬프 long타입) -> 3일
+/*const val AUTODELETE_TIME_LONG: Long = 259200000*/
+const val AUTODELETE_TIME_LONG: Long = 10000
 
 class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
@@ -64,7 +73,6 @@ class MainActivity : AppCompatActivity() {
 
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
-
     }
 
     override fun onStart() {
@@ -94,26 +102,82 @@ class MainActivity : AppCompatActivity() {
         headerView.emailField.text = pref.getString("email", "Email")
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        // 자동삭제 - 시간 비교하여 자동삭제 실행
+        autoDelete()
+    }
+
     // 상단 메뉴 생성
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main, menu)
 
-        //자동 삭제 item에서 빼오기
-        val item: MenuItem = menu.findItem(R.id.app_bar_switch)
-        val deleteSwitch: Switch = item.actionView.findViewById<Switch>(R.id.switch1)
+        return true
+    }
 
+    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
+        //자동 삭제 item에서 빼오기
+        val item_swtich: MenuItem = menu.findItem(R.id.app_bar_switch)
+        val deleteSwitch: Switch = item_swtich.actionView.findViewById<Switch>(R.id.deleteSwitch)
+
+        /*val item_label: MenuItem = menu.findItem(R.id.app_bar_label)
+        //val item_label: MenuItem = menu.getItem(0)
+        val deleteTime: TextView = item_label.actionView.findViewById<TextView>(R.id.deleteTime)*/
+
+        // 자동삭제 Switch 이전 값을 가져와 ON/OFF 설정해줌
+        val pref2 = this.getSharedPreferences("autoDelete", Context.MODE_PRIVATE)
+        val editor = pref2.edit()
+        val status = pref2.getBoolean("status", false)
+        /*editor.putBoolean("", false)
+        deleteSwitch.isChecked = status*/
+
+        // 자동삭제 ON/OFF 액션
         deleteSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
-            if(isChecked){
+            val pref = this.getSharedPreferences("autoDelete", Context.MODE_PRIVATE)
+            val editor = pref.edit()
+            if (isChecked) {
                 Toast.makeText(this, "Switch On", Toast.LENGTH_SHORT).show()
-            }
-            else{
+
+                val builder: AlertDialog.Builder = AlertDialog.Builder(this)
+                builder.setTitle("자동 삭제")
+                builder.setMessage("자동 삭제를 켜시면 3일 뒤 삭제 추천 사진이 삭제 됩니다. 정말 삭제하시겠습니까?")
+                builder.setPositiveButton("YES") { dialogInterface, i ->
+                    // 현재 시간 SharedPReference에 저장
+                    val time = Calendar.getInstance().time.time
+                    editor.putBoolean("status", true)
+                    editor.putBoolean("first", true)
+                    editor.putLong("time", time)
+                    editor.apply()
+
+                    // 자동 삭제 켠 시간 TextView에 띄우기
+                    val dateFormat: SimpleDateFormat = SimpleDateFormat("MM/dd HH:mm")
+                    //deleteTime.text = dateFormat.format(time)
+                }.setNegativeButton("NO") { dialogInterface, i ->
+                    deleteSwitch.isChecked = false
+                }
+                val dialog: AlertDialog = builder.create()
+                dialog.setOnShowListener {
+                    dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                        .setTextColor(ContextCompat.getColor(this, R.color.colorAccent))
+                    dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+                        .setTextColor(ContextCompat.getColor(this, R.color.colorAccent))
+                }
+                dialog.show()
+
+            } else {
                 Toast.makeText(this, "Switch Off", Toast.LENGTH_SHORT).show()
+                editor.putBoolean("status", false)
+                editor.putBoolean("first", false)
+                editor.putLong("time", 0)
+                editor.apply()
+
+                //deleteTime.text = null
             }
         }
 
-            return true
+        return true
     }
-
 
     // 상단 메뉴 중 검색 선택 시
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
@@ -271,9 +335,10 @@ class MainActivity : AppCompatActivity() {
                         val latitude = cursor.getDouble(latitudeColumn)
                         val longitude = cursor.getDouble(longitudeColumn)
                         val token = ""
+                        val upload = Calendar.getInstance().time.time
 
                         // 이미지 배열에 이미지 저장
-                        val image = Meta(id, title, path, date, latitude, longitude, token, false)
+                        val image = Meta(id, title, path, date, latitude, longitude, token, false, upload)
                         images += image
                         Log.d("pre", preTimeString)
                         Log.d("date", date.toString())
@@ -344,7 +409,8 @@ class MainActivity : AppCompatActivity() {
             device = false,
             plant = false,
             food = false,
-            things = false
+            things = false,
+            deleted = false
         )
         db.collection("auto")
             .document(docTitle)
@@ -352,7 +418,9 @@ class MainActivity : AppCompatActivity() {
             .addOnSuccessListener { documentReference ->
                 Log.d("DB auto upload", "DocumentSnapshot written with ID: ${docTitle}")
                 // 스크린샷이 아닌 사진들에 대해서만 태그 체크
-                checkAuto(img)
+                if (!checkScreenshot(img)) {
+                    checkAuto(img)
+                }
             }
             .addOnFailureListener { e ->
                 Log.w("DB auto upload", "Error adding document", e)
@@ -365,7 +433,8 @@ class MainActivity : AppCompatActivity() {
             similar = false,
             shaken = false,
             darked = false,
-            screenshot = false
+            screenshot = false,
+            remove = false
         )
         db.collection("remove")
             .document(docTitle)
@@ -399,6 +468,7 @@ class MainActivity : AppCompatActivity() {
                 .update("screenshot", true)
                 .addOnSuccessListener { documentReference ->
                     Log.d("DB Screenshot upload", "DocumentSnapshot written with ID: ${docTitle}")
+                    db.collection("remove").document(docTitle).update("remove", true)
                 }
                 .addOnFailureListener { e ->
                     Log.w("DB Screenshot upload", "Error adding document", e)
@@ -421,6 +491,7 @@ class MainActivity : AppCompatActivity() {
                 .update("shaken", true)
                 .addOnSuccessListener { documentReference ->
                     Log.d("DB Shaken upload", "DocumentSnapshot written with ID: ${docTitle}")
+                    db.collection("remove").document(docTitle).update("remove", true)
                 }
                 .addOnFailureListener { e ->
                     Log.w("DB Shaken upload", "Error adding document", e)
@@ -440,6 +511,7 @@ class MainActivity : AppCompatActivity() {
                 .update("darked", true)
                 .addOnSuccessListener { documentReference ->
                     Log.d("DB darked upload", "DocumentSnapshot written with ID: ${docTitle}")
+                    db.collection("remove").document(docTitle).update("remove", true)
                 }
                 .addOnFailureListener { e ->
                     Log.w("DB darked upload", "Error adding document", e)
@@ -544,14 +616,14 @@ class MainActivity : AppCompatActivity() {
         var final: Array<Array<String>> = isAuto.checkAutoImg(img.path)
 
 
-        if(final[0][1].toDouble()>= 0.5&&final[1][1].toDouble()>= 0.5){
+        if (final[0][1].toDouble() >= 0.5 && final[1][1].toDouble() >= 0.5) {
             highPercent = arrayOf(final[0][0], final[1][0])
             Log.d("highPercent", highPercent[0])
             Log.d("highPercent", highPercent[1])
-        }else if(final[0][1].toDouble()>= 0.5 &&final[1][1].toDouble() < 0.5){
+        } else if (final[0][1].toDouble() >= 0.5 && final[1][1].toDouble() < 0.5) {
             highPercent = arrayOf(final[0][0])
             Log.d("highPercent", highPercent[0])
-        }else if(final[0][1].toDouble() < 0.5 &&final[1][1].toDouble() >= 0.5){
+        } else if (final[0][1].toDouble() < 0.5 && final[1][1].toDouble() >= 0.5) {
             highPercent = arrayOf(final[1][0])
             Log.d("highPercent", highPercent[0])
         }
@@ -653,8 +725,8 @@ class MainActivity : AppCompatActivity() {
                 Log.d("compare", "time")
                 var resultDocuments = documents.documents
                 resultDocuments.clear()
-                for(d in documents) {
-                    if(!(d.get("title").toString().equals(img.title)))
+                for (d in documents) {
+                    if (!(d.get("title").toString().equals(img.title)))
                         resultDocuments.add(d)
                 }
                 if (resultDocuments.size != 0)
@@ -700,7 +772,8 @@ class MainActivity : AppCompatActivity() {
                 }
                 // 넘겨받은 문서 값 받아와서 비교
                 for (d in resultDocuments) {
-                    docTitle2 = String.format("%s-%s", d.get("id").toString(), d.get("title").toString())
+                    docTitle2 =
+                        String.format("%s-%s", d.get("id").toString(), d.get("title").toString())
                     db.collection("color").document(docTitle2).collection("colors")
                         .orderBy("intColor").get().addOnSuccessListener { documents ->
                             for (d in documents) {  // 3번 실행
@@ -721,14 +794,33 @@ class MainActivity : AppCompatActivity() {
 
 
     }
+
     // RGB 각각 범위 비교 (오차범위 : +- 20)
     fun isInRange(n1: Int, n2: Int) = n2 in n1 - 20..n1 + 20
-    fun compareRGB(docTitle : String, colors: ArrayList<Color>, compareColors: ArrayList<Color>)  : Boolean{
-        if (isInRange(colors[0].r, compareColors[0].r) && isInRange(colors[0].g, compareColors[0].g) && isInRange(colors[0].g, compareColors[0].g)) {
-            if (isInRange(colors[1].r, compareColors[1].r) && isInRange(colors[1].g, compareColors[1].g) && isInRange(colors[1].g, compareColors[1].g)) {
-                if (isInRange(colors[2].r, compareColors[2].r) && isInRange(colors[2].g, compareColors[2].g) && isInRange(colors[2].g, compareColors[2].g)) {
+
+    fun compareRGB(
+        docTitle: String,
+        colors: ArrayList<Color>,
+        compareColors: ArrayList<Color>
+    ): Boolean {
+        if (isInRange(colors[0].r, compareColors[0].r) && isInRange(
+                colors[0].g,
+                compareColors[0].g
+            ) && isInRange(colors[0].g, compareColors[0].g)
+        ) {
+            if (isInRange(colors[1].r, compareColors[1].r) && isInRange(
+                    colors[1].g,
+                    compareColors[1].g
+                ) && isInRange(colors[1].g, compareColors[1].g)
+            ) {
+                if (isInRange(colors[2].r, compareColors[2].r) && isInRange(
+                        colors[2].g,
+                        compareColors[2].g
+                    ) && isInRange(colors[2].g, compareColors[2].g)
+                ) {
                     db.collection("remove").document(docTitle)
                         .update("similar", true)
+                    db.collection("remove").document(docTitle).update("remove", true)
                     return true
                 }
             }
@@ -754,6 +846,72 @@ class MainActivity : AppCompatActivity() {
         editor.putString("currentTime", nowTimeString)
         editor.apply()
         Log.d("changeTime", pref.getString("currentTime", ""))
+    }
+
+    // 자동삭제 - 시간 비교하여 자동삭제 실행
+    fun autoDelete() {
+        // 저장된 시간 불러오기
+        val pref = this.getSharedPreferences("autoDelete", Context.MODE_PRIVATE)
+        val time = pref.getLong("time", 0)
+        var first = pref.getBoolean("first", false)
+
+        // 현재 시간 불러오기
+        val nowTime = Calendar.getInstance().time.time
+        Log.d("autoDelete2", time.toString())
+        Log.d("autoDelete3", nowTime.toString())
+        // 자동 삭제를 킨 시간(time)으로부터 3일(AUTODELETE_TIME_LONG)이 지났다면 first=false
+        if (time < nowTime - AUTODELETE_TIME_LONG)
+            first = false
+
+
+        // first가 true면 자동삭제를 킨 시점부터 3일 지난 사진들 삭제
+        if (first) {
+            // 삭제 추천이 하나라도 있는 애들 불러오기
+            db.collection("remove").whereEqualTo("remove", true).get()
+                .addOnSuccessListener { documents ->
+                    for (d in documents) {
+                        val id = d.get("id").toString()
+                        val title = d.get("title").toString()
+                        val docTitle = String.format("%s-%s", id, title)
+                        db.collection("meta").document(docTitle).get().addOnSuccessListener {
+                            if (!it.get("deleted").toString().toBoolean()) {
+                                val docTitle2 = String.format("%s-%s", it.get("id").toString(), it.get("title").toString())
+                                val date = it.get("date").toString().toLong()
+                                // 받아온 날짜가 자동삭제 킨 시점부터 3일 지났으면 deleted=true로 변경
+                                if (date < time - AUTODELETE_TIME_LONG) {
+                                    it.reference.update("deleted", true)
+                                    db.collection("auto").document(docTitle2).update("deleted", true)
+                                    Log.d("autoDelete", "true")
+                                    Toast.makeText(context, "자동 삭제 성공!", Toast.LENGTH_SHORT)
+                                }
+                            }
+                        }
+                    }
+                }
+
+        }
+        // first가 false면 업로드 된 시점부터 3일 지난 사진들 삭제
+        else {
+            var criteriaTime : Long
+            db.collection("remove").whereEqualTo("remove", true).get()
+                .addOnSuccessListener { documents ->
+                    for (d in documents) {
+                        val id = d.get("id").toString()
+                        val title = d.get("title").toString()
+                        val docTitle = String.format("%s-%s", id, title)
+                        db.collection("meta").document(docTitle).get().addOnSuccessListener {
+                            if (!it.get("deleted").toString().toBoolean()) {
+                                criteriaTime = it.get("upload").toString().toLong()
+                                // 현재 시간이 업로드 시점으로부터 3일 지났으면 deleted=true로 변경
+                                if (criteriaTime < time - AUTODELETE_TIME_LONG) {
+                                    db.collection("meta").document(docTitle).update("deleted", true)
+                                    Log.d("autoDelete", "true")
+                                }
+                            }
+                        }
+                    }
+                }
+        }
     }
 
     override fun onDestroy() {
