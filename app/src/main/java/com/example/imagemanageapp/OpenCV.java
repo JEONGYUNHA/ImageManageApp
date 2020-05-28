@@ -61,7 +61,7 @@ public class OpenCV extends AppCompatActivity {
     static {
         /*System.loadLibrary("c++_shared");*/
         System.loadLibrary("opencv_java4");
-        System.loadLibrary("native-lib");
+        //System.loadLibrary("native-lib");
     }
 
    private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(act) {
