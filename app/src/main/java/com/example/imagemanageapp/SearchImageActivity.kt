@@ -2,7 +2,6 @@ package com.example.imagemanageapp
 
 import android.os.Bundle
 import android.util.Log
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_search_details.*
@@ -17,9 +16,9 @@ class SearchImageActivity : AppCompatActivity() {
 
     private val db = FirebaseFirestore.getInstance()
     private var tokens = ArrayList<SearchImageCategory>()
-    private var root : View? = null
     private var search_front_time : Long = 0
     private var search_after_time : Long = 0
+    private var searchPlace : String = ""
 
     var dbCollection : String? = null
     var dbField : String? = null
@@ -32,13 +31,14 @@ class SearchImageActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         var nowTime: Calendar?
-//        var nowTime: Long? = null
+
         var compare_front_time : Calendar
         var compare_after_time : Calendar
         val search_item = intent.extras!!.getString("passselectedcountry")!!
-//        detail_image_text.text = search_item
+
         var removeTableTrue = 0;
         var metaTableTrue = 0;
+        var metaTablePlaceTrue = 0;
 
         // 액션바 지우기
         supportActionBar?.title = search_item
@@ -248,9 +248,23 @@ class SearchImageActivity : AppCompatActivity() {
         if(metaTableTrue>0){
             searchImageDate(search_front_time, search_after_time)
         }
+
+        // -----------------------장소 검색
+
+        if(search_item.contains("서울")||search_item.contains("성북")||search_item.contains("수유")||search_item.contains("경기")||search_item.contains("인천")||search_item.contains("파주")||search_item.contains("군포")){
+            dbCollection = "meta"
+            dbField = "place"
+            Log.d("search_item 위치 확인", search_item)
+            metaTablePlaceTrue++
+        }
+
+        if(metaTablePlaceTrue>0){
+            searchImagePlace(search_item)
+        }
+
     }
 
-
+    // remove table 검색
     private fun searchImageCategory(collection: String?, field: String?) {
         tokens.clear()
         Log.d("check collection",collection)
@@ -275,10 +289,12 @@ class SearchImageActivity : AppCompatActivity() {
             }
         }
     }
+
+    // 날짜 검색
     private fun searchImageDate(search_front_time: Long, search_after_time: Long) {
         var token : String? = null
         var date : Long = 0
-//        var count : Int = 0
+
         // 시간 비교
         db.collection("meta")
             .get()
@@ -290,7 +306,6 @@ class SearchImageActivity : AppCompatActivity() {
                         db.collection("meta").document(docTitle).get().addOnSuccessListener {
                             token = it.get("token").toString()
                             date = it.get("date").toString().toLong()
-                            Log.d("어제 이미지 찾았습니다", date.toString())
                             tokens.add(SearchImageCategory(token, date))
                         }
                     }
@@ -303,6 +318,42 @@ class SearchImageActivity : AppCompatActivity() {
                     val docTitle = String.format("%s-%s", document.get("id").toString(), document.get("title").toString())
                     val dateLong = document.get("date").toString().toLong()
                     if ((search_front_time < dateLong) && (search_after_time > dateLong)) {
+                        db.collection("meta").document(docTitle).get().addOnSuccessListener {
+                            showImages()
+                        }
+                    }
+                }
+            }
+    }
+
+    // 장소 검색
+    private fun searchImagePlace(searchPlace: String) {
+        var token : String? = null
+        var date : Long = 0
+
+        db.collection("meta")
+            .get()
+            .addOnSuccessListener { documents ->
+                for (document in documents) {
+                    val docTitle = String.format("%s-%s", document.get("id").toString(), document.get("title").toString())
+                    val docPlace = document.get("place").toString()
+                    Log.d("document place 장소 확인", docPlace)
+                    if (docPlace.contains(searchPlace)) {
+                        db.collection("meta").document(docTitle).get().addOnSuccessListener {
+                            token = it.get("token").toString()
+                            date = it.get("date").toString().toLong()
+                            tokens.add(SearchImageCategory(token, date))
+                        }
+                    }
+                }
+            }
+        db.collection("meta")
+            .get()
+            .addOnSuccessListener { documents ->
+                for (document in documents) {
+                    val docTitle = String.format("%s-%s", document.get("id").toString(), document.get("title").toString())
+                    val docPlace = document.get("place").toString()
+                    if (docPlace.contains(searchPlace)) {
                         db.collection("meta").document(docTitle).get().addOnSuccessListener {
                             showImages()
                         }
