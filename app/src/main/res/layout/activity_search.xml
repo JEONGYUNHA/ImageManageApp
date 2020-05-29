@@ -10,6 +10,7 @@
     tools:context=".SearchActivity">
 
     <LinearLayout
+        android:layout_marginTop="15dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
@@ -17,19 +18,23 @@
             android:id="@+id/image_search"
             android:layout_width="300dp"
             android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
+            android:background = "#FFFFFF"
             android:textCursorDrawable="@null"
             app:iconifiedByDefault="false"
             app:queryBackground="@null" />
         <Button
             android:id="@+id/okButton"
-            android:text="ok"
+            android:text="검색"
+            android:background="@drawable/search_rounded_button"
+
             android:layout_width="50dp"
             android:layout_height="50dp"/>
     </LinearLayout>
 
 
     <androidx.recyclerview.widget.RecyclerView
+        android:layout_marginTop="15dp"
+        android:layout_marginLeft="10dp"
         android:id="@+id/image_rv"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

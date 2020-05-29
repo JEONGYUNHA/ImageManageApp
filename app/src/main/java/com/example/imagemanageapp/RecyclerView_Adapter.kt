@@ -9,7 +9,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Filter
 import android.widget.Filterable
-import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.recyclerview_row.view.*
 import java.util.*
@@ -56,7 +55,6 @@ class RecyclerView_Adapter(private var recyclerViewList: ArrayList<String>) :
             Log.d("Selected:", searchFilterList[position])
         }
     }
-
 
     //performFiltering 방법을 확인 우리는에 텍스트를 입력 한 경우 SeachView을 .
     //텍스트가 없으면 모든 항목을 반환합니다.

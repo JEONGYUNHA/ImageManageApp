@@ -4,18 +4,14 @@ package com.example.imagemanageapp
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_search.*
-import java.util.*
-import kotlin.collections.ArrayList
 
 data class SearchThings(val title: String)
 
@@ -30,6 +26,11 @@ class SearchActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
 
+        // 액션바 숨기기
+        supportActionBar!!.hide()
+        supportActionBar!!.setDisplayShowTitleEnabled(false)
+
+        // SearchView 보여주기
         val searchIcon = image_search.findViewById<ImageView>(R.id.search_mag_icon)
         searchIcon.setColorFilter(Color.BLACK)
 
@@ -76,14 +77,15 @@ class SearchActivity : AppCompatActivity() {
     private fun getListOfCountries() {
         val searchImageRecyclerViewList = ArrayList<String>()
 
-        searchImageRecyclerViewList.add("최근 검색 1")
-        searchImageRecyclerViewList.add("최근 검색 2")
-        searchImageRecyclerViewList.add("최근 검색 3")
         searchImageRecyclerViewList.add("서울특별시")
-        searchImageRecyclerViewList.add("최근 6개월 검색")
+        searchImageRecyclerViewList.add("어제")
+        searchImageRecyclerViewList.add("최근 3개월")
+        searchImageRecyclerViewList.add("최근 6개월")
+        searchImageRecyclerViewList.add("작년 사진")
         searchImageRecyclerViewList.add("어두운 사진")
         searchImageRecyclerViewList.add("흔들린 사진")
         searchImageRecyclerViewList.add("유사한 사진")
+        searchImageRecyclerViewList.add("스크린샷")
 
         adapter = RecyclerView_Adapter(searchImageRecyclerViewList)
         imageSearchrv.adapter = adapter
