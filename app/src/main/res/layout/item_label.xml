@@ -4,7 +4,8 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:layout_gravity="center"
-    android:gravity="center">
+    android:gravity="center"
+    android:paddingRight="7dp">
 
     <TextView
         android:id="@+id/deleteLabel"
@@ -15,5 +16,7 @@
         android:id="@+id/deleteTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="6dp"/>
+        android:textColor="@color/colorAccent"
+        android:visibility="gone"
+        android:textSize="10dp"/>
 </LinearLayout>

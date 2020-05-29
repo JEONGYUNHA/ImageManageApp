@@ -46,11 +46,10 @@ class RGB {
 
 public class OpenCV extends AppCompatActivity {
     private static final String TAG = "opencv";
-    private AppCompatActivity act;
 
 
-    public OpenCV(AppCompatActivity activity) {
-        this.act = activity;
+    public OpenCV() {
+
     }
 
     @Override
@@ -64,7 +63,7 @@ public class OpenCV extends AppCompatActivity {
         //System.loadLibrary("native-lib");
     }
 
-   private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(act) {
+   /*private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(act) {
         @Override
         public void onManagerConnected(int status) {
             switch (status) {
@@ -77,17 +76,17 @@ public class OpenCV extends AppCompatActivity {
                 break;
             }
         }
-    };
+    };*/
 
     @Override
     protected void onResume() {
         super.onResume();
         if (!OpenCVLoader.initDebug()) {
             Log.d(TAG, "onResume :: Internal OpenCV library not found.");
-            OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_2_0, act, mLoaderCallback);
+           // OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_2_0, act, mLoaderCallback);
         } else {
             Log.d(TAG, "onResume :: OpenCV library found inside package. Using it!");
-            mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
+            //mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
         }
     }
 

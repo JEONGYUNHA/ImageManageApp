@@ -40,7 +40,6 @@ data class SimpleDate(
 )
 
 class ImageFragment : Fragment() {
-    private lateinit var imageViewModel: ImageViewModel
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
     private var images = arrayListOf<Image>()
     private var simpleDates = arrayListOf<SimpleDate>()
@@ -50,7 +49,6 @@ class ImageFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        //imageViewModel = ViewModelProviders.of(this).get(ImageViewModel::class.java)
         val root = inflater.inflate(R.layout.fragment_image, container, false)
         return root
     }
@@ -66,7 +64,6 @@ class ImageFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        (this.activity as MainActivity).autoDelete()
         readImages()
 
     }

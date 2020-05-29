@@ -1,17 +1,22 @@
 package com.example.imagemanageapp
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.AlertDialog
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.os.IBinder
 import android.provider.MediaStore
 import android.provider.Settings
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
@@ -19,7 +24,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.view.isNotEmpty
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.findNavController
@@ -27,7 +31,6 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import com.example.imagemanageapp.ui.image.ImageFragment
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.*
@@ -40,7 +43,6 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 
 // openCV에서 흔들림 정도를 판단할 임계값
 // 이 임계값보다 값이 작으면 흔들린 것, 크면 안 흔들린 것
@@ -78,21 +80,21 @@ class MainActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
 
-        // 시간 저장
-        saveTime()
-
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         val navView: NavigationView = findViewById(R.id.nav_view)
         val navController = findNavController(R.id.nav_host_fragment)
         appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.nav_home, R.id.nav_image, R.id.nav_album, R.id.nav_recommend,
+                R.id.nav_image, R.id.nav_album, R.id.nav_recommend,
                 R.id.nav_mypage, R.id.nav_trash
             ), drawerLayout
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
+        // 시간 저장
+        saveTime()
+        // 사진 업로드 시작
         openMediaStore()
 
         // HeaderView 접근하여 프로필 변경
@@ -112,18 +114,17 @@ class MainActivity : AppCompatActivity() {
     // 상단 메뉴 생성
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main, menu)
-
         return true
     }
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
         //자동 삭제 item에서 빼오기
         val item_swtich: MenuItem = menu.findItem(R.id.app_bar_switch)
-        val deleteSwitch: Switch = item_swtich.actionView.findViewById<Switch>(R.id.deleteSwitch)
+        val deleteSwitch: Switch = item_swtich.actionView.findViewById(R.id.deleteSwitch)
 
-        /*val item_label: MenuItem = menu.findItem(R.id.app_bar_label)
+        val item_label: MenuItem = menu.findItem(R.id.app_bar_label)
         //val item_label: MenuItem = menu.getItem(0)
-        val deleteTime: TextView = item_label.actionView.findViewById<TextView>(R.id.deleteTime)*/
+        val deleteTime: TextView = item_label.actionView.findViewById(R.id.deleteTime)
 
         // 자동삭제 Switch 이전 값을 가져와 ON/OFF 설정해줌
         val pref2 = this.getSharedPreferences("autoDelete", Context.MODE_PRIVATE)
@@ -141,7 +142,7 @@ class MainActivity : AppCompatActivity() {
 
                 val builder: AlertDialog.Builder = AlertDialog.Builder(this)
                 builder.setTitle("자동 삭제")
-                builder.setMessage("자동 삭제를 켜시면 3일 뒤 삭제 추천 사진이 삭제 됩니다. 정말 삭제하시겠습니까?")
+                builder.setMessage("자동 삭제를 켜면 3일 뒤 삭제 추천 사진이 삭제 됩니다.\n정말 삭제하시겠습니까?")
                 builder.setPositiveButton("YES") { dialogInterface, i ->
                     // 현재 시간 SharedPReference에 저장
                     val time = Calendar.getInstance().time.time
@@ -152,7 +153,8 @@ class MainActivity : AppCompatActivity() {
 
                     // 자동 삭제 켠 시간 TextView에 띄우기
                     val dateFormat: SimpleDateFormat = SimpleDateFormat("MM/dd HH:mm")
-                    //deleteTime.text = dateFormat.format(time)
+                    deleteTime.text = dateFormat.format(time)
+                    deleteTime.visibility = View.VISIBLE
                 }.setNegativeButton("NO") { dialogInterface, i ->
                     deleteSwitch.isChecked = false
                 }
@@ -172,7 +174,8 @@ class MainActivity : AppCompatActivity() {
                 editor.putLong("time", 0)
                 editor.apply()
 
-                //deleteTime.text = null
+                deleteTime.text = null
+                deleteTime.visibility = View.GONE
             }
         }
 
@@ -194,7 +197,6 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
-
 
     // ******** 여기서부터 MediaStore로 저장소 접근해서 이미지 업로드 하는 부분 ********
     companion object {
@@ -338,7 +340,8 @@ class MainActivity : AppCompatActivity() {
                         val upload = Calendar.getInstance().time.time
 
                         // 이미지 배열에 이미지 저장
-                        val image = Meta(id, title, path, date, latitude, longitude, token, false, upload)
+                        val image =
+                            Meta(id, title, path, date, latitude, longitude, token, false, upload)
                         images += image
                         Log.d("pre", preTimeString)
                         Log.d("date", date.toString())
@@ -480,7 +483,7 @@ class MainActivity : AppCompatActivity() {
 
     // 흔들린 사진 체크하는 함수
     fun checkShaken(img: Meta) {
-        val opencv: OpenCV = OpenCV(this)
+        val opencv: OpenCV = OpenCV()
         val fm: Double = opencv.isShaken(img.path)
         Log.d("fm", String.format("%s - %.5f", img.path, fm))
         if (fm < SHAKEN_THRESHOLD) {
@@ -690,7 +693,7 @@ class MainActivity : AppCompatActivity() {
 
     // Color 3가지 추출하여 저장
     fun saveColor(img: Meta) {
-        val opencv: OpenCV = OpenCV(this)
+        val opencv: OpenCV = OpenCV()
         val rgbList = opencv.color(img.path)
         val docTitle = String.format("%s-%s", img.id, img.title)
 
@@ -849,6 +852,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     // 자동삭제 - 시간 비교하여 자동삭제 실행
+    @SuppressLint("ShowToast")
     fun autoDelete() {
         // 저장된 시간 불러오기
         val pref = this.getSharedPreferences("autoDelete", Context.MODE_PRIVATE)
@@ -875,14 +879,14 @@ class MainActivity : AppCompatActivity() {
                         val docTitle = String.format("%s-%s", id, title)
                         db.collection("meta").document(docTitle).get().addOnSuccessListener {
                             if (!it.get("deleted").toString().toBoolean()) {
-                                val docTitle2 = String.format("%s-%s", it.get("id").toString(), it.get("title").toString())
                                 val date = it.get("date").toString().toLong()
                                 // 받아온 날짜가 자동삭제 킨 시점부터 3일 지났으면 deleted=true로 변경
                                 if (date < time - AUTODELETE_TIME_LONG) {
+                                    val docTitle2 = String.format("%s-%s", it.get("id").toString(), it.get("title").toString())
                                     it.reference.update("deleted", true)
                                     db.collection("auto").document(docTitle2).update("deleted", true)
                                     Log.d("autoDelete", "true")
-                                    Toast.makeText(context, "자동 삭제 성공!", Toast.LENGTH_SHORT)
+                                    Toast.makeText(context, "자동 삭제 성공", Toast.LENGTH_SHORT).show()
                                 }
                             }
                         }
@@ -904,8 +908,11 @@ class MainActivity : AppCompatActivity() {
                                 criteriaTime = it.get("upload").toString().toLong()
                                 // 현재 시간이 업로드 시점으로부터 3일 지났으면 deleted=true로 변경
                                 if (criteriaTime < time - AUTODELETE_TIME_LONG) {
-                                    db.collection("meta").document(docTitle).update("deleted", true)
+                                    val docTitle2 = String.format("%s-%s", it.get("id").toString(), it.get("title").toString())
+                                    it.reference.update("deleted", true)
+                                    db.collection("auto").document(docTitle2).update("deleted", true)
                                     Log.d("autoDelete", "true")
+                                    Toast.makeText(context, "자동 삭제 성공", Toast.LENGTH_SHORT).show()
                                 }
                             }
                         }

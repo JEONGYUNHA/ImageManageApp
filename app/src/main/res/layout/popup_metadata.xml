@@ -3,13 +3,24 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center"
-    android:orientation="vertical">
-
+    android:orientation="vertical"
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp">
+    <Button
+        android:id="@+id/closeBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:padding="5dp"
+        android:background="@color/fui_transparent"
+        android:textColor="@color/fontColor"
+        android:textSize="20dp"
+        android:text="X" />
     <GridLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:columnCount="2"
-        android:padding="10dp"
+        android:padding="15dp"
         android:useDefaultMargins="true">
 
         <TextView
@@ -101,9 +112,5 @@
             android:layout_gravity="fill_horizontal" />
     </GridLayout>
 
-    <Button
-        android:id="@+id/closeBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="close" />
+
 </LinearLayout>

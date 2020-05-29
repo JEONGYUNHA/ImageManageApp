@@ -33,11 +33,6 @@ class PopupActivity : AppCompatActivity() {
         super.onStart()
 
         // 색 3가지 띄우기
-        /*db!!.collection("remove").document(docTitle).get().addOnSuccessListener {
-            if (!(it.get("screenshot") as Boolean)) {
-                showColors()
-            }
-        }*/
         showColors()
 
         // Tag 띄우기

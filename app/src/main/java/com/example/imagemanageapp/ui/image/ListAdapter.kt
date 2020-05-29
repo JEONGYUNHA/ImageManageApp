@@ -50,7 +50,7 @@ class ListAdapter : BaseAdapter {
         val month = currentDate!!.split(".")[1].toInt()
         // 한 자리 수 달(1~9)은 앞에 0 붙여서 출력(01~09)
         if(month < 10) {
-            mText.text = String.format("%s.0%s", year, month)
+            mText.text = String.format("%s년 0%s월", year, month)
         } else {
             mText.text = currentDate
         }

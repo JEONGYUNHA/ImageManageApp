@@ -2,6 +2,7 @@ package com.example.imagemanageapp
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -9,11 +10,12 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.ImageView
 import com.bumptech.glide.Glide
+import com.example.imagemanageapp.ui.image.SingleImageFragment
 
 class SearchImageGridAdapter : BaseAdapter {
     private val ctx: Context?
     private val data: ArrayList<SearchImageCategory>
-
+    private val transaction: Transaction
     constructor(
         _ctx: Context?,
         _data: ArrayList<SearchImageCategory>
@@ -51,19 +53,20 @@ class SearchImageGridAdapter : BaseAdapter {
             .centerCrop()
             .into(imageView)
 
-//        val fragment = SingleImageFragment()
-//        val bundle = Bundle(1)
-//        bundle.putString("token", token)
-//        fragment.arguments = bundle
-//        Log.d("bundle", bundle.toString())
+
+        val fragment = SingleImageFragment()
+        val bundle = Bundle(1)
+        bundle.putString("token", token)
+        fragment.arguments = bundle
+        Log.d("bundle", bundle.toString())
 
 
         // 클릭 시 사진 확대
-//        mView.setOnClickListener {
-//            transaction?.replace(R.id.nav_host_fragment, fragment)
-//            transaction?.addToBackStack(null)
-//            transaction?.commit()
-//        }
+        mView.setOnClickListener {
+            transaction?.replace(R.id.nav_host_fragment, fragment)
+            transaction?.addToBackStack(null)
+            transaction?.commit()
+
         return mView
     }
 }
