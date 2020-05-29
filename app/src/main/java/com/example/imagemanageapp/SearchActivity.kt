@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_search.*
 
-data class SearchThings(val title: String)
+//data class SearchThings(val title: String)
 
 class SearchActivity : AppCompatActivity() {
 
@@ -78,14 +78,15 @@ class SearchActivity : AppCompatActivity() {
         val searchImageRecyclerViewList = ArrayList<String>()
 
         searchImageRecyclerViewList.add("서울특별시")
-        searchImageRecyclerViewList.add("어제")
+        searchImageRecyclerViewList.add("인천광역시")
+        searchImageRecyclerViewList.add("경기도 파주시")
+        searchImageRecyclerViewList.add("경기도 군포시")
         searchImageRecyclerViewList.add("최근 3개월")
         searchImageRecyclerViewList.add("최근 6개월")
         searchImageRecyclerViewList.add("작년 사진")
         searchImageRecyclerViewList.add("어두운 사진")
         searchImageRecyclerViewList.add("흔들린 사진")
         searchImageRecyclerViewList.add("유사한 사진")
-        searchImageRecyclerViewList.add("스크린샷")
 
         adapter = RecyclerView_Adapter(searchImageRecyclerViewList)
         imageSearchrv.adapter = adapter

@@ -6,6 +6,7 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.location.Geocoder
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -39,6 +40,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -336,10 +338,21 @@ class MainActivity : AppCompatActivity() {
                         val longitude = cursor.getDouble(longitudeColumn)
                         val token = ""
                         val upload = Calendar.getInstance().time.time
+                        var place =""
 
+                        if (latitude != 0.0 && longitude != 0.0) {
+                            try {
+                                val mGeocoder = Geocoder(baseContext)
+                                place = mGeocoder.getFromLocation(latitude, longitude, 1)[0].getAddressLine(0)
+                                Log.d("place 메타 추가", place)
+                            } catch (e: IOException) {
+                                e.printStackTrace()
+                                Log.d("place", "failed")
+                            }
+                        }
                         // 이미지 배열에 이미지 저장
                         val image =
-                            Meta(id, title, path, date, latitude, longitude, token, false, upload)
+                            Meta(id, title, path, date, latitude, longitude, token, false, upload, place)
                         images += image
                         Log.d("pre", preTimeString)
                         Log.d("date", date.toString())
