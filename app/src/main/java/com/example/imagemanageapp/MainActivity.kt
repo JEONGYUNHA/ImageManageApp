@@ -3,14 +3,11 @@ package com.example.imagemanageapp
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.AlertDialog
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
-import android.os.IBinder
 import android.provider.MediaStore
 import android.provider.Settings
 import android.util.Log
@@ -33,7 +30,8 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.*
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.nav_header_main.view.*
 import kotlinx.coroutines.Dispatchers
@@ -392,6 +390,9 @@ class MainActivity : AppCompatActivity() {
             .document(docTitle)
             .set(img)
             .addOnSuccessListener { documentReference ->
+                // 색 추출 후 저장
+                saveColor(img)
+
                 Log.d("DB upload result", "DocumentSnapshot written with ID: ${docTitle}")
             }
             .addOnFailureListener { e ->
@@ -444,8 +445,6 @@ class MainActivity : AppCompatActivity() {
             .set(remove)
             .addOnSuccessListener { documentReference ->
                 Log.d("DB remove upload", "DocumentSnapshot written with ID: ${docTitle}")
-                // 색 추출 후 저장
-                saveColor(img)
                 // 스크린샷이 아닌 사진들에 대해서만 태그 체크
                 if (!checkScreenshot(img)) {
                     checkShaken(img)
