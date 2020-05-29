@@ -2,7 +2,7 @@ LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
 
 #opencv library
-OPENCVROOT:= C:\SDKProjectAnd\ImageManageApp1\opencv
+OPENCVROOT:= C:\SDKCloud\ImageManageApp\opencv
 
 OPENCV_CAMERA_MODULES:=on
 OPENCV_INSTALL_MODULES:=on
