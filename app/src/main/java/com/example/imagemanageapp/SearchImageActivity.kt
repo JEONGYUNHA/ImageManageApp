@@ -95,19 +95,37 @@ class SearchImageActivity : AppCompatActivity() {
         }
 
         //------------------날짜 비교
+        if (search_item.contains("오늘")) {
 
-        if (search_item.contains("어제")) {
+            nowTime = Calendar.getInstance()
+            nowTime.time = Date()
+            Log.d("check now Time 오늘", nowTime.toString())
+
+            compare_front_time = nowTime
+            compare_front_time.set(Calendar.HOUR_OF_DAY, 0)
+            compare_front_time.set(Calendar.MINUTE, 0)
+            compare_front_time.set(Calendar.SECOND, 0)
+            var calendarToDate : Date = compare_front_time.time
+            search_front_time = calendarToDate.time
+            Log.d("compare_front_time 오늘",compare_front_time.toString())
+
+            compare_after_time = Calendar.getInstance()
+            var calendarToDate2 : Date = compare_after_time.time
+            search_after_time = calendarToDate2.time
+            Log.d("compare_after_time 오늘",compare_after_time.toString())
+            metaTableTrue++
+        } else if (search_item.contains("어제")) {
 
             nowTime = Calendar.getInstance()
             nowTime.time = Date()
             nowTime.add(Calendar.DATE, -1)
-            Log.d("check now Time", nowTime.toString())
+            Log.d("check now Time 어제", nowTime.toString())
 
             compare_front_time = nowTime
             compare_front_time.set(Calendar.HOUR_OF_DAY, 0)
             var calendarToDate : Date = compare_front_time.time
             search_front_time = calendarToDate.time
-            Log.d("compare_front_time",compare_front_time.toString())
+            Log.d("compare_front_time 어제",compare_front_time.toString())
 
             compare_after_time =nowTime
             compare_after_time.set(Calendar.HOUR, 23)
@@ -115,7 +133,7 @@ class SearchImageActivity : AppCompatActivity() {
             compare_after_time.set(Calendar.SECOND, 59)
             var calendarToDate2 : Date = compare_after_time.time
             search_after_time = calendarToDate2.time
-            Log.d("compare_after_time",compare_after_time.toString())
+            Log.d("compare_after_time 어제",compare_after_time.toString())
             metaTableTrue++
         } else if (search_item.contains("일주일")) {
 
@@ -130,12 +148,12 @@ class SearchImageActivity : AppCompatActivity() {
             compare_front_time.set(Calendar.SECOND, 0)
             var calendarToDate : Date = compare_front_time.time
             search_front_time = calendarToDate.time
-            Log.d("compare_front_time",compare_front_time.toString())
+            Log.d("compare_front_time 일주일",compare_front_time.toString())
 
             compare_after_time = Calendar.getInstance()
             var calendarToDate2 : Date = compare_after_time.time
             search_after_time = calendarToDate2.time
-            Log.d("compare_after_time",compare_after_time.toString())
+            Log.d("compare_after_time 일주일",compare_after_time.toString())
             metaTableTrue++
         } else if (search_item.contains("한달")||search_item.contains("한 달")) {
 
@@ -150,12 +168,12 @@ class SearchImageActivity : AppCompatActivity() {
             compare_front_time.set(Calendar.SECOND, 0)
             var calendarToDate : Date = compare_front_time.time
             search_front_time = calendarToDate.time
-            Log.d("compare_front_time",compare_front_time.toString())
+            Log.d("compare_front_time 한달",compare_front_time.toString())
 
             compare_after_time = Calendar.getInstance()
             var calendarToDate2 : Date = compare_after_time.time
             search_after_time = calendarToDate2.time
-            Log.d("compare_after_time",compare_after_time.toString())
+            Log.d("compare_after_time 한달",compare_after_time.toString())
             metaTableTrue++
         } else if (search_item.contains("6개월")||search_item.contains("6 개월")) {
 
@@ -170,12 +188,12 @@ class SearchImageActivity : AppCompatActivity() {
             compare_front_time.set(Calendar.SECOND, 0)
             var calendarToDate : Date = compare_front_time.time
             search_front_time = calendarToDate.time
-            Log.d("compare_front_time",compare_front_time.toString())
+            Log.d("compare_front_time 6개월",compare_front_time.toString())
 
             compare_after_time = Calendar.getInstance()
             var calendarToDate2 : Date = compare_after_time.time
             search_after_time = calendarToDate2.time
-            Log.d("compare_after_time",compare_after_time.toString())
+            Log.d("compare_after_time 6개월",compare_after_time.toString())
             metaTableTrue++
         }else if (search_item.contains("3개월")||search_item.contains("3 개월")) {
 
@@ -190,12 +208,12 @@ class SearchImageActivity : AppCompatActivity() {
             compare_front_time.set(Calendar.SECOND, 0)
             var calendarToDate : Date = compare_front_time.time
             search_front_time = calendarToDate.time
-            Log.d("compare_front_time",compare_front_time.toString())
+            Log.d("compare_front_time 3개월",compare_front_time.toString())
 
             compare_after_time = Calendar.getInstance()
             var calendarToDate2 : Date = compare_after_time.time
             search_after_time = calendarToDate2.time
-            Log.d("compare_after_time",compare_after_time.toString())
+            Log.d("compare_after_time 3개월",compare_after_time.toString())
             metaTableTrue++
         } else if (search_item.contains("일년")||search_item.contains("일 년")||search_item.contains("1년")||search_item.contains("1 년")||search_item.contains("작년")) {
 
