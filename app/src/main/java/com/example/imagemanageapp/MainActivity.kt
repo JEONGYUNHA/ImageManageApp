@@ -46,7 +46,7 @@ import java.util.*
 
 // openCV에서 흔들림 정도를 판단할 임계값
 // 이 임계값보다 값이 작으면 흔들린 것, 크면 안 흔들린 것
-const val SHAKEN_THRESHOLD: Double = 350.0
+const val SHAKEN_THRESHOLD: Double = 400.0
 
 // 유사사진 판단할 초(10초)
 const val SIMILAR_TIME: Int = 10000
@@ -863,6 +863,7 @@ class MainActivity : AppCompatActivity() {
         Log.d("changeTime", pref.getString("currentTime", ""))
     }
 
+
     // 자동삭제 - 시간 비교하여 자동삭제 실행
     @SuppressLint("ShowToast")
     fun autoDelete() {
@@ -889,45 +890,65 @@ class MainActivity : AppCompatActivity() {
                         val id = d.get("id").toString()
                         val title = d.get("title").toString()
                         val docTitle = String.format("%s-%s", id, title)
-                        db.collection("meta").document(docTitle).get().addOnSuccessListener {
-                            if (!it.get("deleted").toString().toBoolean()) {
-                                val date = it.get("date").toString().toLong()
-                                // 받아온 날짜가 자동삭제 킨 시점부터 3일 지났으면 deleted=true로 변경
-                                if (date < time - AUTODELETE_TIME_LONG) {
-                                    val docTitle2 = String.format("%s-%s", it.get("id").toString(), it.get("title").toString())
-                                    it.reference.update("deleted", true)
-                                    db.collection("auto").document(docTitle2).update("deleted", true)
-                                    Log.d("autoDelete", "true")
-                                    Toast.makeText(context, "자동 삭제 성공", Toast.LENGTH_SHORT).show()
+                        db.collection("meta").document(docTitle).get()
+                            .addOnSuccessListener {
+                                if (!it.get("deleted").toString().toBoolean()) {
+                                    val date = it.get("date").toString().toLong()
+                                    // 받아온 날짜가 자동삭제 킨 시점부터 3일 지났으면 deleted=true로 변경
+                                    if (date < time - AUTODELETE_TIME_LONG) {
+                                        val docTitle2 = String.format(
+                                            "%s-%s",
+                                            it.get("id").toString(),
+                                            it.get("title").toString()
+                                        )
+                                        it.reference.update("deleted", true)
+                                        db.collection("auto").document(docTitle2)
+                                            .update("deleted", true)
+                                        Log.d("autoDelete", "true")
+                                        Toast.makeText(
+                                            context,
+                                            "자동 삭제 성공",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
                                 }
                             }
-                        }
                     }
                 }
 
         }
         // first가 false면 업로드 된 시점부터 3일 지난 사진들 삭제
         else {
-            var criteriaTime : Long
+            var criteriaTime: Long
             db.collection("remove").whereEqualTo("remove", true).get()
                 .addOnSuccessListener { documents ->
                     for (d in documents) {
                         val id = d.get("id").toString()
                         val title = d.get("title").toString()
                         val docTitle = String.format("%s-%s", id, title)
-                        db.collection("meta").document(docTitle).get().addOnSuccessListener {
-                            if (!it.get("deleted").toString().toBoolean()) {
-                                criteriaTime = it.get("upload").toString().toLong()
-                                // 현재 시간이 업로드 시점으로부터 3일 지났으면 deleted=true로 변경
-                                if (criteriaTime < time - AUTODELETE_TIME_LONG) {
-                                    val docTitle2 = String.format("%s-%s", it.get("id").toString(), it.get("title").toString())
-                                    it.reference.update("deleted", true)
-                                    db.collection("auto").document(docTitle2).update("deleted", true)
-                                    Log.d("autoDelete", "true")
-                                    Toast.makeText(context, "자동 삭제 성공", Toast.LENGTH_SHORT).show()
+                        db.collection("meta").document(docTitle).get()
+                            .addOnSuccessListener {
+                                if (!it.get("deleted").toString().toBoolean()) {
+                                    criteriaTime = it.get("upload").toString().toLong()
+                                    // 현재 시간이 업로드 시점으로부터 3일 지났으면 deleted=true로 변경
+                                    if (criteriaTime < time - AUTODELETE_TIME_LONG) {
+                                        val docTitle2 = String.format(
+                                            "%s-%s",
+                                            it.get("id").toString(),
+                                            it.get("title").toString()
+                                        )
+                                        it.reference.update("deleted", true)
+                                        db.collection("auto").document(docTitle2)
+                                            .update("deleted", true)
+                                        Log.d("autoDelete", "true")
+                                        Toast.makeText(
+                                            context,
+                                            "자동 삭제 성공",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
                                 }
                             }
-                        }
                     }
                 }
         }
@@ -938,10 +959,10 @@ class MainActivity : AppCompatActivity() {
 
         // 로그아웃
         /*AuthUI.getInstance()
-            .signOut(this)
-            .addOnCompleteListener {
-                // ...
-            }*/
+    .signOut(this)
+    .addOnCompleteListener {
+        // ...
+    }*/
 
     }
 }
