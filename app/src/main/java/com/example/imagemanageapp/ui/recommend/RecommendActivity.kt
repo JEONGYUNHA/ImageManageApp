@@ -54,7 +54,6 @@ class RecommendActivity  : AppCompatActivity() {
 
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
-
         //상단에 뒤로가기버튼 추가
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 

@@ -2,6 +2,7 @@ package com.example.imagemanageapp.ui.recommend
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.media.Image
 import android.os.Bundle
 import android.util.Log
@@ -14,6 +15,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.example.imagemanageapp.R
+import com.example.imagemanageapp.SearchSingleImageActivity
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.fragment_showcategory_image.view.*
 
@@ -65,7 +67,13 @@ class CategoryImageAdapter : BaseAdapter{
             .into(image)
 
     //    title.text = c.title
-
+        // 클릭 시 사진 확대
+        cView.setOnClickListener {
+            val intent = Intent(ctx, RecommendSingleImageActivity::class.java)
+            intent.putExtra("token", c.token)
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            ctx!!.startActivity(intent)
+        }
 
         return cView
 

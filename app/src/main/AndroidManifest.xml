@@ -44,6 +44,8 @@
             android:theme="@style/Theme.MyDialog"/>
         <activity android:name=".ui.recommend.RecommendActivity"
             android:theme="@style/AppTheme.NoActionBar"/>
+        <activity android:name=".ui.recommend.RecommendSingleImageActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
 
     </application>
 
