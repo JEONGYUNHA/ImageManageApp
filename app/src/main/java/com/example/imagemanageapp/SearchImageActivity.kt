@@ -30,6 +30,8 @@ class SearchImageActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+
+        tokens.clear()
         var nowTime: Calendar?
 
         var compare_front_time : Calendar

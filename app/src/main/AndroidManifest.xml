@@ -38,6 +38,8 @@
         <activity android:name=".SearchImageActivity"
             android:parentActivityName=".SearchActivity"
             android:theme="@style/AppTheme.SearchTheme"/>
+        <activity android:name=".SearchSingleImageActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity android:name=".ui.image.PopupActivity"
             android:theme="@style/Theme.MyDialog"/>
         <activity android:name=".ui.recommend.RecommendActivity"
