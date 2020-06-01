@@ -149,7 +149,6 @@ class RecommendFristFragment: Fragment() {
         cGrid!!.adapter = cAdapter
         cGrid!!.setOnItemClickListener { parent, view, position, id ->
 
-
             var deleteNum = model1.getNums()
             
             if (deleteNum == 1) {
