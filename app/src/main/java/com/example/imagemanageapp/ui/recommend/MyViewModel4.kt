@@ -4,7 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
 
-class MyViewModel : ViewModel(){
+class MyViewModel4 : ViewModel(){
 
     private var nums : Int = 0
     val checkDone: MutableLiveData<Int> by lazy {

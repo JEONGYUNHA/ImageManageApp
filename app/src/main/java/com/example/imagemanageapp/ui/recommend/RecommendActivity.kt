@@ -1,31 +1,25 @@
 package com.example.imagemanageapp.ui.recommend
 
-import android.R.attr.left
-import android.app.PendingIntent.getActivity
 import android.content.Intent
-import android.graphics.Color
-import android.graphics.PorterDuff
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.*
+import android.widget.Button
+import android.widget.GridView
+import android.widget.RelativeLayout
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.core.view.get
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.ui.AppBarConfiguration
 import com.example.imagemanageapp.R
 import com.example.imagemanageapp.SearchActivity
 import com.google.android.material.tabs.TabLayout
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_recommand.*
-import kotlinx.android.synthetic.main.fragment_recommend_secondfragment.*
-import kotlinx.android.synthetic.main.fragment_showcategory_image.view.*
-import kotlinx.android.synthetic.main.fragment_showcategory_image_list.*
-import kotlinx.android.synthetic.main.fragment_showcategory_image_list.grid
 
 
 class RecommendActivity  : AppCompatActivity() {
@@ -36,7 +30,12 @@ class RecommendActivity  : AppCompatActivity() {
     )
     private val list by lazy { findViewById<GridView>(R.id.list) }
     private lateinit var appBarConfiguration: AppBarConfiguration
-    private lateinit var model: MyViewModel
+    private lateinit var model1: MyViewModel1
+    private lateinit var model2: MyViewModel2
+    private lateinit var model3: MyViewModel3
+    private lateinit var model4: MyViewModel4
+
+
 
 
     val db = FirebaseFirestore.getInstance()
@@ -59,34 +58,10 @@ class RecommendActivity  : AppCompatActivity() {
         //상단에 뒤로가기버튼 추가
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
-
-
-
-   /*     for(i in 0..3) {
-            val newFragment = adapter.getItem(i)
-            val num = Bundle()
-            num.putString("num", num.toString())
-            newFragment.arguments = num
-
-            //fragment to fragment 전환
-            val transaction = supportFragmentManager.beginTransaction()
-            transaction?.replace(R.id.nav_host_fragment, newFragment)
-            transaction.addToBackStack(null)
-            transaction.commit()
-        }
-*/
-
-        val newFragment = RecommendSecondFragment()
-        val num1 = Bundle()
-        num1.putInt("num",num)
-        newFragment.arguments = num1
-
-        //fragment to fragment 전환
-        val transaction = supportFragmentManager.beginTransaction()
-        transaction?.replace(R.id.nav_host_fragment,newFragment)
-        transaction.addToBackStack(null)
-        transaction.commit()
-
+        model1= ViewModelProvider(this)[MyViewModel1::class.java]
+        model2= ViewModelProvider(this)[MyViewModel2::class.java]
+        model3= ViewModelProvider(this)[MyViewModel3::class.java]
+        model4= ViewModelProvider(this)[MyViewModel4::class.java]
 
 
         // Adapter에 Fragment 추가하기
@@ -102,25 +77,30 @@ class RecommendActivity  : AppCompatActivity() {
 
         viewPager.addOnPageChangeListener( TabLayout.TabLayoutOnPageChangeListener(tabss))
         tabss.addOnTabSelectedListener(object:TabLayout.OnTabSelectedListener{
+            //탭이 선택되면
             override fun onTabSelected(tab: TabLayout.Tab) {
                 var i = tab.position
                 viewPager.currentItem = i
                 if (tab.isSelected) {
+                  // Log.d("tabb",i.toString())
                     deleteBtn1.setOnClickListener {
-                        setParams(deleteBtn1,adapter.getItem(i))
+                        setParams(deleteBtn1,adapter.getItem(i),i)
 
                     }
 
                 }
-
-
-             //   tabSelect()
 
             }
             override fun onTabUnselected(tab: TabLayout.Tab) {
 
             }
             override fun onTabReselected(tab: TabLayout.Tab) {
+
+                var i = tab.position
+                viewPager.currentItem = i
+                refreash(adapter.getItem(i),supportFragmentManager.beginTransaction())
+
+
 
             }
         })
@@ -129,26 +109,21 @@ class RecommendActivity  : AppCompatActivity() {
 
 
     }
-/*
-    fun tabSelect() {
-        for (i in 0..3) {
-            val tab = tabss.getTabAt(i)!!
-            if (tab.isSelected) {
-                deleteBtn1.setOnClickListener {
-                    setParams(deleteBtn1,adapter.getItem(i))
 
+    fun refreash(fragment: Fragment,transaction: FragmentTransaction){
+        //val transaction = supportFragmentManager.beginTransaction()
+      //  transaction?.replace(R.id.nav_host_fragment,fragment)
+    //    transaction.addToBackStack(null)
+    //    transaction.commit()
 
-
-                }
-            }
-        }
+     //   val ft: FragmentTransaction = fragmentManager.beginTransaction()
+        transaction.detach(fragment).attach(fragment).commit()
     }
-*/
+
+
     //삭제버튼 눌렀는지 확인하고 num값 보내기
-    fun setParams(btn:Button,fragment: Fragment){
-    //var model : MyViewModel
-    model= ViewModelProvider(this)[MyViewModel::class.java]
-   // model = ViewModelProviders.of(this).get(MyViewModel::class.java)
+    fun setParams(btn:Button,fragment: Fragment,i:Int){
+
     if(num == 0){ //deleteBtn이 처음눌렸을때
             Toast.makeText(this, "삭제할 사진을 선택하세요", Toast.LENGTH_SHORT).show()
             val iParam =
@@ -156,16 +131,35 @@ class RecommendActivity  : AppCompatActivity() {
             btn.setBackgroundResource(R.drawable.checkbtn)
             btn.setLayoutParams(iParam)
             num++
-            model.numsPlus()
+            model1.numsPlus()
+            model2.numsPlus()
+            model3.numsPlus()
+            model4.numsPlus()
         }else{//체크버튼 눌렸을때 (num == 1)
             val iParam =
                 btn.getLayoutParams() as RelativeLayout.LayoutParams
             btn.setBackgroundResource(R.drawable.deletebtn)
             btn.setLayoutParams(iParam)
             num--
-            model.numsMinus()
-            //model.checkPlus()
-            model.checkPlus()
+            model1.numsMinus()
+            model2.numsMinus()
+            model3.numsMinus()
+            model4.numsMinus()
+            for(ii in 0..3){
+                if(i == 0){
+                    model1.checkPlus()
+
+                }else if(i == 1){
+                    model2.checkPlus()
+                }else if(i == 2){
+                    model3.checkPlus()
+                }else if(i == 3){
+                    model4.checkPlus()
+
+                }
+
+
+            }
 
         }
 

@@ -10,6 +10,7 @@ import android.util.Log
 import android.view.*
 import android.widget.GridView
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.core.view.get
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
@@ -28,7 +29,7 @@ class RecommendSecondFragment: Fragment() {
     private val db = FirebaseFirestore.getInstance()
     private var cGrid: GridView? = grid
     private var img: ImageView? = null
-    lateinit var model: MyViewModel
+    lateinit var model2: MyViewModel2
     var tList = ArrayList<String>()
     private var checkedImages = mutableListOf<String>()
 
@@ -45,7 +46,7 @@ class RecommendSecondFragment: Fragment() {
         val root = inflater.inflate(R.layout.fragment_recommend_secondfragment, container, false)
 
         //viewModel 싱글톤으로 구현
-        model = ViewModelProvider(activity as ViewModelStoreOwner)[MyViewModel::class.java]
+        model2 = ViewModelProvider(activity as ViewModelStoreOwner)[MyViewModel2::class.java]
 
         img = root.findViewById((R.id.img))
 
@@ -55,50 +56,39 @@ class RecommendSecondFragment: Fragment() {
 
         getTitleList()
 
-        model.checkDone.observe(activity as LifecycleOwner, Observer<Int> {
-            // it로 넘어오는 param은 LiveData의 value
-            //text_test.text = it
-            Log.d("observe update","")
+        //옵저버 변화감지(확인버튼 누르면 action)
+        model2.checkDone.observe(viewLifecycleOwner,Observer<Int> {
+        //    if (checkedImages.contains("jpg")){
+                Toast.makeText(this.activity, "선택한 사진을 삭제했어요!", Toast.LENGTH_SHORT).show()
+                val titleLIst = checkedImages.toString()
+                var titles = titleLIst!!.substring(1, titleLIst.length - 1).split(", ")
+                for (t in titles) {
+                    //id나중에 수정
+                     val doc = String.format("%s-%s", "hankki1998", t)
+                    Log.d("docList", doc)
+
+                    db.collection("meta")
+                        .document(doc)
+                        .update("deleted", true)
+                    db.collection("auto")
+                        .document(doc)
+                        .update("deleted", true)
+                }
+            //    onResume()
+
 
         })
-
 
 
 
         return root
     }
-/*
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        val checkObserver = Observer<Int>{ newCheck ->
-            Log.d("observe update","")
-        }
-        model.checkDone.observe(activity as LifecycleOwner, Observer<Int> {
-            // it로 넘어오는 param은 LiveData의 value
-            //text_test.text = it
-            Log.d("observe update","")
-        })
 
-      //  model.checkDone.observe(activity as LifecycleOwner,checkObserver)
-
-    }  */
-/*
-    override fun onStart() {
-        super.onStart()
-
-/*
-        model.checkDone.observe(this, Observer {
-            Log.d("observer Done","")
-        })
-*/
-    }
-*/
-
-    /* override fun onResume() {
+    override fun onResume() {
         super.onResume()
-        var num = arguments?.getInt("num")
-        Log.d("fragment num4",num.toString())
-    }  */
+       // categoryImageData.clear()
+        getTitleList()
+    }
 
 
     private fun getTitleList() {
@@ -167,7 +157,7 @@ class RecommendSecondFragment: Fragment() {
         cGrid!!.setOnItemClickListener { parent, view, position, id ->
 
 
-            var deleteNum = model.getNums()
+            var deleteNum = model2.getNums()
             if (deleteNum == 1) {
                 Log.d("Fragment num1", deleteNum.toString())
                 checkItem(categoryImageData[position].title)
@@ -181,25 +171,12 @@ class RecommendSecondFragment: Fragment() {
                 Log.d("fragment num3", "null")
             }
 
-            // Log.d("num11",num.toString)
-
-            /*
-            if(arguments?.getString("num") == null){
-                Log.d("num",null)
-                cGrid!![position!!].img!!.setColorFilter(null)
-
-            }else if(arguments?.getString("num")!!.toInt() == 1){
-                Log.d("num",arguments?.getString("num"))
-                cGrid!![position!!].img!!.setColorFilter(color,mode)
-            }else if(arguments?.getString("num")!!.toInt() == 0){
-                Log.d("num",arguments?.getString("num"))
-                cGrid!![position!!].img!!.setColorFilter(null)
-            }  */
         }
 
 
     }
 
+    //gridView 누르면 색상변화
     private fun changeColor(position:Int?,title: String?){
         val color=Color.DKGRAY
         val mode = PorterDuff.Mode.DARKEN
