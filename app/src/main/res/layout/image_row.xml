@@ -11,14 +11,14 @@
         android:layout_margin="5dp"
         android:paddingLeft="7dp"
         android:text=""
-        android:textSize="22dp" />
+        android:textSize="19dp" />
     <GridView
         android:id="@+id/gridView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:horizontalSpacing="2dp"
-        android:numColumns="2"
+        android:numColumns="3"
         android:padding="1dp"
         android:stretchMode="columnWidth"
         android:verticalSpacing="2dp" />

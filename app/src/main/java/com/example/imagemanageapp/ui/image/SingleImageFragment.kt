@@ -159,12 +159,6 @@ class SingleImageFragment : Fragment() {
             startActivity(intent)
         }
 
-        // edit 버튼 눌렀을 때
-        val editBtn = root!!.findViewById<ImageButton>(R.id.editBtn)
-        editBtn.setOnClickListener {
-            editImage()
-        }
-
         // delete 버튼 눌렀을 때
         val deleteBtn = root!!.findViewById<ImageButton>(R.id.deleteBtn)
         deleteBtn.setOnClickListener {
@@ -193,9 +187,6 @@ class SingleImageFragment : Fragment() {
 
     }
 
-    private fun editImage() {
-
-    }
 
     private fun deleteImage() {
         val docTitle = String.format("%s-%s", meta!!.id, meta!!.title)

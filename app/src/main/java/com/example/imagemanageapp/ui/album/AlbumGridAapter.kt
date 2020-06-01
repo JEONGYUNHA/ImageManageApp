@@ -9,10 +9,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import com.bumptech.glide.Glide
 import com.example.imagemanageapp.R
 import com.example.imagemanageapp.ui.image.Image
+import com.example.imagemanageapp.ui.image.ImageFragment
 import com.example.imagemanageapp.ui.image.SingleImageFragment
 import kotlinx.android.synthetic.main.data.view.*
 
@@ -61,15 +63,30 @@ class AlbumGridAdapter : BaseAdapter {
             .centerCrop()
             .into(imageView)
 
-        // 앨범 이름과 사진 수 띄우기
-        albumTitle.text = data[position].koreanTag
-        albumSize.text = data[position].size.toString()
 
-        val fragment = AlbumImageFragment()
-        val bundle = Bundle(2)
-        bundle.putString("krTag", data[position].koreanTag)
-        bundle.putString("enTag", data[position].englishTag)
-        fragment.arguments = bundle
+
+        var fragment : Fragment
+
+        // 모든 사진
+        if(data[position].koreanTag == null && data[position].englishTag == null) {
+            fragment = ImageFragment()
+
+            // 앨범 이름과 사진 수 띄우기
+            albumTitle.text = "모든 사진"
+            albumSize.text = data[position].size.toString()
+        }
+        // 앨범별 사진
+        else {
+            fragment = AlbumImageFragment()
+            val bundle = Bundle(2)
+            bundle.putString("krTag", data[position].koreanTag)
+            bundle.putString("enTag", data[position].englishTag)
+            fragment.arguments = bundle
+
+            // 앨범 이름과 사진 수 띄우기
+            albumTitle.text = data[position].koreanTag
+            albumSize.text = data[position].size.toString()
+        }
 
         val linear = mView.findViewById<LinearLayout>(R.id.linearLayout)
         linear.setOnClickListener {
@@ -77,12 +94,6 @@ class AlbumGridAdapter : BaseAdapter {
             transaction?.addToBackStack(null)
             transaction?.commit()
         }
-
-        /*mView!!.findViewById<Button>(R.id.moreBtn).setOnClickListener {
-            transaction?.replace(R.id.nav_host_fragment, fragment)
-            transaction?.addToBackStack(null)
-            transaction?.commit()
-        }*/
 
         return mView
     }

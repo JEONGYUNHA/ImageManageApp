@@ -4,14 +4,15 @@
     android:layout_height="match_parent"
     android:gravity="center"
     android:orientation="vertical"
-    android:paddingTop="10dp"
+    android:paddingTop="4dp"
     android:paddingBottom="10dp">
     <Button
         android:id="@+id/closeBtn"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="35dp"
+        android:gravity="right|center"
         android:layout_gravity="right"
-        android:padding="5dp"
+        android:paddingRight="20dp"
         android:background="@color/fui_transparent"
         android:textColor="@color/fontColor"
         android:textSize="20dp"
@@ -26,7 +27,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="title"
+            android:text="Title"
             android:textStyle="bold" />
 
         <TextView
@@ -38,7 +39,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="path"
+            android:text="Path"
             android:textStyle="bold" />
 
         <TextView
@@ -50,7 +51,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="date"
+            android:text="Date"
             android:textStyle="bold" />
 
         <TextView
@@ -62,7 +63,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="location"
+            android:text="Location"
             android:textStyle="bold" />
 
         <TextView
@@ -74,7 +75,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="color"
+            android:text="Color"
             android:textStyle="bold" />
 
         <LinearLayout
@@ -85,24 +86,24 @@
 
             <View
                 android:id="@+id/color1"
-                android:layout_width="30dp"
-                android:layout_height="30dp" />
+                android:layout_width="40dp"
+                android:layout_height="40dp" />
 
             <View
                 android:id="@+id/color2"
-                android:layout_width="30dp"
-                android:layout_height="30dp" />
+                android:layout_width="40dp"
+                android:layout_height="40dp" />
 
             <View
                 android:id="@+id/color3"
-                android:layout_width="30dp"
-                android:layout_height="30dp" />
+                android:layout_width="40dp"
+                android:layout_height="40dp" />
         </LinearLayout>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="tag"
+            android:text="Tag"
             android:textStyle="bold" />
 
         <TextView

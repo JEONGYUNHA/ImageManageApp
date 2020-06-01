@@ -39,18 +39,7 @@ class PopupActivity : AppCompatActivity() {
         showTags()
 
         // 위경도로 주소 불러오기
-        var location = ""
-        if (meta!!.latitude != 0.0 && meta!!.longitude != 0.0) {
-            try {
-                val mGeocoder = Geocoder(baseContext)
-                location =
-                    mGeocoder.getFromLocation(meta!!.latitude, meta!!.longitude, 1)[0].getAddressLine(0)
-                Log.d("location", location)
-            } catch (e: IOException) {
-                e.printStackTrace()
-                Log.d("location", "failed")
-            }
-        }
+        var location = meta!!.place
 
         // 날짜 Long타입에서 Date타입으로 바꾸기
         var date = DateToString(Date(meta!!.date))

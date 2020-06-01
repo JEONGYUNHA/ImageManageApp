@@ -80,12 +80,10 @@ class ListAdapter : BaseAdapter {
         var totalHeight = 0
         // 현재 item의 갯수/2
         var currentSize = 0
-        // 짝수
-        if(currentData.size % 2 == 0)
-            currentSize = currentData.size / 2
-        // 홀수
+        if(currentData.size % 3 == 0)
+            currentSize = currentData.size / 3
         else
-            currentSize = (currentData.size / 2) + 1
+            currentSize = (currentData.size / 3) + 1
 
         // GridView 높이
         mGrid.measure(0, 0)

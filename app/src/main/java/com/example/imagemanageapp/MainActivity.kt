@@ -129,24 +129,18 @@ class MainActivity : AppCompatActivity() {
         // 자동삭제 Switch 이전 값을 가져와 ON/OFF 설정해줌
         val pref2 = this.getSharedPreferences("autoDelete", Context.MODE_PRIVATE)
         val editor = pref2.edit()
-        val status = pref2.getBoolean("status", false)
-        /*editor.putBoolean("", false)
-        deleteSwitch.isChecked = status*/
 
         // 자동삭제 ON/OFF 액션
         deleteSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
             val pref = this.getSharedPreferences("autoDelete", Context.MODE_PRIVATE)
             val editor = pref.edit()
             if (isChecked) {
-                Toast.makeText(this, "Switch On", Toast.LENGTH_SHORT).show()
-
                 val builder: AlertDialog.Builder = AlertDialog.Builder(this)
                 builder.setTitle("자동 삭제")
                 builder.setMessage("자동 삭제를 켜면 3일 뒤 삭제 추천 사진이 삭제 됩니다.\n정말 삭제하시겠습니까?")
                 builder.setPositiveButton("YES") { dialogInterface, i ->
                     // 현재 시간 SharedPReference에 저장
                     val time = Calendar.getInstance().time.time
-                    editor.putBoolean("status", true)
                     editor.putBoolean("first", true)
                     editor.putLong("time", time)
                     editor.apply()
@@ -168,8 +162,6 @@ class MainActivity : AppCompatActivity() {
                 dialog.show()
 
             } else {
-                Toast.makeText(this, "Switch Off", Toast.LENGTH_SHORT).show()
-                editor.putBoolean("status", false)
                 editor.putBoolean("first", false)
                 editor.putLong("time", 0)
                 editor.apply()
@@ -197,6 +189,8 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
+
+
 
     // ******** 여기서부터 MediaStore로 저장소 접근해서 이미지 업로드 하는 부분 ********
     companion object {
@@ -906,7 +900,7 @@ class MainActivity : AppCompatActivity() {
                                             .update("deleted", true)
                                         Log.d("autoDelete", "true")
                                         Toast.makeText(
-                                            context,
+                                            this,
                                             "자동 삭제 성공",
                                             Toast.LENGTH_SHORT
                                         ).show()
@@ -941,11 +935,7 @@ class MainActivity : AppCompatActivity() {
                                         db.collection("auto").document(docTitle2)
                                             .update("deleted", true)
                                         Log.d("autoDelete", "true")
-                                        Toast.makeText(
-                                            context,
-                                            "자동 삭제 성공",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
+                                        Toast.makeText(this, "자동 삭제 성공", Toast.LENGTH_SHORT).show()
                                     }
                                 }
                             }

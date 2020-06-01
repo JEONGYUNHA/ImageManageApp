@@ -25,5 +25,6 @@
             android:id="@+id/nav_trash"
             android:icon="@drawable/trash_icon"
             android:title="@string/menu_trash" />
+
     </group>
 </menu>

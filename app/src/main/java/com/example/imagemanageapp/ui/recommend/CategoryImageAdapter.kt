@@ -17,7 +17,6 @@ import com.bumptech.glide.Glide
 import com.example.imagemanageapp.R
 import com.example.imagemanageapp.SearchSingleImageActivity
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.android.synthetic.main.fragment_showcategory_image.view.*
 
 class CategoryImageAdapter : BaseAdapter{
 
@@ -55,9 +54,8 @@ class CategoryImageAdapter : BaseAdapter{
         var cView = convertView
 
         val inflater = LayoutInflater.from(ctx)
-        cView = inflater.inflate(R.layout.fragment_showcategory_image,parent,false)
-        val image = cView.img
-        val title = cView.title
+        cView = inflater.inflate(R.layout.data,parent,false)
+        val image = cView.findViewById<ImageView>(R.id.img)
 
         val c = data[position]
 

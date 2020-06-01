@@ -8,6 +8,12 @@
         <item name="colorAccent">@color/colorAccent</item>
         <!--상태바 글씨 색-->
         <item name="android:windowLightStatusBar">true</item>
+        <!--내비게이션 드로어 선택 시 색-->
+        <!--<item name="android:activatedBackgroundIndicator">@drawable/drawer_list_selector</item>-->
+    </style>
+
+    <style name="Widget.Custom.NavigationView" parent="Widget.Design.NavigationView">
+        <item name="itemBackground">@drawable/navigation_background</item>
     </style>
 
     <style name="AppTheme.InitTheme">
