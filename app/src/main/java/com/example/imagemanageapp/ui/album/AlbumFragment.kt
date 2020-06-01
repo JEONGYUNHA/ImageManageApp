@@ -21,6 +21,7 @@ import com.example.imagemanageapp.ui.image.SingleImageFragment
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
 import kotlinx.android.synthetic.main.fragment_album.*
 import kotlinx.android.synthetic.main.fragment_image.*
@@ -87,7 +88,27 @@ class AlbumFragment : Fragment() {
         datas.clear()
         count = 0
         (this.activity as MainActivity).autoDelete()
+        readAll()
         readImages()
+    }
+
+    private fun readAll() {
+        db.collection("meta").whereEqualTo("deleted", false).get().addOnSuccessListener { documents ->
+            var size = documents.size()
+            var count = 0
+            var token = ""
+            var max : Long = 0
+            for(d in documents) {
+                count += 1
+                if(d.get("date").toString().toLong() > max) {
+                    max = d.get("date").toString().toLong()
+                    token = d.get("token").toString()
+                }
+                if(count == size)
+                    datas.add(Album(null, null, size, token))
+            }
+
+        }
     }
 
     private fun readImages() {
@@ -122,7 +143,7 @@ class AlbumFragment : Fragment() {
         count += 1
         val size = titleList.size
         var token = ""
-        val title = titleList[0]
+        val title = titleList[size-1]
         db.collection("meta").document(title).get().addOnSuccessListener {
             token = it.get("token").toString()
             datas.add(Album(koreanTags[i], englishTags[i], size, token))

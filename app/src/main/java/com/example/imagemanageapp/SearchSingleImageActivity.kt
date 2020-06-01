@@ -118,11 +118,6 @@ class SearchSingleImageActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        // edit 버튼 눌렀을 때
-        val editBtn = findViewById<ImageButton>(R.id.editBtn)
-        editBtn.setOnClickListener {
-            editImage()
-        }
 
         // delete 버튼 눌렀을 때
         val deleteBtn = findViewById<ImageButton>(R.id.deleteBtn)
@@ -149,10 +144,6 @@ class SearchSingleImageActivity : AppCompatActivity() {
         shareBtn.setOnClickListener {
             shareImage()
         }
-
-    }
-
-    private fun editImage() {
 
     }
 

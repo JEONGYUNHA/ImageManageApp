@@ -179,7 +179,7 @@ class RecommendActivity  : AppCompatActivity() {
 
     // 상단 메뉴 생성
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.activity_app, menu)
+        menuInflater.inflate(R.menu.main, menu)
         return true
     }
 

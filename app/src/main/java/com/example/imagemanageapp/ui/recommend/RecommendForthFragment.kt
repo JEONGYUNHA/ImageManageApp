@@ -17,11 +17,8 @@ import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.*
 import com.example.imagemanageapp.R
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.android.synthetic.main.data.view.*
 import kotlinx.android.synthetic.main.fragment_recommend_secondfragment.*
-import kotlinx.android.synthetic.main.fragment_showcategory_image_list.*
-import kotlinx.android.synthetic.main.fragment_showcategory_image_list.view.*
-import kotlinx.android.synthetic.main.fragment_showcategory_image.view.*
-import kotlinx.android.synthetic.main.fragment_showcategory_image_list.grid
 
 
 class RecommendForthFragment: Fragment() {

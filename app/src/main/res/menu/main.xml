@@ -18,10 +18,10 @@
         android:title="search"
         app:showAsAction="always" />
 
-    <item
+<!--    <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"
         android:title="@string/action_settings"
-        app:showAsAction="never" />
+        app:showAsAction="never" />-->
 
 </menu>

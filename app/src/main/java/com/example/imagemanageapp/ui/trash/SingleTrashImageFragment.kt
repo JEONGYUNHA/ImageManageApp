@@ -149,7 +149,7 @@ class SingleTrashImageFragment : Fragment() {
         restoreBtn.setOnClickListener {
             val builder: AlertDialog.Builder = AlertDialog.Builder(ctx)
             builder.setTitle("복원하시겠습니까?")
-            builder.setMessage("YES 누르면 복원한당당구리")
+            builder.setMessage("YES를 누르시면 사진이 복원됩니다.")
             builder.setPositiveButton("YES") { dialogInterface, i ->
                 restoreImage()
             }.setNegativeButton("NO") { dialogInterface, i ->
@@ -168,7 +168,7 @@ class SingleTrashImageFragment : Fragment() {
         deleteBtn.setOnClickListener {
             val builder: AlertDialog.Builder = AlertDialog.Builder(ctx)
             builder.setTitle("영구 삭제 하시겠습니까?")
-            builder.setMessage("한번 영구 삭제된 사진은 다시 돌아오지 않는당당구리")
+            builder.setMessage("YES를 누르시면 사진이 영구 삭제됩니다.\n한번 영구 삭제된 사진은 다시 돌아오지 않습니다.")
             builder.setPositiveButton("YES") { dialogInterface, i ->
                 deleteImage()
             }.setNegativeButton("NO") { dialogInterface, i ->

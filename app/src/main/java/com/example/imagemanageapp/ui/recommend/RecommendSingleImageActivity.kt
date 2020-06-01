@@ -118,11 +118,6 @@ class RecommendSingleImageActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        // edit 버튼 눌렀을 때
-        val editBtn = findViewById<ImageButton>(R.id.editBtn)
-        editBtn.setOnClickListener {
-            editImage()
-        }
 
         // delete 버튼 눌렀을 때
         val deleteBtn = findViewById<ImageButton>(R.id.deleteBtn)
@@ -151,11 +146,6 @@ class RecommendSingleImageActivity : AppCompatActivity() {
         }
 
     }
-
-    private fun editImage() {
-
-    }
-
     private fun deleteImage() {
         val docTitle = String.format("%s-%s", meta!!.id, meta!!.title)
         db.collection("meta").document(docTitle).update("deleted", true)
