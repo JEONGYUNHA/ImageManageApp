@@ -75,10 +75,11 @@
             android:textSize="23dp" />
 
         <ImageButton
+            android:id="@+id/changeImageBtn"
             android:layout_width="70dp"
             android:layout_height="match_parent"
             android:layout_marginLeft="120dp"
-           />
+            android:background="@drawable/album_icon"/>
 
 
     </LinearLayout>

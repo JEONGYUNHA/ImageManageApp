@@ -60,6 +60,7 @@ class MainActivity : AppCompatActivity() {
     val context: Context = this
     private lateinit var auth: FirebaseAuth
     private lateinit var preTimeString: String
+    var headerView : View? = null
 
     // Cloud storage 인스턴스 생성
     val storage = FirebaseStorage.getInstance()
@@ -98,10 +99,10 @@ class MainActivity : AppCompatActivity() {
         openMediaStore()
 
         // HeaderView 접근하여 프로필 변경
-        val headerView = navView.getHeaderView(0)
+        headerView = navView.getHeaderView(0)
         val pref = this.getSharedPreferences("id", Context.MODE_PRIVATE)
-        headerView.idField.text = pref.getString("id", "User")
-        headerView.emailField.text = pref.getString("email", "Email")
+        headerView!!.idField.text = pref.getString("id", "User")
+        headerView!!.emailField.text = pref.getString("email", "Email")
     }
 
     override fun onResume() {
