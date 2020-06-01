@@ -15,23 +15,25 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 
-class RecyclerView_Adapter(private var recyclerViewList: ArrayList<String>) :
+class RecyclerView_Adapter(private var recyclerViewList: ArrayList<String>, private var recyclerIconViewList: ArrayList<Int>) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>(), Filterable {
 
     var searchFilterList = ArrayList<String>()
+    var searchIconFilterList = ArrayList<Int>()
 
     lateinit var mcontext: Context
 
-    class CountryHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
+    class SearchHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
     init {
         searchFilterList = recyclerViewList
+        searchIconFilterList = recyclerIconViewList
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        val countryListView =
+        val searchImageListView =
             LayoutInflater.from(parent.context).inflate(R.layout.recyclerview_row, parent, false)
-        val sch = CountryHolder(countryListView)
+        val sch = SearchHolder(searchImageListView)
 
         mcontext = parent.context
 
@@ -43,10 +45,11 @@ class RecyclerView_Adapter(private var recyclerViewList: ArrayList<String>) :
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        holder.itemView.select_country_container.setBackgroundColor(Color.TRANSPARENT)
+        holder.itemView.select_search_image_container.setBackgroundColor(Color.TRANSPARENT)
 
         holder.itemView.select_search_text.setTextColor(Color.BLACK)
         holder.itemView.select_search_text.text = searchFilterList[position]
+        holder.itemView.recyclerview_icon.setImageResource(searchIconFilterList[position])
 
         holder.itemView.setOnClickListener {
             val intent = Intent(mcontext, SearchImageActivity::class.java)
@@ -82,6 +85,7 @@ class RecyclerView_Adapter(private var recyclerViewList: ArrayList<String>) :
             @Suppress("UNCHECKED_CAST")
             override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
                 searchFilterList = results?.values as ArrayList<String>
+                searchIconFilterList = results?.values as ArrayList<Int>
                 notifyDataSetChanged()
             }
 
