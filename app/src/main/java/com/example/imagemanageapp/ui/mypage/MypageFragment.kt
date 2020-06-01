@@ -97,7 +97,17 @@ class MypageFragment : Fragment() {
             headerView.imageView.cropToPadding = true
            // changeImageBtn.setImageURI(selectedImageUri)
 
+            nowProfileImage.setImageURI(selectedImageUri)
+            nowProfileImage.setBackground(ShapeDrawable(OvalShape()))
+            nowProfileImage.setClipToOutline(true)
+            headerView.imageView.cropToPadding = true
+
         }
+    }
+
+    private fun readProfileImage(){
+       // val selectedImageUri: Uri? = data.data
+        val headerView = (activity as MainActivity).headerView!!
     }
 
 
@@ -112,6 +122,7 @@ class MypageFragment : Fragment() {
                     userEmail = document.get("email").toString()
                 }
                 user_email.text = userEmail//.toString()
+                user_id.text = " hankki"
                 Log.d("userEmail", userEmail)
             }
             .addOnFailureListener {
@@ -153,7 +164,7 @@ class MypageFragment : Fragment() {
                 Log.d("metadata", allSize.toString())
 
                 var megaByte = allSize/1000000
-                user_amount.text = " "+(megaByte.toString())+"MB"
+                user_amount.text = "  "+(megaByte.toString())+"MB"
             }.addOnFailureListener {
                 Log.d("metadata", "failed")
 
