@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_search.*
 
-//data class SearchThings(val title: String)
+//data class SearchThings(val title: String, val icon: Drawable)
 
 class SearchActivity : AppCompatActivity() {
 
@@ -76,11 +76,12 @@ class SearchActivity : AppCompatActivity() {
 
     private fun getListOfCountries() {
         val searchImageRecyclerViewList = ArrayList<String>()
+        val searchImageIconRecyclerViewList = ArrayList<Int>()
 
         searchImageRecyclerViewList.add("서울특별시")
         searchImageRecyclerViewList.add("인천광역시")
-        searchImageRecyclerViewList.add("경기도 파주시")
-        searchImageRecyclerViewList.add("경기도 군포시")
+        searchImageRecyclerViewList.add("파주시")
+        searchImageRecyclerViewList.add("군포시")
         searchImageRecyclerViewList.add("최근 3개월")
         searchImageRecyclerViewList.add("최근 6개월")
         searchImageRecyclerViewList.add("작년 사진")
@@ -88,7 +89,19 @@ class SearchActivity : AppCompatActivity() {
         searchImageRecyclerViewList.add("흔들린 사진")
         searchImageRecyclerViewList.add("유사한 사진")
 
-        adapter = RecyclerView_Adapter(searchImageRecyclerViewList)
+        searchImageIconRecyclerViewList.add(R.drawable.signs)
+        searchImageIconRecyclerViewList.add(R.drawable.signs)
+        searchImageIconRecyclerViewList.add(R.drawable.signs)
+        searchImageIconRecyclerViewList.add(R.drawable.signs)
+        searchImageIconRecyclerViewList.add(R.drawable.three_month_icon)
+        searchImageIconRecyclerViewList.add(R.drawable.six_month_icon)
+        searchImageIconRecyclerViewList.add(R.drawable.last_year)
+        searchImageIconRecyclerViewList.add(R.drawable.dark)
+        searchImageIconRecyclerViewList.add(R.drawable.shaken_img)
+        searchImageIconRecyclerViewList.add(R.drawable.similar_image)
+
+
+        adapter = RecyclerView_Adapter(searchImageRecyclerViewList,searchImageIconRecyclerViewList)
         imageSearchrv.adapter = adapter
     }
 
