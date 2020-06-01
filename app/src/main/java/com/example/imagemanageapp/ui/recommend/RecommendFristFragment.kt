@@ -151,6 +151,7 @@ class RecommendFristFragment: Fragment() {
 
 
             var deleteNum = model1.getNums()
+            
             if (deleteNum == 1) {
                 Log.d("Fragment num1", deleteNum.toString())
                 checkItem(categoryImageData[position].title)
