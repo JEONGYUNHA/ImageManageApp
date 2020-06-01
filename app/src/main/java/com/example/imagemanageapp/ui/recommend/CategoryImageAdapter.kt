@@ -64,52 +64,13 @@ class CategoryImageAdapter : BaseAdapter{
             .load(c.token)
             .into(image)
 
-    //    title.text = c.title
-        // 클릭 시 사진 확대
-        cView.setOnClickListener {
-            val intent = Intent(ctx, RecommendSingleImageActivity::class.java)
-            intent.putExtra("token", c.token)
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            ctx!!.startActivity(intent)
-        }
 
-        return cView
+     return cView
 
     }
 
-    fun getTitleList(pos:Int){
-
-        //position읽어서 해당 데이터 tList로 만들기
-        val categoryNum = categoryDBList[pos]
-        db.collection("remove")
-            .whereEqualTo(categoryNum!!, true)
-            .get()
-            .addOnSuccessListener { documents ->
-                for (document in documents) {
-                    val name = document.get("title").toString()
-                    tList.add(name)
-                    Log.d("!!!List", tList.toString())
-               //    tt = getTlist(tList.toString())
-
-                }
-
-
-            //    tt = getTlist(tList.toString())
-            //    Log.d("???List", tt)
-
-
-
-            }
-
-        //return tt
-
-
-    }
-
-    fun getTlist(pos: Int):String{
-        getTitleList(pos)
-        Log.d("?!?!List", tt)
-        return tList.toString()
+    fun giveCtx():Context?{
+        return ctx
     }
 
 

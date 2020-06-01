@@ -1,6 +1,8 @@
 
 package com.example.imagemanageapp.ui.recommend
 
+import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
@@ -29,6 +31,7 @@ class RecommendSecondFragment: Fragment() {
     lateinit var model2: MyViewModel2
     var tList = ArrayList<String>()
     private var checkedImages = mutableListOf<String>()
+  //  private val ctx: Context?
 
 
     // 중복 띄우기 방지, 한 번 읽으면 true로 변경
@@ -164,6 +167,15 @@ class RecommendSecondFragment: Fragment() {
             } else if (deleteNum == 0) {
                 Log.d("Fragment num2", deleteNum.toString())
                 cGrid!![position!!].img!!.setColorFilter(null)
+
+                var ctx = cAdapter.giveCtx()
+
+                // 클릭 시 사진 확대
+                val intent = Intent(ctx, RecommendSingleImageActivity::class.java)
+                intent.putExtra("token", categoryImageData[position].token)
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                ctx!!.startActivity(intent)
+
             } else if (deleteNum == null) {
                 Log.d("fragment num3", "null")
             }
