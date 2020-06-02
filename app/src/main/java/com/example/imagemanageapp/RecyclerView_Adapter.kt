@@ -68,6 +68,7 @@ class RecyclerView_Adapter(private var recyclerViewList: ArrayList<String>, priv
                 val charSearch = constraint.toString()
                 if (charSearch.isEmpty()) {
                     searchFilterList = recyclerViewList
+                    searchIconFilterList = recyclerIconViewList
                 } else {   // 텍스트가 목록의 항목과 일치하는지 확인
                     val resultList = ArrayList<String>()
                     for (row in recyclerViewList) {
@@ -85,11 +86,27 @@ class RecyclerView_Adapter(private var recyclerViewList: ArrayList<String>, priv
             @Suppress("UNCHECKED_CAST")
             override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
                 searchFilterList = results?.values as ArrayList<String>
-                searchIconFilterList = results?.values as ArrayList<Int>
+//                searchIconFilterList = results?.values as ArrayList<Int>
                 notifyDataSetChanged()
             }
 
         }
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 }

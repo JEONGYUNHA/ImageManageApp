@@ -71,10 +71,10 @@ class SearchActivity : AppCompatActivity() {
         }
         //--------------------------------------
 
-        getListOfCountries()
+        getListOfSearchItem()
     }
 
-    private fun getListOfCountries() {
+    private fun getListOfSearchItem() {
         val searchImageRecyclerViewList = ArrayList<String>()
         val searchImageIconRecyclerViewList = ArrayList<Int>()
 
