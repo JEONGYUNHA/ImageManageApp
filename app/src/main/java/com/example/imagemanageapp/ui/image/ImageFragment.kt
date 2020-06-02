@@ -35,7 +35,8 @@ data class Image(
 // date : 2020.4
 // count : 해당 년월에 해당하는 사진 수
 data class SimpleDate(
-    val date: String? = null,
+    val dateStr: String? = null,
+    val dateInt: Int? = null,
     var count: Int = 0
 )
 
@@ -108,7 +109,9 @@ class ImageFragment : Fragment() {
     private fun showImages() {
         val mList: ListView = list
         val transaction = parentFragmentManager.beginTransaction()
-        simpleDates.reverse()
+        //simpleDates.reverse()
+        simpleDates.sortByDescending { sd: SimpleDate -> sd.dateInt }
+        Log.d("sd", simpleDates.toString())
         val mAdapter = ListAdapter(this.activity, transaction, images, simpleDates)
         mList.adapter = mAdapter
     }
@@ -124,17 +127,26 @@ class ImageFragment : Fragment() {
     //
     private fun CountSimpleDate(sd : String) {
         var i = 0
+        var year = sd.split(".")[0].toInt()
+        var month = sd.split(".")[1].toInt()
+        var dateInt = 0
+        if(month < 10) {
+            dateInt = String.format("%d0%d", year, month).toInt()
+        } else {
+            dateInt = String.format("%d%d", year, month).toInt()
+        }
         if(simpleDates.isNotEmpty()){
             for(i in 0 until simpleDates.size) {
                 // 주어진 sd가 이미 있는 경우
-                if(simpleDates[i].date.equals(sd)){
+                if(simpleDates[i].dateStr.equals(sd)){
                     simpleDates[i].count++
                     return
                 }
             }
         }
         // 주어진 sd가 없거나 맨 처음인 경우
-        simpleDates.add(SimpleDate(sd, 1))
+        simpleDates.add(SimpleDate(sd, dateInt,1))
+        Log.d("simple", simpleDates.toString())
         return
 
     }

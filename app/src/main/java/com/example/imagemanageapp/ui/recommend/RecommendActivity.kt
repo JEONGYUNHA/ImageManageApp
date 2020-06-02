@@ -2,6 +2,7 @@ package com.example.imagemanageapp.ui.recommend
 
 import android.content.Intent
 import android.content.res.Resources
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -22,6 +23,7 @@ import com.example.imagemanageapp.SearchActivity
 import com.google.android.material.tabs.TabLayout
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_recommand.*
+import kotlinx.android.synthetic.main.app_bar_recommend.*
 
 
 class RecommendActivity  : AppCompatActivity() {
@@ -55,8 +57,9 @@ class RecommendActivity  : AppCompatActivity() {
 
 
         val toolbar: Toolbar = findViewById(R.id.toolbar)
-        toolbar.title = "삭제 추천"
         setSupportActionBar(toolbar)
+        supportActionBar!!.setTitle(R.string.menu_recommend)
+
         //상단에 뒤로가기버튼 추가
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
@@ -122,6 +125,7 @@ class RecommendActivity  : AppCompatActivity() {
 
      //   val ft: FragmentTransaction = fragmentManager.beginTransaction()
         transaction.detach(fragment).attach(fragment).commit()
+        supportActionBar!!.setTitle(R.string.menu_recommend)
     }
 
 
@@ -177,6 +181,7 @@ class RecommendActivity  : AppCompatActivity() {
         val actionBar = supportActionBar
         if(actionBar != null) actionBar.setDisplayShowTitleEnabled(false)
 
+        supportActionBar!!.setTitle(R.string.menu_recommend)
 
 
 

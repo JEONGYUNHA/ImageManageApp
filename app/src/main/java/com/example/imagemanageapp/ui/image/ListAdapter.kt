@@ -45,14 +45,14 @@ class ListAdapter : BaseAdapter {
         val mText: TextView = mView.findViewById(R.id.textView)
 
         // 현재 리스트뷰의 날짜
-        var currentDate = date[position].date
+        var currentDate = date[position].dateStr
         val year = currentDate!!.split(".")[0]
         val month = currentDate!!.split(".")[1].toInt()
         // 한 자리 수 달(1~9)은 앞에 0 붙여서 출력(01~09)
         if(month < 10) {
             mText.text = String.format("%s년 0%s월", year, month)
         } else {
-            mText.text = currentDate
+            mText.text = String.format("%s년 %s월", year, month)
         }
 
 
