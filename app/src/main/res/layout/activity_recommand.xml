@@ -48,7 +48,7 @@
                 android:id="@+id/tabss"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:tabBackground="@color/white_pressed"
+                app:tabBackground="@color/colorPrimary"
                 app:tabGravity="fill"
                 app:tabMode="fixed"
                 app:tabTextColor="@android:color/background_dark" />
