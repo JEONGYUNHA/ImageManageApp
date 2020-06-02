@@ -45,9 +45,13 @@ class PopupActivity : AppCompatActivity() {
         var date = DateToString(Date(meta!!.date))
 
         titleField.text = meta!!.title
+        titleField.textSize = this.resources.getDimension(R.dimen.text_size)
         pathField.text = meta!!.path
+        pathField.textSize = this.resources.getDimension(R.dimen.text_size)
         dateField.text = date
+        dateField.textSize = this.resources.getDimension(R.dimen.text_size)
         locationField.text = location
+        locationField.textSize = this.resources.getDimension(R.dimen.text_size)
 
 
         closeBtn.setOnClickListener() {
@@ -82,6 +86,7 @@ class PopupActivity : AppCompatActivity() {
 
     // Tag 띄우기
     private fun showTags() {
+        tagField.textSize = this.resources.getDimension(R.dimen.text_size)
         db!!.collection("remove").document(docTitle).get().addOnSuccessListener {
             if(it.get("shaken") as Boolean) { tagField.append("#흔들린 ") }
             if(it.get("darked") as Boolean) { tagField.append("#어두운 ") }

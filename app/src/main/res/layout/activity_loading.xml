@@ -9,16 +9,27 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:gravity="center">
-
+        <ImageView
+            android:layout_width="300dp"
+            android:layout_height="300dp"
+            android:src="@drawable/picle"
+            />
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="@string/app_name"
-            android:textColor="#FFFFFF"
-            android:textSize="55dp"
-            android:textStyle="bold"
-            android:layout_marginTop="30dp"/>
+            android:text="픽클"
+            android:textColor="@color/colorPrimary"
+            android:textSize="40dp"
+            android:textStyle="bold"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Picture Cloud"
+            android:textColor="@color/colorPrimary"
+            android:textSize="25dp"
+            android:textStyle="bold"/>
 
         <Button
             android:id="@+id/btn"
@@ -27,7 +38,7 @@
             android:text="START"
             android:padding="15dp"
             android:textSize="17dp"
-            android:textColor="#000000"
+            android:textColor="@color/colorAccent"
             android:layout_margin="40dp"
             android:background="@drawable/roundedbutton"
             />

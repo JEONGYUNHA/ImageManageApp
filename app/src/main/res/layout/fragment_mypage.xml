@@ -2,22 +2,30 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
-
+    android:orientation="vertical"
+    android:background="@color/colorPrimaryDark">
+    <ImageView
+        android:id="@+id/nowProfileImage"
+        android:layout_gravity="center"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_margin="40dp"
+        android:scaleType="centerCrop"
+        android:background="@drawable/profile"/>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:background="@color/colorPrimaryDark"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_marginRight="10dp">
 
         <TextView
-            android:layout_width="130dp"
+            android:layout_width="110dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical|right"
             android:layout_marginLeft="20dp"
             android:text="사용자"
             android:textColor="@color/colorAccent"
-            android:textSize="25dp" />
+            android:textSize="18dp" />
 
         <TextView
             android:id="@+id/user_id"
@@ -25,23 +33,24 @@
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
             android:layout_marginLeft="10dp"
-            android:textSize="20dp" />
+            android:textSize="17dp" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:background="@color/colorPrimaryDark"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_marginRight="10dp">
 
         <TextView
-            android:layout_width="130dp"
+            android:layout_width="110dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginLeft="20dp"
             android:text="사용자 계정"
             android:textColor="@color/colorAccent"
-            android:textSize="25dp" />
+            android:textSize="18dp" />
 
         <TextView
             android:id="@+id/user_email"
@@ -49,14 +58,15 @@
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
             android:layout_marginLeft="10dp"
-            android:textSize="20dp" />
+            android:textSize="17dp" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="70dp"
         android:background="@color/colorPrimaryDark"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_marginRight="10dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -71,13 +81,13 @@
                 android:layout_marginLeft="20dp"
                 android:text="사용 용량"
                 android:textColor="@color/colorAccent"
-                android:textSize="25dp"
+                android:textSize="18dp"
                 android:layout_gravity="left"/>
 
             <TextView
                 android:id="@+id/user_amount"
                 android:layout_width="match_parent"
-                android:textSize="20dp"
+                android:textSize="17dp"
                 android:layout_height="50dp" />
         </LinearLayout>
 
@@ -88,7 +98,8 @@
         android:layout_width="match_parent"
         android:layout_height="70dp"
         android:background="@color/colorPrimaryDark"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_marginRight="10dp">
 
         <TextView
             android:layout_width="180dp"
@@ -97,13 +108,13 @@
             android:layout_marginTop="15dp"
             android:text="프로필 사진 바꾸기"
             android:textColor="@color/colorAccent"
-            android:textSize="23dp" />
+            android:textSize="18dp" />
 
         <ImageButton
             android:id="@+id/changeImageBtn"
             android:layout_width="60dp"
             android:layout_height="60dp"
-            android:layout_marginLeft="120dp"
+            android:layout_marginLeft="80dp"
             android:background="@drawable/gallery"/>
 
 
@@ -114,25 +125,10 @@
         android:background="@color/colorPrimaryDark"
         android:orientation="horizontal">
 
-        <TextView
-            android:layout_width="180dp"
-            android:layout_gravity="center"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:text="현재 프로필 사진"
-            android:textColor="@color/colorAccent"
-            android:textSize="23dp" />
 
 
     </LinearLayout>
-    <ImageView
-        android:id="@+id/nowProfileImage"
-        android:layout_width="120dp"
-        android:layout_height="120dp"
-        android:layout_marginLeft="30dp"
-        android:layout_marginTop="20dp"
-        android:scaleType="centerCrop"
-        android:background="@drawable/profile"/>
+
 
 
 </LinearLayout>

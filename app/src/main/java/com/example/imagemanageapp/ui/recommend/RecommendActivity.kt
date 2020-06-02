@@ -1,6 +1,7 @@
 package com.example.imagemanageapp.ui.recommend
 
 import android.content.Intent
+import android.content.res.Resources
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -11,6 +12,7 @@ import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.ViewModelProvider
@@ -34,7 +36,7 @@ class RecommendActivity  : AppCompatActivity() {
     private lateinit var model2: MyViewModel2
     private lateinit var model3: MyViewModel3
     private lateinit var model4: MyViewModel4
-
+    private var ctx = this
 
 
 
@@ -53,6 +55,7 @@ class RecommendActivity  : AppCompatActivity() {
 
 
         val toolbar: Toolbar = findViewById(R.id.toolbar)
+        toolbar.title = "삭제 추천"
         setSupportActionBar(toolbar)
         //상단에 뒤로가기버튼 추가
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
@@ -82,6 +85,7 @@ class RecommendActivity  : AppCompatActivity() {
                 viewPager.currentItem = i
                 if (tab.isSelected) {
                   // Log.d("tabb",i.toString())
+                    // tab.view.background = ContextCompat.getDrawable(ctx, R.drawable.navigation_background)
                     deleteBtn1.setOnClickListener {
                         setParams(deleteBtn1,adapter.getItem(i),i)
 
@@ -97,6 +101,7 @@ class RecommendActivity  : AppCompatActivity() {
 
                 var i = tab.position
                 viewPager.currentItem = i
+
                 refreash(adapter.getItem(i),supportFragmentManager.beginTransaction())
 
 
