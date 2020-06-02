@@ -1,8 +1,6 @@
 package com.example.imagemanageapp.ui.recommend
 
 import android.content.Intent
-import android.content.res.Resources
-import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -13,7 +11,7 @@ import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.core.content.ContextCompat
+
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.ViewModelProvider
@@ -23,7 +21,6 @@ import com.example.imagemanageapp.SearchActivity
 import com.google.android.material.tabs.TabLayout
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_recommand.*
-import kotlinx.android.synthetic.main.app_bar_recommend.*
 
 
 class RecommendActivity  : AppCompatActivity() {
@@ -47,6 +44,8 @@ class RecommendActivity  : AppCompatActivity() {
     var num = 0
     val adapter = MyPagerAdapter(supportFragmentManager)
 
+    var toolbar: Toolbar? = null
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,11 +55,10 @@ class RecommendActivity  : AppCompatActivity() {
 
 
 
-        val toolbar: Toolbar = findViewById(R.id.toolbar)
+        toolbar = findViewById(R.id.toolbar_recommend)
+        toolbar!!.title = "삭제 추천"
         setSupportActionBar(toolbar)
-        supportActionBar!!.setTitle(R.string.menu_recommend)
-
-        //상단에 뒤로가기버튼 추가
+//        //상단에 뒤로가기버튼 추가
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
         model1= ViewModelProvider(this)[MyViewModel1::class.java]
@@ -87,15 +85,11 @@ class RecommendActivity  : AppCompatActivity() {
                 var i = tab.position
                 viewPager.currentItem = i
                 if (tab.isSelected) {
-                  // Log.d("tabb",i.toString())
-                    // tab.view.background = ContextCompat.getDrawable(ctx, R.drawable.navigation_background)
+//                    Log.d("tabb",i.toString())
                     deleteBtn1.setOnClickListener {
                         setParams(deleteBtn1,adapter.getItem(i),i)
-
                     }
-
                 }
-
             }
             override fun onTabUnselected(tab: TabLayout.Tab) {
 
@@ -106,33 +100,27 @@ class RecommendActivity  : AppCompatActivity() {
                 viewPager.currentItem = i
 
                 refreash(adapter.getItem(i),supportFragmentManager.beginTransaction())
-
-
-
             }
         })
         tabss.setupWithViewPager(viewPager)
-
-
 
     }
 
     fun refreash(fragment: Fragment,transaction: FragmentTransaction){
         //val transaction = supportFragmentManager.beginTransaction()
-      //  transaction?.replace(R.id.nav_host_fragment,fragment)
-    //    transaction.addToBackStack(null)
-    //    transaction.commit()
+        //  transaction?.replace(R.id.nav_host_fragment,fragment)
+        //    transaction.addToBackStack(null)
+        //    transaction.commit()
 
-     //   val ft: FragmentTransaction = fragmentManager.beginTransaction()
+        //   val ft: FragmentTransaction = fragmentManager.beginTransaction()
         transaction.detach(fragment).attach(fragment).commit()
-        supportActionBar!!.setTitle(R.string.menu_recommend)
     }
 
 
     //삭제버튼 눌렀는지 확인하고 num값 보내기
     fun setParams(btn:Button,fragment: Fragment,i:Int){
 
-    if(num == 0){ //deleteBtn이 처음눌렸을때
+        if(num == 0){ //deleteBtn이 처음눌렸을때
             Toast.makeText(this, "삭제할 사진을 선택하세요", Toast.LENGTH_SHORT).show()
             val iParam =
                 btn.getLayoutParams() as RelativeLayout.LayoutParams
@@ -165,14 +153,9 @@ class RecommendActivity  : AppCompatActivity() {
                     model4.checkPlus()
 
                 }
-
-
             }
-
         }
-
     }
-
 
     override fun onStart() {
         super.onStart()
@@ -181,15 +164,13 @@ class RecommendActivity  : AppCompatActivity() {
         val actionBar = supportActionBar
         if(actionBar != null) actionBar.setDisplayShowTitleEnabled(false)
 
-        supportActionBar!!.setTitle(R.string.menu_recommend)
-
-
-
     }
 
     // 상단 메뉴 생성
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main, menu)
+        toolbar!!.title = "삭제 추천"
+
         return true
     }
 
@@ -206,7 +187,6 @@ class RecommendActivity  : AppCompatActivity() {
             //  startActivity(backIntent)
         }
         return super.onOptionsItemSelected(item)
-
 
     }
 
