@@ -1,5 +1,6 @@
 package com.example.imagemanageapp.ui.image
 
+import android.app.Activity
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -29,7 +30,8 @@ data class Image(
     val dateLong: Long? = null,
     val year: Int? = null,
     val month: Int? = null,
-    val simpleDate: String? = null
+    val simpleDate: String? = null,
+    val tobedeleted: Boolean = false
 )
 
 // date : 2020.4
@@ -93,8 +95,9 @@ class ImageFragment : Fragment() {
                     val year = cal.get(Calendar.YEAR)
                     val month = cal.get(Calendar.MONTH) + 1
                     val simpleDate = String.format("%s.%s", year.toString(), month.toString())
+                    val tobedeleted = document.get("tobedeleted").toString().toBoolean()
                     val image =
-                        Image(document.get("token").toString(), dateStr, dateLong, year, month, simpleDate)
+                        Image(document.get("token").toString(), dateStr, dateLong, year, month, simpleDate, tobedeleted)
                     images.add(image)
                     CountSimpleDate(simpleDate)
                 }

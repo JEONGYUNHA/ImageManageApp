@@ -36,6 +36,7 @@ class RecommendActivity  : AppCompatActivity() {
     private lateinit var model3: MyViewModel3
     private lateinit var model4: MyViewModel4
     private var ctx = this
+    var transaction : FragmentTransaction? = null
 
 
 
@@ -75,7 +76,7 @@ class RecommendActivity  : AppCompatActivity() {
         viewPager.adapter = adapter
         tabss.setupWithViewPager(viewPager)
 
-
+        transaction = supportFragmentManager.beginTransaction()
 
 
         viewPager.addOnPageChangeListener( TabLayout.TabLayoutOnPageChangeListener(tabss))
@@ -114,6 +115,10 @@ class RecommendActivity  : AppCompatActivity() {
 
         //   val ft: FragmentTransaction = fragmentManager.beginTransaction()
         transaction.detach(fragment).attach(fragment).commit()
+    }
+
+    fun refresh() {
+        adapter.notifyDataSetChanged()
     }
 
 

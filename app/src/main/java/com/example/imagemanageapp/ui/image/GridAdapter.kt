@@ -3,12 +3,14 @@ package com.example.imagemanageapp.ui.image
 import android.annotation.SuppressLint
 import android.app.FragmentManager
 import android.content.Context
+import android.graphics.*
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentTransaction
 import com.bumptech.glide.Glide
 import com.example.imagemanageapp.R
@@ -50,10 +52,16 @@ class GridAdapter : BaseAdapter {
 
         // 이미지 띄워주기
         Glide.with(ctx)
-            .load(d.token).thumbnail(0.1f)
+            .load(d.token)
+            .thumbnail(0.1f)
             .centerCrop()
             .into(imageView)
 
+        if(d.tobedeleted) {
+            //imageView.colorFilter = BlendModeColorFilter(Color.GRAY, BlendMode.SRC_ATOP)
+            imageView.setColorFilter(Color.DKGRAY, PorterDuff.Mode.DARKEN)
+            mView.tobedelete.visibility = View.VISIBLE
+        }
 
         val fragment = SingleImageFragment()
         val bundle = Bundle(1)

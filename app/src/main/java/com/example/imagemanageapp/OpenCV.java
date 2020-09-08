@@ -96,7 +96,6 @@ public class OpenCV extends AppCompatActivity {
             Mat dst = new Mat();
             int ddepth = CvType.CV_64F;
 
-            //String path = "/storage/emulated/0/DCIM/Camera/noshake.jpg";
             image = Imgcodecs.imread(path);
             double width = (image.width() * 0.5);
             double height = (image.height() * 0.5);
@@ -104,7 +103,6 @@ public class OpenCV extends AppCompatActivity {
             Imgproc.cvtColor(image, gray, Imgproc.COLOR_BGR2GRAY);
 
             Imgproc.Laplacian(gray, dst, ddepth, 3, 1, 0);
-            //Imgproc.Laplacian(gray, dst, ddepth);
 
             // labplacian 값 구하는 코드
             MatOfDouble median = new MatOfDouble();

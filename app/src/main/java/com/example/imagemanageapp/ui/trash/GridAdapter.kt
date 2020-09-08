@@ -52,7 +52,7 @@ class GridAdapter : BaseAdapter {
 
         // 이미지 띄워주기
         Glide.with(ctx)
-            .load(d.token)
+            .load(d.token).thumbnail(0.1f)
             .centerCrop()
             .into(imageView)
 

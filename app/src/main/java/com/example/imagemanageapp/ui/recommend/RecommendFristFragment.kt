@@ -52,9 +52,6 @@ class RecommendFristFragment: Fragment() {
         //툴바 메뉴사용하려면 꼭 필요
         setHasOptionsMenu(true)
 
-        getTitleList()
-
-
         //옵저버 변화감지(확인버튼 누르면 action)
         model1.checkDone.observe(viewLifecycleOwner,Observer<Int> {
             //    if (checkedImages.contains("jpg")){
@@ -71,11 +68,13 @@ class RecommendFristFragment: Fragment() {
                     .update("deleted", true)
                 db.collection("auto")
                     .document(doc)
-                    .update("deleted", true)
+                    .update("deleted", true).addOnSuccessListener {
+                        //(activity as RecommendActivity).supportFragmentManager.beginTransaction().detach(this).attach(this).commit()
+                        //(activity as RecommendActivity).refresh()
+                        //(activity as RecommendActivity).refreash(this, (activity as RecommendActivity).supportFragmentManager.beginTransaction())
+                        //read(tList.toString())
+                    }
             }
-
-
-
         })
 
 
@@ -83,9 +82,12 @@ class RecommendFristFragment: Fragment() {
         return root
     }
 
+    override fun onResume() {
+        super.onResume()
+        getTitleList()
+    }
 
     private fun getTitleList() {
-
         db.collection("remove")
             .whereEqualTo("similar", true)
             .get()

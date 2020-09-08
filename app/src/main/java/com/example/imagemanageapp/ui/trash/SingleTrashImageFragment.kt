@@ -175,8 +175,8 @@ class SingleTrashImageFragment : Fragment() {
             }
             val dialog: AlertDialog = builder.create()
             dialog.setOnShowListener {
-                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(ContextCompat.getColor(ctx!!, R.color.colorPrimary))
-                dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(ContextCompat.getColor(ctx!!, R.color.colorPrimary))
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(ContextCompat.getColor(ctx!!, R.color.colorAccent))
+                dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(ContextCompat.getColor(ctx!!, R.color.colorAccent))
             }
             dialog.show()
 
@@ -196,7 +196,7 @@ class SingleTrashImageFragment : Fragment() {
     private fun restoreImage() {
         val docTitle = String.format("%s-%s", id, title)
         db!!.collection("meta").document(docTitle).update("deleted", false)
-
+        db!!.collection("auto").document(docTitle).update("deleted", false)
         back()
     }
 

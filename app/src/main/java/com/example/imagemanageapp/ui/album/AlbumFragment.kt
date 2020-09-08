@@ -87,7 +87,7 @@ class AlbumFragment : Fragment() {
         super.onResume()
         datas.clear()
         count = 0
-        (this.activity as MainActivity).autoDelete()
+        //(this.activity as MainActivity).autoDelete()
         readAll()
         readImages()
     }

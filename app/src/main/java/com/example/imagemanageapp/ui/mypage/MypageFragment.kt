@@ -30,8 +30,7 @@ class MypageFragment : Fragment() {
     lateinit var storage: FirebaseStorage
     private var userEmail: String = ""
     private var ImageTitles = mutableListOf<String>()
-    private var allSize:Long = 0
-
+    private var allSize: Long = 0
 
 
     override fun onCreateView(
@@ -42,16 +41,8 @@ class MypageFragment : Fragment() {
         storage = FirebaseStorage.getInstance()
         val root = inflater.inflate(R.layout.fragment_mypage, container, false)
 
-
         readUserEmail()
         imageList()
-
-
-
-
-
-
-
 
 
         return root
@@ -59,12 +50,11 @@ class MypageFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-       // val navView: NavigationView = nav_view
-
+        // val navView: NavigationView = nav_view
 
 
         changeImageBtn.setOnClickListener {
-            Log.d("BtnClicked","ok")
+            Log.d("BtnClicked", "ok")
 
 
             val intent = Intent(Intent.ACTION_PICK)
@@ -75,12 +65,39 @@ class MypageFragment : Fragment() {
             startActivityForResult(intent, 1)
         }
 
+        // DB에서 자동삭제 옵션 불러오기
+        readOption()
 
+        var userDocument = db.collection("user").document("hankki")
+        checkSimilar.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (isChecked)
+                userDocument.update("similar", true)
+            else
+                userDocument.update("similar", false)
+        }
+        checkShaken.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (isChecked)
+                userDocument.update("shaken", true)
+            else
+                userDocument.update("shaken", false)
+        }
+        checkDarked.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (isChecked)
+                userDocument.update("darked", true)
+            else
+                userDocument.update("darked", false)
+        }
+        checkScreenshot.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (isChecked)
+                userDocument.update("screenshot", true)
+            else
+                userDocument.update("screenshot", false)
+        }
 
     }
 
     //앨범에서 사진선택했을 때 프로필바꾸기
-     override fun onActivityResult(
+    override fun onActivityResult(
         requestCode: Int,
         resultCode: Int,
         data: Intent?
@@ -95,7 +112,7 @@ class MypageFragment : Fragment() {
             headerView.imageView.setBackground(ShapeDrawable(OvalShape()))
             headerView.imageView.setClipToOutline(true)
             headerView.imageView.cropToPadding = true
-           // changeImageBtn.setImageURI(selectedImageUri)
+            // changeImageBtn.setImageURI(selectedImageUri)
 
             nowProfileImage.setImageURI(selectedImageUri)
             nowProfileImage.setBackground(ShapeDrawable(OvalShape()))
@@ -105,11 +122,10 @@ class MypageFragment : Fragment() {
         }
     }
 
-    private fun readProfileImage(){
-       // val selectedImageUri: Uri? = data.data
+    private fun readProfileImage() {
+        // val selectedImageUri: Uri? = data.data
         val headerView = (activity as MainActivity).headerView!!
     }
-
 
 
     //사용자 아이디 읽어오기
@@ -130,7 +146,7 @@ class MypageFragment : Fragment() {
     }
 
     //삭제되지않은 모든 이미지 가져오기
-    private fun imageList(){
+    private fun imageList() {
         db.collection("auto")
             .whereEqualTo("deleted", false)
             .get()
@@ -140,7 +156,7 @@ class MypageFragment : Fragment() {
                     ImageTitles.add(title)
                 }
                 user_email.text = userEmail//.toString()
-                Log.d("ImageTitles",ImageTitles.toString())
+                Log.d("ImageTitles", ImageTitles.toString())
                 allAmount()
             }
             .addOnFailureListener {
@@ -155,24 +171,49 @@ class MypageFragment : Fragment() {
         Log.d("tttList", titles.toString())
         for (t in titles) {
             val storageRef = storage.reference
-            val forestRef = storageRef.child("images/"+t)
+            val forestRef = storageRef.child("images/" + t)
 
             forestRef.metadata.addOnSuccessListener {
                 var size = it.sizeBytes
                 allSize += size
-                Log.d("size",size.toString())
+                Log.d("size", size.toString())
                 Log.d("metadata", allSize.toString())
 
-                var megaByte = allSize/1000000
-                user_amount.text = "  "+(megaByte.toString())+"MB"
+                var megaByte = allSize / 1000000
+                user_amount.text = "  " + (megaByte.toString()) + "MB"
             }.addOnFailureListener {
                 Log.d("metadata", "failed")
 
             }
         }
-        Log.d("allSize",allSize.toString())
+        Log.d("allSize", allSize.toString())
 
     }
 
+    // 자동삭제 옵션 읽어와서 설정
+    private fun readOption() {
+        var similar = false
+        var shaken = false
+        var darked = false
+        var screenshot = false
+
+        db.collection("user")
+            .whereEqualTo("id", "hankki")
+            .get()
+            .addOnSuccessListener { documents ->
+                for (document in documents) {
+                    similar = document.get("similar").toString().toBoolean()
+                    shaken = document.get("shaken").toString().toBoolean()
+                    darked = document.get("darked").toString().toBoolean()
+                    screenshot = document.get("screenshot").toString().toBoolean()
+                }
+                checkSimilar.isChecked = similar
+                checkShaken.isChecked = shaken
+                checkDarked.isChecked = darked
+                checkScreenshot.isChecked = screenshot
+            }
+            .addOnFailureListener {
+            }
+    }
 
 }

@@ -61,7 +61,8 @@ class CategoryImageAdapter : BaseAdapter{
 
         // 이미지 띄우기
         Glide.with(ctx)
-            .load(c.token)
+            .load(c.token).thumbnail(0.1f)
+            .centerCrop()
             .into(image)
 
 

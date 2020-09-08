@@ -9,9 +9,11 @@ import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
 import android.provider.MediaStore
 import android.provider.Settings
 import android.util.Log
+import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -22,6 +24,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.os.postDelayed
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.findNavController
@@ -29,10 +32,13 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.example.imagemanageapp.ui.image.ImageFragment
+import com.google.android.gms.tasks.Tasks
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.nav_header_main.view.*
 import kotlinx.coroutines.Dispatchers
@@ -43,6 +49,8 @@ import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.concurrent.ExecutionException
+import kotlin.concurrent.timer
 
 // openCV에서 흔들림 정도를 판단할 임계값
 // 이 임계값보다 값이 작으면 흔들린 것, 크면 안 흔들린 것
@@ -53,14 +61,15 @@ const val SIMILAR_TIME: Int = 10000
 
 // 자동삭제 기간(타임스탬프 long타입) -> 3일
 /*const val AUTODELETE_TIME_LONG: Long = 259200000*/
-const val AUTODELETE_TIME_LONG: Long = 10000
+// 5분
+const val AUTODELETE_TIME_LONG: Long = 300000
 
 class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
     val context: Context = this
     private lateinit var auth: FirebaseAuth
     private lateinit var preTimeString: String
-    var headerView : View? = null
+    var headerView: View? = null
 
     // Cloud storage 인스턴스 생성
     val storage = FirebaseStorage.getInstance()
@@ -69,6 +78,12 @@ class MainActivity : AppCompatActivity() {
 
     // Firestore 인스턴스 생성
     val db = FirebaseFirestore.getInstance()
+
+    // 자동삭제 옵션
+    var similar = false
+    var shaken = false
+    var darked = false
+    var screenshot = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -103,14 +118,28 @@ class MainActivity : AppCompatActivity() {
         val pref = this.getSharedPreferences("id", Context.MODE_PRIVATE)
         headerView!!.idField.text = pref.getString("id", "User")
         headerView!!.emailField.text = pref.getString("email", "Email")
+
+        /*var timer = timer(period = 10000) {
+            delete()
+        }*/
+        val handler = Handler()
+
+        val handlerTask = object : Runnable {
+            override fun run() {
+                // do task
+                autoDelete()
+                // 30초에 한번씩 자동삭제 실행
+                handler.postDelayed(this, 10000) // millisTiem 이후 다시
+            }
+        }
+        handler.post(handlerTask) // tick timer 실행
     }
 
     override fun onResume() {
         super.onResume()
 
-        // 자동삭제 - 시간 비교하여 자동삭제 실행
-        autoDelete()
     }
+
 
     // 상단 메뉴 생성
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -129,47 +158,67 @@ class MainActivity : AppCompatActivity() {
 
         // 자동삭제 Switch 이전 값을 가져와 ON/OFF 설정해줌
         val pref2 = this.getSharedPreferences("autoDelete", Context.MODE_PRIVATE)
-        val editor = pref2.edit()
+        if (pref2.getBoolean("ON", false)) {
+            deleteSwitch.isChecked = true
+            val time = pref2.getLong("time", 0)
+            // 자동 삭제 켠 시간 TextView에 띄우기
+            val dateFormat: SimpleDateFormat = SimpleDateFormat("MM/dd HH:mm")
+            deleteTime.text = dateFormat.format(time)
+            deleteTime.visibility = View.VISIBLE
+        } else {
+            deleteSwitch.isChecked = false
+            deleteTime.text = null
+            deleteTime.visibility = View.GONE
+        }
 
         // 자동삭제 ON/OFF 액션
         deleteSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
             val pref = this.getSharedPreferences("autoDelete", Context.MODE_PRIVATE)
             val editor = pref.edit()
             if (isChecked) {
-                val builder: AlertDialog.Builder = AlertDialog.Builder(this)
-                builder.setTitle("자동 삭제")
-                builder.setMessage("자동 삭제를 켜면 3일 뒤 삭제 추천 사진이 삭제 됩니다.\n정말 삭제하시겠습니까?")
-                builder.setPositiveButton("YES") { dialogInterface, i ->
-                    // 현재 시간 SharedPReference에 저장
-                    val time = Calendar.getInstance().time.time
-                    editor.putBoolean("first", true)
-                    editor.putLong("time", time)
-                    editor.apply()
+                if (!pref.getBoolean("ON", false)) {
+                    val builder: AlertDialog.Builder = AlertDialog.Builder(this)
+                    builder.setTitle("자동 삭제")
+                    builder.setMessage("자동 삭제를 켜면 3일 뒤 삭제 추천 사진이 삭제 됩니다.\n정말 삭제하시겠습니까?")
+                    builder.setPositiveButton("YES") { dialogInterface, i ->
+                        // 현재 시간 SharedPReference에 저장
+                        val time = Calendar.getInstance().time.time
+                        editor.putBoolean("ON", true)
+                        editor.putLong("time", time)
+                        editor.apply()
 
-                    // 자동 삭제 켠 시간 TextView에 띄우기
-                    val dateFormat: SimpleDateFormat = SimpleDateFormat("MM/dd HH:mm")
-                    deleteTime.text = dateFormat.format(time)
-                    deleteTime.visibility = View.VISIBLE
-                }.setNegativeButton("NO") { dialogInterface, i ->
-                    deleteSwitch.isChecked = false
+                        // 자동 삭제 켠 시간 TextView에 띄우기
+                        val dateFormat: SimpleDateFormat = SimpleDateFormat("MM/dd HH:mm")
+                        deleteTime.text = dateFormat.format(time)
+                        deleteTime.visibility = View.VISIBLE
+                        onResume()
+                    }.setNegativeButton("NO") { dialogInterface, i ->
+                        deleteSwitch.isChecked = false
+                    }
+                    val dialog: AlertDialog = builder.create()
+                    dialog.setOnShowListener {
+                        dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                            .setTextColor(ContextCompat.getColor(this, R.color.colorAccent))
+                        dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+                            .setTextColor(ContextCompat.getColor(this, R.color.colorAccent))
+                    }
+                    dialog.show()
                 }
-                val dialog: AlertDialog = builder.create()
-                dialog.setOnShowListener {
-                    dialog.getButton(AlertDialog.BUTTON_POSITIVE)
-                        .setTextColor(ContextCompat.getColor(this, R.color.colorAccent))
-                    dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
-                        .setTextColor(ContextCompat.getColor(this, R.color.colorAccent))
-                }
-                dialog.show()
-
             } else {
-                editor.putBoolean("first", false)
+                editor.putBoolean("ON", false)
                 editor.putLong("time", 0)
                 editor.apply()
 
                 deleteTime.text = null
                 deleteTime.visibility = View.GONE
+
+                db.collection("meta").get().addOnSuccessListener {documents ->
+                    for(d in documents) {
+                        d.reference.update("tobedeleted", false)
+                    }
+                }
             }
+
         }
 
         return true
@@ -190,7 +239,6 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
-
 
 
     // ******** 여기서부터 MediaStore로 저장소 접근해서 이미지 업로드 하는 부분 ********
@@ -333,12 +381,16 @@ class MainActivity : AppCompatActivity() {
                         val longitude = cursor.getDouble(longitudeColumn)
                         val token = ""
                         val upload = Calendar.getInstance().time.time
-                        var place =""
+                        var place = ""
 
                         if (latitude != 0.0 && longitude != 0.0) {
                             try {
                                 val mGeocoder = Geocoder(baseContext)
-                                place = mGeocoder.getFromLocation(latitude, longitude, 1)[0].getAddressLine(0)
+                                place = mGeocoder.getFromLocation(
+                                    latitude,
+                                    longitude,
+                                    1
+                                )[0].getAddressLine(0)
                                 Log.d("place 메타 추가", place)
                             } catch (e: IOException) {
                                 e.printStackTrace()
@@ -347,7 +399,18 @@ class MainActivity : AppCompatActivity() {
                         }
                         // 이미지 배열에 이미지 저장
                         val image =
-                            Meta(id, title, path, date, latitude, longitude, token, false, upload, place)
+                            Meta(
+                                id,
+                                title,
+                                path,
+                                date,
+                                latitude,
+                                longitude,
+                                token,
+                                false,
+                                upload,
+                                place
+                            )
                         images += image
                         Log.d("pre", preTimeString)
                         Log.d("date", date.toString())
@@ -862,84 +925,83 @@ class MainActivity : AppCompatActivity() {
     // 자동삭제 - 시간 비교하여 자동삭제 실행
     @SuppressLint("ShowToast")
     fun autoDelete() {
-        // 저장된 시간 불러오기
-        val pref = this.getSharedPreferences("autoDelete", Context.MODE_PRIVATE)
-        val time = pref.getLong("time", 0)
-        var first = pref.getBoolean("first", false)
-
-        // 현재 시간 불러오기
-        val nowTime = Calendar.getInstance().time.time
-        Log.d("autoDelete2", time.toString())
-        Log.d("autoDelete3", nowTime.toString())
-        // 자동 삭제를 킨 시간(time)으로부터 3일(AUTODELETE_TIME_LONG)이 지났다면 first=false
-        if (time < nowTime - AUTODELETE_TIME_LONG)
-            first = false
-
-
-        // first가 true면 자동삭제를 킨 시점부터 3일 지난 사진들 삭제
-        if (first) {
-            // 삭제 추천이 하나라도 있는 애들 불러오기
-            db.collection("remove").whereEqualTo("remove", true).get()
-                .addOnSuccessListener { documents ->
-                    for (d in documents) {
-                        val id = d.get("id").toString()
-                        val title = d.get("title").toString()
-                        val docTitle = String.format("%s-%s", id, title)
-                        db.collection("meta").document(docTitle).get()
-                            .addOnSuccessListener {
-                                if (!it.get("deleted").toString().toBoolean()) {
-                                    val date = it.get("date").toString().toLong()
-                                    // 받아온 날짜가 자동삭제 킨 시점부터 3일 지났으면 deleted=true로 변경
-                                    if (date < time - AUTODELETE_TIME_LONG) {
-                                        val docTitle2 = String.format(
-                                            "%s-%s",
-                                            it.get("id").toString(),
-                                            it.get("title").toString()
-                                        )
-                                        it.reference.update("deleted", true)
-                                        db.collection("auto").document(docTitle2)
-                                            .update("deleted", true)
-                                        Log.d("autoDelete", "true")
-                                        Toast.makeText(
-                                            this,
-                                            "자동 삭제 성공",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                    }
-                                }
-                            }
+        Log.d("자동삭제", "실행")
+        // 자동 삭제 옵션 검토
+        var dc = db.collection("user").document("hankki")
+        dc.get().addOnSuccessListener {
+            similar = it.get("similar").toString().toBoolean()
+            shaken = it.get("shaken").toString().toBoolean()
+            darked = it.get("darked").toString().toBoolean()
+            screenshot = it.get("screenshot").toString().toBoolean()
+            // 자동삭제 - 시간 비교하여 자동삭제 실행
+            if (getSharedPreferences("autoDelete", Context.MODE_PRIVATE).getBoolean("ON", false)) {
+                var col = db.collection("remove")
+                // 유사사진 옵션 ON
+                if (similar) {
+                    col.whereEqualTo("similar", true).get().addOnSuccessListener { documents ->
+                        deleteImages(documents)
                     }
                 }
-
+                if (shaken) {
+                    col.whereEqualTo("shaken", true).get().addOnSuccessListener { documents ->
+                        deleteImages(documents)
+                    }
+                }
+                if (darked) {
+                    col.whereEqualTo("darked", true).get().addOnSuccessListener { documents ->
+                        deleteImages(documents)
+                    }
+                }
+                if (screenshot) {
+                    col.whereEqualTo("screenshot", true).get().addOnSuccessListener { documents ->
+                        deleteImages(documents)
+                    }
+                }
+            }
         }
-        // first가 false면 업로드 된 시점부터 3일 지난 사진들 삭제
-        else {
-            var criteriaTime: Long
-            db.collection("remove").whereEqualTo("remove", true).get()
-                .addOnSuccessListener { documents ->
-                    for (d in documents) {
-                        val id = d.get("id").toString()
-                        val title = d.get("title").toString()
-                        val docTitle = String.format("%s-%s", id, title)
-                        db.collection("meta").document(docTitle).get()
-                            .addOnSuccessListener {
-                                if (!it.get("deleted").toString().toBoolean()) {
-                                    criteriaTime = it.get("upload").toString().toLong()
-                                    // 현재 시간이 업로드 시점으로부터 3일 지났으면 deleted=true로 변경
-                                    if (criteriaTime < time - AUTODELETE_TIME_LONG) {
-                                        val docTitle2 = String.format(
-                                            "%s-%s",
-                                            it.get("id").toString(),
-                                            it.get("title").toString()
-                                        )
-                                        it.reference.update("deleted", true)
-                                        db.collection("auto").document(docTitle2)
-                                            .update("deleted", true)
-                                        Log.d("autoDelete", "true")
-                                        Toast.makeText(this, "자동 삭제 성공", Toast.LENGTH_SHORT).show()
-                                    }
-                                }
+    }
+
+    fun deleteImages(documents: QuerySnapshot) {
+        var pref = this.getSharedPreferences("currentTime", Context.MODE_PRIVATE)
+        //var time = pref.getLong("nowTime", 0)
+        // 현재시각
+        var time = Calendar.getInstance().time.time
+        var count = 0
+        for (d in documents) {
+            val id = d.get("id").toString()
+            val title = d.get("title").toString()
+            val docTitle = String.format("%s-%s", id, title)
+            db.collection("meta").document(docTitle).get()
+                .addOnSuccessListener {
+                    if (!it.get("deleted").toString().toBoolean()) {
+                        // 3일 이내 사진이면
+                        if (it.get("upload").toString().toLong() > time - AUTODELETE_TIME_LONG) {
+                            it.reference.update("tobedeleted", true)
+                        }
+                        // 3일 지난 사진이면
+                        else {
+                            val docTitle2 = String.format(
+                                "%s-%s",
+                                it.get("id").toString(),
+                                it.get("title").toString()
+                            )
+                            it.reference.update("deleted", true)
+                            val task =
+                                db.collection("auto").document(docTitle2).update("deleted", true)
+                            task.addOnSuccessListener {
+                                count++
+                                Log.d("autoDelete", count.toString())
+                                val toast = Toast.makeText(
+                                    this,
+                                    String.format("%d 장의 사진을 자동삭제하였습니다.", count),
+                                    Toast.LENGTH_LONG
+                                )
+
+                                toast.setGravity(Gravity.CENTER_HORIZONTAL and Gravity.TOP, 0, 0)
+                                toast.show()
+
                             }
+                        }
                     }
                 }
         }

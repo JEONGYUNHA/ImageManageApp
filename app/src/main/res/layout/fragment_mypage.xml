@@ -4,6 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@color/colorPrimaryDark">
+
     <ImageView
         android:id="@+id/nowProfileImage"
         android:layout_gravity="center"
@@ -11,7 +12,8 @@
         android:layout_height="120dp"
         android:layout_margin="40dp"
         android:scaleType="centerCrop"
-        android:background="@drawable/profile"/>
+        android:background="@drawable/profile" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="60dp"
@@ -82,7 +84,7 @@
                 android:text="사용 용량"
                 android:textColor="@color/colorAccent"
                 android:textSize="18dp"
-                android:layout_gravity="left"/>
+                android:layout_gravity="left" />
 
             <TextView
                 android:id="@+id/user_amount"
@@ -115,20 +117,60 @@
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:layout_marginLeft="80dp"
-            android:background="@drawable/gallery"/>
+            android:background="@drawable/gallery" />
 
 
     </LinearLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="70dp"
+        android:layout_height="match_parent"
         android:background="@color/colorPrimaryDark"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_marginRight="10dp">
 
+        <TextView
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="30dp"
+            android:layout_marginBottom="10dp"
+            android:text="자동삭제 옵션"
+            android:textColor="@color/colorAccent"
+            android:textSize="18dp" />
 
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="15dp">
+            <CheckBox
+                android:id="@+id/checkShaken"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="흔들린 사진" />
 
+            <CheckBox
+                android:id="@+id/checkSimilar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="유사 사진" />
+
+            <CheckBox
+                android:id="@+id/checkDarked"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="어두운 사진" />
+
+            <CheckBox
+                android:id="@+id/checkScreenshot"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="스크린샷" />
+        </LinearLayout>
     </LinearLayout>
-
-
-
 </LinearLayout>

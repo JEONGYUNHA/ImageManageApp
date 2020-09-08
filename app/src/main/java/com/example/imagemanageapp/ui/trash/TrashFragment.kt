@@ -38,7 +38,7 @@ class TrashFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        (this.activity as MainActivity).autoDelete()
+        //(this.activity as MainActivity).autoDelete()
         readImages()
     }
 
