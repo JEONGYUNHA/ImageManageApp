@@ -82,6 +82,8 @@ MachineLearning을 이용한 사진 관리 클라우드 서비스.
   웹 어플리케이션 제작하기 위한 개발 환경.
 
   
+### 어플 실행 화면
+<img src="https://user-images.githubusercontent.com/48197531/113474808-2838db80-94ad-11eb-8306-366e21be8049.jpg" width="250" height="500"><img src="https://user-images.githubusercontent.com/48197531/113474811-296a0880-94ad-11eb-8f04-ec2ccad9cfb4.png" width="250" height="500"><img src="https://user-images.githubusercontent.com/48197531/113474809-296a0880-94ad-11eb-9524-20da061e60d8.jpg" width="250" height="500"> <img src="https://user-images.githubusercontent.com/48197531/113474811-296a0880-94ad-11eb-8f04-ec2ccad9cfb4.png" width="250" height="500">
 
   
 
