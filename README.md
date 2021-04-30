@@ -85,7 +85,10 @@ MachineLearning을 이용한 사진 관리 클라우드 서비스.
 ### 어플 실행 화면
 <img src="https://user-images.githubusercontent.com/48197531/113474808-2838db80-94ad-11eb-8306-366e21be8049.jpg" width="250" height="500">   <img src="https://user-images.githubusercontent.com/48197531/113474811-296a0880-94ad-11eb-8f04-ec2ccad9cfb4.png" width="250" height="500">   <img src="https://user-images.githubusercontent.com/48197531/113474809-296a0880-94ad-11eb-9524-20da061e60d8.jpg" width="250" height="500"> 
 
-  
+
+### 프로젝트 소개 영상
+
+YOUTUBE(https://www.youtube.com/watch?v=mu_E95uTo5g&list=LL&index=45&t=88s)
 
 ### 프로젝트 구성원
 
